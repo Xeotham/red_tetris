@@ -1,0 +1,91 @@
+{
+"fr": {
+    "tetris": {
+      "refreshConfirmation": "Êtes-vous sûr de vouloir quitter la page ?",
+      "nav": {
+        "title": "Tetris",
+        "solo": "Solo",
+        "versus": "Versus",
+        "join": "Liste des parties",
+        "create": "Créer une partie",
+        "settings": "Réglages",
+        "home": "Retour"
+      },
+      "settings": {
+        "title": "Paramètres Tetris",
+        "back": "Retour",
+        "mino": {
+          "title": "Tetriminos"
+        },
+        "bkg": {
+          "title": "Fond d'écran"
+        },
+        "music": {
+          "title": "Musique"
+        },
+        "key": {
+          "title": "Touches",
+          "role": "action",
+          "keys": "touches",
+          "moveLeft": "Gauche",
+          "moveRight": "Droite",
+          "rotateClockwise": "Rotation",
+          "rotateCounterclockwise": "Anti-Rotation",
+          "rotate180": "Demi-tour",
+          "hardDrop": "Placer",
+          "softDrop": "Bas",
+          "hold": "Garder",
+          "forfeit": "Forfait",
+          "retry": "Recommencer"
+        },
+        "validate": "Valider",
+        "keyChange": "Appuyez sur la touche"
+      },
+      "board": {
+        "score": "Score",
+        "level": "Niveau",
+        "lines": "Lignes",
+        "next": "Suivant",
+        "pause": "Pause",
+        "resume": "Reprendre",
+        "quit": "Quitter",
+        "gameOver": "Game over",
+        "ReturnToMenu": "Retour au menu",
+        "newGame": "Nouvelle partie"
+      },
+      "createMultiplayerRoom": {
+        "title": "Création de la salle",
+        "back": "Retour",
+        "copyCode": "copier",
+        "start": "Démarrer",
+        "nbPlayers": "participant.e.s",
+        "settingsTitle": "Réglages",
+        "isPrivate": "Privé",
+        "isVersus": "Versus",
+        "showShadow": "Afficher l'ombre",
+        "showBags": "Afficher le sac",
+        "holdAllowed": "Autoriser le maintien",
+        "showHold": "Afficher le maintien",
+        "infiniteHold": "Maintien infini",
+        "infiniteMovement": "Déplacement infini",
+        "lockTime": "Temps de verrouillage (ms)",
+        "spawnARE": "Spawn ARE",
+        "softDropAmp": "Multiplicateur de descente lente",
+        "level": "Niveau de départ",
+        "isLeveling": "Niveaux progressifs"
+      },
+      "displayMultiplayerRoom": {
+        "title": "Tetris rooms",
+        "back": "Retour",
+        "codeTitle": "Privée",
+        "codeLabel": "Room Code",
+        "codeSubmit": "Rejoindre",
+        "listTitle": "Public",
+        "refresh": "actualiser",
+        "noList": "Aucune partie disponible",
+        "join": " » Rejoindre"
+      }
+    }
+  }
+}
+

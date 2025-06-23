@@ -5,7 +5,7 @@ src/.venv
 fastify-blog/
 *node_modules/
 *.js
-!src/front/transcendenceFront/vite.config.js
+!src/front/redTetrisFront/vite.config.js
 .data/back/*
 .data/front/*
 .idea

@@ -5,8 +5,6 @@ services:
     container_name: back
     ports:
       - "3000:3000"
-    volumes:
-        - database_volume:/app/database/transcendenceDb
     env_file: ".env"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000/health" ]
@@ -31,19 +29,12 @@ services:
     depends_on:
       back:
           condition: service_healthy
+    volumes:
+        - ./front/redTetrisFront:/app
     networks:
       transcendence:
     restart: always
     init: true
-
-volumes:
-  database_volume:
-    driver: local
-    driver_opts:
-      type: none
-      device: ../.data/database
-      o: bind
-
 
 networks:
   transcendence:

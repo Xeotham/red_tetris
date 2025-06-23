@@ -14,14 +14,14 @@ ENV VITE_FRONT_PORT=${VITE_FRONT_PORT}
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY    transcendenceFront/package*.json ./
+COPY    redTetrisFront/package*.json ./
 
 # Install dependencies
 RUN     npm install
 RUN     #npm audit fix
 
 # Copy the rest of the application code
-COPY transcendenceFront .
+COPY redTetrisFront .
 
 #RUN npm run build
 

@@ -5,10 +5,10 @@ FROM node:18-alpine
 WORKDIR /app
 RUN     apk add curl
 
-#COPY    ./transcendenceBack/package.json .
-#COPY    ./transcendenceBack/package-lock.json .
-#COPY    ./transcendenceBack/node_modules .
-COPY    ./transcendenceBack/ .
+#COPY    ./redTetrisBack/package.json .
+#COPY    ./redTetrisBack/package-lock.json .
+#COPY    ./redTetrisBack/node_modules .
+COPY    redTetrisBack/ .
 
 RUN     rm -rf node_modules
 # Install dependencies
