@@ -1,0 +1,11 @@
+*.idea
+src/.venv
+*.nfs*
+*.env
+fastify-blog/
+*node_modules/
+*.js
+!src/front/transcendenceFront/vite.config.js
+.data/back/*
+.data/front/*
+.idea
