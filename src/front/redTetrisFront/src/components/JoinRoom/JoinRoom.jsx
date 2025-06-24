@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-export default function JoinRoom() {
+const   JoinRoom = () => {
 	const   { roomId, username } = useParams();
 	return (
 	<>
@@ -9,3 +9,5 @@ export default function JoinRoom() {
 		Username: {username}. <br />
 	</>)
 }
+
+export default JoinRoom;
