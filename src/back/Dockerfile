@@ -1,8 +1,9 @@
 # Use an official Node.js runtime as a parent image
-FROM node:18-alpine
+FROM node:21-alpine
 
 # Set the working directory
 WORKDIR /app
+RUN     apk update
 RUN     apk add curl
 
 #COPY    ./redTetrisBack/package.json .

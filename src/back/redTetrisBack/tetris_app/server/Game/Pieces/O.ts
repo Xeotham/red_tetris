@@ -21,8 +21,8 @@ export class O extends ATetrimino {
 		};
 	})();
 
-	constructor(coordinates: Pos = new Pos(0, 0), texture: string = "O") {
-		super("O", coordinates, texture);
+	constructor(rotationType: "original" | "SRS" | "SRSX", coordinates: Pos = new Pos(0, 0), texture: string = "O") {
+		super(rotationType, "O", coordinates, texture);
 	}
 
 	protected getSpinSpecific(matrix: Matrix, major: number, minor: number, rotationPointUsed: number): string {

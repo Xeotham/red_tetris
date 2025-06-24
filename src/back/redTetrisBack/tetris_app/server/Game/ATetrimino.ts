@@ -10,17 +10,19 @@ export abstract class ATetrimino {
 	protected rotation:				number;
 	protected coordinates:			Pos;
 	protected texture:				string;
+	protected rotationType:			"original" | "SRS" | "SRSX";
 
 	protected static struct:	tc.pieceStruct;
 	protected static SpinCheck:	number[][];
 
-	protected constructor(name: string = "None",
+	protected constructor(rotationType: "original" | "SRS" | "SRSX", name: string = "None",
 				coordinates: Pos = new Pos(0, 0),
 				texture: string = "Empty") {
 		this.name = name;
 		this.coordinates = coordinates;
 		this.texture = texture;
 		this.rotation = tc.NORTH;
+		this.rotationType = rotationType;
 	}
 
 	protected abstract getSpinSpecific(matrix: Matrix, major: number, minor: number, rotationPointUsed: number): string;
@@ -38,18 +40,23 @@ export abstract class ATetrimino {
 		for (let i = 0; i < jsonBlock.blocks?.length || 0; ++i)
 			blocks.push(new Pos(jsonBlock.blocks[i].x, jsonBlock.blocks[i].y));
 
-		let rotationPoints: Pos[] = [];
-		for (let i = 0; i < jsonBlock.rotationPoints?.length || 0; ++i)
-			rotationPoints.push(new Pos(jsonBlock.rotationPoints[i].x, jsonBlock.rotationPoints[i].y));
+		let original: Pos[] = [];
+		for (let i = 0; i < jsonBlock.original?.length || 0; ++i)
+			original.push(new Pos(jsonBlock.blocks[i].x, jsonBlock.blocks[i].y));
 
-		let rotationPoints180: Pos[] = [];
-		for (let i = 0; i < jsonBlock.rotationPoints180?.length || 0; ++i)
-			rotationPoints180.push(new Pos(jsonBlock.rotationPoints180[i].x, jsonBlock.rotationPoints180[i].y));
+		let SRS: Pos[] = [];
+		for (let i = 0; i < jsonBlock.SRS?.length || 0; ++i)
+			SRS.push(new Pos(jsonBlock.SRS[i].x, jsonBlock.SRS[i].y));
+
+		let SRSX: Pos[] = [];
+		for (let i = 0; i < jsonBlock.SRSX?.length || 0; ++i)
+			SRSX.push(new Pos(jsonBlock.SRSX[i].x, jsonBlock.SRSX[i].y));
 
 		return ({
 			blocks: blocks,
-			rotationPoints: rotationPoints,
-			rotationPoints180: rotationPoints180
+			original: original,
+			SRS: SRS,
+			SRSX: SRSX
 		});
 	};
 
@@ -77,11 +84,14 @@ export abstract class ATetrimino {
 		if (!end)
 			return "";
 
+		let startRotations: Pos[] = ((direction !== "180" && this.rotationType !== "original") ? start["SRS"] : start[this.rotationType]);
+		let endRotations: Pos[] = ((direction !== "180" && this.rotationType !== "original") ? start["SRS"] : end[this.rotationType]);
+
 		this.remove(matrix, false);
 
-		for (let i = 0; i < (direction === "180" ? start.rotationPoints180.length : start.rotationPoints.length); ++i) {
-			const startPos: Pos = (direction === "180" ? new Pos(3, 3) : start.rotationPoints[i]);
-			const endPos: Pos = (direction === "180" ? end.rotationPoints180[i] : end.rotationPoints[i]);
+		for (let i = 0; i < startRotations.length; ++i) {
+			const startPos: Pos = (direction === "180" ? new Pos(3, 3) : startRotations[i]);
+			const endPos: Pos = endRotations[i];
 			const dist = startPos.distanceToPos(endPos);
 
 			const collides = () => {

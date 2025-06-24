@@ -84,6 +84,7 @@ export class TetrisGame {
 
 	// settings
 
+	private rotationType:				"original" | "SRS" | "SRSX";
 	private showShadowPiece:			boolean;
 	private showBags:					boolean;
 	private holdAllowed:				boolean;
@@ -184,6 +185,7 @@ export class TetrisGame {
 
 		// settings
 
+		this.rotationType = "SRS";
 		this.showShadowPiece = true;
 		this.showBags = true;
 		this.holdAllowed = true;
@@ -242,8 +244,17 @@ export class TetrisGame {
 	}
 
 	private shuffleBag(): ATetrimino[] {
-		const pieces: ATetrimino[] = [new S(), new T(), new Z(), new L(), new J(), new O(), new I()];
-		return pieces.sort(() => Math.random() - 0.5) as ATetrimino[];
+		const pieces: ATetrimino[] = [
+			new S(this.rotationType),
+			new T(this.rotationType),
+			new Z(this.rotationType),
+			new L(this.rotationType),
+			new J(this.rotationType),
+			new O(this.rotationType),
+			new I(this.rotationType)
+		];
+
+		return pieces.sort(() => Math.random() - 0.5) as ATetrimino[]; // TODO : Use a seeded shuffle algorithm
 	}
 
 	private trySetInterval(interval: number = this.fallSpeed): void {

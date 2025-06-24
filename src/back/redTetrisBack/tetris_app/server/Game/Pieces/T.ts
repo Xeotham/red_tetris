@@ -28,8 +28,8 @@ export class T extends ATetrimino {
 		};
 	})();
 
-	constructor(coordinates: Pos = new Pos(0, 0), texture: string = "T") {
-		super("T", coordinates, texture);
+	constructor(rotationType: "original" | "SRS" | "SRSX", coordinates: Pos = new Pos(0, 0), texture: string = "T") {
+		super(rotationType, "T", coordinates, texture);
 	}
 
 	protected getSpinSpecific(matrix: Matrix, major: number, minor: number, rotationPointUsed: number): string {

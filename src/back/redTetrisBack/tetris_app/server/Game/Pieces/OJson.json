@@ -8,10 +8,13 @@
       { "x": 3, "y": 3 },
       { "x": 4, "y": 3 }
     ],
-    "rotationPoints": [
+    "original": [
       { "x": 3, "y": 3 }
     ],
-    "rotationPoints180": [
+    "SRS": [
+      { "x": 3, "y": 3 }
+    ],
+    "SRSX": [
       { "x": 3, "y": 3 }
     ]
   },
@@ -22,10 +25,13 @@
       { "x": 3, "y": 3 },
       { "x": 4, "y": 3 }
     ],
-    "rotationPoints": [
+    "original": [
       { "x": 3, "y": 3 }
     ],
-    "rotationPoints180": [
+    "SRS": [
+      { "x": 3, "y": 3 }
+    ],
+    "SRSX": [
       { "x": 3, "y": 3 }
     ]
   },
@@ -36,10 +42,13 @@
       { "x": 3, "y": 3 },
       { "x": 4, "y": 3 }
     ],
-    "rotationPoints": [
+    "original": [
       { "x": 3, "y": 3 }
     ],
-    "rotationPoints180": [
+    "SRS": [
+      { "x": 3, "y": 3 }
+    ],
+    "SRSX": [
       { "x": 3, "y": 3 }
     ]
   },
@@ -50,10 +59,13 @@
       { "x": 3, "y": 3 },
       { "x": 4, "y": 3 }
     ],
-    "rotationPoints": [
+    "original": [
       { "x": 3, "y": 3 }
     ],
-    "rotationPoints180": [
+    "SRS": [
+      { "x": 3, "y": 3 }
+    ],
+    "SRSX": [
       {"x": 3, "y": 3}
     ]
   }

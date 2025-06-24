@@ -188,8 +188,9 @@ export interface linesCleared {
 export interface block {
 	[key: string]: any;
 	"blocks" : Pos[];
-	"rotationPoints": Pos[];
-	"rotationPoints180": Pos[];
+	"original": Pos[];
+	"SRS": Pos[];
+	"SRSX": Pos[];
 }
 
 export interface pieceStruct {
