@@ -40,10 +40,10 @@ up:
 	@# cp ./src/.env ./src/front/transcendenceFront/.env
 	@ echo "$(DARK_GREEN)IP addr replaced!$(BASE_COLOR)"
 	@ echo "$(RED)Building project...$(BASE_COLOR)"
-	docker compose -f ./src/docker-compose.yml build
+	@ docker compose -f ./src/docker-compose.yml --progress quiet build
 	@ echo "$(DARK_GREEN)Build done !$(BASE_COLOR)"
 	@ echo "$(RED)Starting services...$(BASE_COLOR)"
-	docker compose -f ./src/docker-compose.yml up -d
+	@ docker compose -f ./src/docker-compose.yml --progress quiet up -d
 	@ echo "$(DARK_GREEN)Services started !$(BASE_COLOR)"
 
 down: 

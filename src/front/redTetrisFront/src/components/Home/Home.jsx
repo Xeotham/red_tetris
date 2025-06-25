@@ -1,6 +1,6 @@
 import  "./Home.css"
 import TetrisButtons from "../TetrisButtons/TetrisButtons.jsx";
-import {useNavigate} from "react-router-dom";
+import {data, useNavigate} from "react-router-dom";
 import {io} from "socket.io-client";
 
 const   Home = () => {
@@ -8,14 +8,16 @@ const   Home = () => {
 
 	const   arcadeOnClick = () => {
 		console.log("arcadeOnClick");
-		const	socket = new io("http://localhost:3000");
+		const	socket = new io('http://localhost:3000', {});
+		socket.on("message", (data) => {
+			console.log(data);
+		});
 
-		console.log("Socket initialized", socket);
+		socket.send("Hello from client");
 
-		socket.on("connect", ()=>{
-			console.log("Connected to server");
-			// navigate("/arcade");
-		})
+
+
+		socket.emit("message", "Message from client");
 	}
 
 	const   versusOnClick = () => {

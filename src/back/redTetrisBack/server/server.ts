@@ -7,7 +7,12 @@ import tetrisRoutes from "../tetris_app/api/routes";
 config();
 
 export const fastify = Fastify();
-export const io = new Server(fastify.server);
+export const io = new Server(fastify.server, {
+	cors: {
+		origin: '*', // Allow all origins, or specify your frontend's origin
+		methods: ['GET', 'POST'],
+	},
+});
 
 // Register the CORS plugin
 fastify.register(fastifyCors, {
@@ -31,16 +36,12 @@ fastify.listen({ port: parseInt(process.env.BACK_PORT!), host: "0.0.0.0" }, (err
 		process.exit(1);
 	}
 
-	// io.listen(4000);
-	// io.attach(3000);
-
-	// io.addListener("connection", (socket) => {
-	// 	socket.send(JSON.stringify({message: "Hello from the server!"}));
-	// })
-
 	io.on('connection', (socket) => {
 		console.log(`Received ${JSON.stringify(socket.id)}`);
-		socket.emit("message", { message: "Hello from the server!" });
+		socket.emit("message", "Hello from the server!");
+		socket.on("message", (message) => {
+			console.log(`Received message from client ${socket.id}: ${message}`);
+		})
 	});
 
 	console.log(`🚀 Server listening at ${address}`);
