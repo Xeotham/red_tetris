@@ -1,12 +1,21 @@
 import  "./Home.css"
 import TetrisButtons from "../TetrisButtons/TetrisButtons.jsx";
 import {useNavigate} from "react-router-dom";
+import {io} from "socket.io-client";
 
 const   Home = () => {
 	const   navigate = useNavigate();
 
 	const   arcadeOnClick = () => {
 		console.log("arcadeOnClick");
+		const	socket = new io("http://localhost:3000");
+
+		console.log("Socket initialized", socket);
+
+		socket.on("connect", ()=>{
+			console.log("Connected to server");
+			// navigate("/arcade");
+		})
 	}
 
 	const   versusOnClick = () => {

@@ -1,5 +1,5 @@
 import { TetrisGame } from "./Game/TetrisGame";
-import { WebSocket } from "ws";
+// import { WebSocket } from "ws";
 
 export class MultiplayerRoomPlayer {
 	private readonly socket:	WebSocket;

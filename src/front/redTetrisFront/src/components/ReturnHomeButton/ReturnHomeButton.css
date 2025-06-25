@@ -25,5 +25,5 @@
  	cursor: pointer;
 	font-size: 23px;
 	font-family: 'play_pretend', 'Arial', sans-serif;
-
+	user-select: none;
 }

@@ -9,7 +9,7 @@ import { zoneGame } from "../immanence.ts";
 // @ts-ignore
 import page from "page";
 
-let socket: WebSocket | null = null;
+// let socket: WebSocket | null = null;
 const generateInviteCode = () => {
 	const   characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 	const   length = 10;
