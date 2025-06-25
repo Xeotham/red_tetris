@@ -1,23 +1,33 @@
 import  "./Home.css"
 import TetrisButtons from "../TetrisButtons/TetrisButtons.jsx";
-import {data, useNavigate} from "react-router-dom";
-import {io} from "socket.io-client";
+import { data, useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
+import  * as R from 'ramda';
+import {sfxPlayer} from "../../sfxHandler.jsx";
+
 
 const   Home = () => {
 	const   navigate = useNavigate();
 
+	const   socket = new io('http://localhost:3000', {});
+	const   socketListeners = ev => listener => socket.on(ev, listener);
+	socketListeners("EFFECT")((data) => {
+		data = JSON.parse(data);
+		console.log (data);
+		return sfxPlayer(data.type, data.value).play()
+	});
+	const   socketGame = socketListeners("GAME");
+	const   socketGameStart = socketListeners("GAME_START");
+
+
+
 	const   arcadeOnClick = () => {
 		console.log("arcadeOnClick");
-		const	socket = new io('http://localhost:3000', {});
-		socket.on("message", (data) => {
-			console.log(data);
-		});
-
-		socket.send("Hello from client");
-
-
-
-		socket.emit("message", "Message from client");
+		navigate("/arcade-board");
+		// socket.emit("arcadeStart", {});
+		// socketGame((data) => {
+			// console.log(data);
+		// })
 	}
 
 	const   versusOnClick = () => {

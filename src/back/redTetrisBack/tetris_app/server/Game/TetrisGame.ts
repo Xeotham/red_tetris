@@ -12,11 +12,12 @@ import { O } from "./Pieces/O";
 import { I } from "./Pieces/I";
 import { clamp, delay, mod } from "./utils";
 import { idGenerator } from "./../../utils";
+import { Socket } from "socket.io";
 
 const   idGen = idGenerator()
 
 export class TetrisGame {
-	private readonly player:			WebSocket;
+	private readonly player:			Socket;
 	private readonly username:			string;
 	private readonly size:				Pos;
 	private matrix:						Matrix;
@@ -99,9 +100,9 @@ export class TetrisGame {
 
 	private initialState:				TetrisGame;
 
-	constructor(player: WebSocket, username: string) {
+	constructor(player: Socket, username: string | null = null) {
 		this.player = player;
-		this.username = username;
+		this.username = username ? username : player.id;
 		this.size = new Pos(tc.TETRIS_WIDTH, tc.TETRIS_HEIGHT);
 		this.matrix = new Matrix(this.size.add(0, tc.BUFFER_HEIGHT));
 		this.currentPiece = null;
@@ -356,7 +357,7 @@ export class TetrisGame {
 			return ;
 		if (this.currentPiece.canFall(this.matrix)) {
 			if (this.dropType === "Soft")
-				this.player.send(JSON.stringify({type: "EFFECT", argument: "USER_EFFECT", value: "softdrop" }));
+				this.player.emit("EFFECT", JSON.stringify({type: "USER_EFFECT", value: "softdrop"}));
 			this.spinType = "";
 			this.currentPiece.remove(this.matrix);
 			this.currentPiece.setCoordinates(this.currentPiece.getCoordinates().down());
@@ -367,13 +368,13 @@ export class TetrisGame {
 				this.lowestReached = this.currentPiece.getCoordinates().getY();
 			}
 			if (this.dropType !== "Hard" && !this.currentPiece.canFall(this.matrix))
-				this.player.send(JSON.stringify({type: "EFFECT", argument: "BOARD", value: "floor" }));
+				this.player.emit("EFFECT", JSON.stringify({type: "BOARD", value: "floor" }));
 		}
 		else {
 			if (this.shouldLock) {
 				clearInterval(this.fallInterval);
 				if (this.dropType === "Hard")
-					this.player.send(JSON.stringify({type: "EFFECT", argument: "USER_EFFECT", value: "harddrop" }));
+					this.player.emit("EFFECT", JSON.stringify({type: "USER_EFFECT", value: "harddrop" }));
 				this.fallInterval = -1;
 				this.currentPiece.remove(this.matrix);
 				this.currentPiece.setTexture(this.currentPiece.getTexture() + "_LOCKED")
@@ -422,7 +423,7 @@ export class TetrisGame {
 			this.updateB2B();
 			if (this.lastClear.includes("Zero")) {
 				if (this.combo >= 3)
-					this.player.send(JSON.stringify({type: "EFFECT", argument: "COMBO", value: "break" }));
+					this.player.emit("EFFECT", JSON.stringify({type: "COMBO", value: "break" }));
 				this.combo = -1;
 			}
 			else
@@ -435,23 +436,23 @@ export class TetrisGame {
 					++this.allLinesClear[this.lastClear];
 
 				if (this.lastClear.includes("Spin Zero"))
-					this.player.send(JSON.stringify({type: "EFFECT", argument: "LOCK", value: "spinend"}));
+					this.player.emit("EFFECT", JSON.stringify({type: "LOCK", value: "spinend"}));
 				else if (this.lastClear.includes("Spin"))
-					this.player.send(JSON.stringify({type: "EFFECT", argument: "CLEAR", value: "spin"}));
+					this.player.emit("EFFECT", JSON.stringify({type: "CLEAR", value: "spin"}));
 				else if (this.B2B > 0)
-					this.player.send(JSON.stringify({type: "EFFECT", argument: "CLEAR", value: "btb" }));
+					this.player.emit("EFFECT", JSON.stringify({type: "CLEAR", value: "btb" }));
 				else
- 					this.player.send(JSON.stringify({type: "EFFECT", argument: "CLEAR", value: "line"}));
+ 					this.player.emit("EFFECT", JSON.stringify({type: "CLEAR", value: "line"}));
 
 				if (this.combo >= 1) {
 					this.score += tc.STANDARD_COMBO_SCORING(this.combo, this.level);
-					this.player.send(JSON.stringify({type: "EFFECT", argument: "COMBO", value: this.combo }));
+					this.player.emit("EFFECT", JSON.stringify({type: "COMBO", value: this.combo }));
 				}
 				if (this.combo > this.maxCombo)
 					this.maxCombo = this.combo;
 			}
 			else
-				this.player.send(JSON.stringify({type: "EFFECT", argument: "LOCK", value: "lock"}));
+				this.player.emit("EFFECT", JSON.stringify({type: "LOCK", value: "lock"}));
 		}
 		this.completionPhase();
 		return ;
@@ -465,22 +466,22 @@ export class TetrisGame {
 			if (this.matrix.isEmpty()) {
 				++this.perfectClears;
 				this.sendGarbage("Perfect Clear");
-				this.player.send(JSON.stringify({type: "EFFECT", argument: "CLEAR", value: "all" }));
+				this.player.emit("EFFECT", JSON.stringify({type: "CLEAR", value: "all" }));
 			}
 			if (this.lastClear !== "Zero" && this.B2B > 0)
-				this.player.send(JSON.stringify({type: "EFFECT", argument: "BTB", value: this.B2B }));
+				this.player.emit("EFFECT", JSON.stringify({type: "BTB", value: this.B2B }));
 			if (!this.garbageRespite && this.awaitingGarbage.length > 0) {
 				if (this.matrix.addGarbage(this.awaitingGarbage[0]) === "Top Out") {
-					this.player.send(JSON.stringify({type: "EFFECT", argument: "BOARD", value: "topout"}));
+					this.player.emit("EFFECT", JSON.stringify({type: "BOARD", value: "topout"}));
 					this.over = true;
 					return ;
 				}
 				if (this.awaitingGarbage[0] <= 2)
-					this.player.send(JSON.stringify({type: "EFFECT", argument: "GARBAGE", value: "damage_small"}));
+					this.player.emit("EFFECT", JSON.stringify({type: "GARBAGE", value: "damage_small"}));
 				else if (this.awaitingGarbage[0] <= 4)
-					this.player.send(JSON.stringify({type: "EFFECT", argument: "GARBAGE", value: "damage_medium"}));
+					this.player.emit("EFFECT", JSON.stringify({type: "GARBAGE", value: "damage_medium"}));
 				else
-					this.player.send(JSON.stringify({type: "EFFECT", argument: "GARBAGE", value: "damage_large"}));
+					this.player.emit("EFFECT", JSON.stringify({type: "GARBAGE", value: "damage_large"}));
 				this.awaitingGarbage.shift();
 			}
 			this.garbageRespite = false;
@@ -490,9 +491,9 @@ export class TetrisGame {
 			++this.level;
 			this.lineClearGoal = tc.FIXED_GOAL_SYSTEM[this.level];
 			if (this.level % 5 === 0)
-				this.player.send(JSON.stringify({type: "EFFECT", argument: "LEVEL", value: this.level.toString()}));
+				this.player.emit("EFFECT", JSON.stringify({type: "LEVEL", value: this.level.toString()}));
 			else
-				this.player.send(JSON.stringify({type: "EFFECT", argument: "LEVEL", value: "up"}));
+				this.player.emit("EFFECT", JSON.stringify({type: "LEVEL", value: "up"}));
 		}
 		if (this.shouldSpawn) {
 			await this.spawnPiece();
@@ -548,7 +549,7 @@ export class TetrisGame {
 			++this.B2B;
 		else {
 			if (this.B2B >= 4)
-				this.player.send(JSON.stringify({type: "EFFECT", argument: "BTB", value: "break" }));
+				this.player.emit("EFFECT", JSON.stringify({type: "BTB", value: "break" }));
 			this.B2B = -1;
 		}
 		if (this.B2B > this.maxB2B)
@@ -570,15 +571,15 @@ export class TetrisGame {
 				sending -= this.awaitingGarbage.shift()!;
 		}
 		if (sendSound)
-			this.player.send(JSON.stringify({type: "EFFECT", argument: "GARBAGE", value: "counter"}));
+			this.player.emit("EFFECT", JSON.stringify({type: "GARBAGE", value: "counter"}));
 		if (sending <= 0 || !this.opponent)
 			return ;
 		else if (sending <= 2)
-			this.player.send(JSON.stringify({type: "EFFECT", argument: "GARBAGE", value: "garbage_out_small"}));
+			this.player.emit("EFFECT", JSON.stringify({type: "GARBAGE", value: "garbage_out_small"}));
 		else if (sending <= 4)
-			this.player.send(JSON.stringify({type: "EFFECT", argument: "GARBAGE", value: "garbage_out_medium"}));
+			this.player.emit("EFFECT", JSON.stringify({type: "GARBAGE", value: "garbage_out_medium"}));
 		else
-			this.player.send(JSON.stringify({type: "EFFECT", argument: "GARBAGE", value: "garbage_out_large"}));
+			this.player.emit("EFFECT", JSON.stringify({type: "GARBAGE", value: "garbage_out_large"}));
 		this.attacksSent += sending;
 		this.opponent?.receiveGarbage(sending);
 	}
@@ -587,11 +588,11 @@ export class TetrisGame {
 		if (this.over || lines <= 0)
 			return ;
 		else if (lines <= 2)
-			this.player.send(JSON.stringify({type: "EFFECT", argument: "GARBAGE", value: "garbage_in_small"}));
+			this.player.emit("EFFECT", JSON.stringify({type: "GARBAGE", value: "garbage_in_small"}));
 		else if (lines <= 4)
-			this.player.send(JSON.stringify({type: "EFFECT", argument: "GARBAGE", value: "garbage_in_medium"}));
+			this.player.emit("EFFECT", JSON.stringify({type: "GARBAGE", value: "garbage_in_medium"}));
 		else
-			this.player.send(JSON.stringify({type: "EFFECT", argument: "GARBAGE", value: "garbage_in_large"}));
+			this.player.emit("EFFECT", JSON.stringify({type: "GARBAGE", value: "garbage_in_large"}));
 		this.attacksReceived += lines;
 		this.awaitingGarbage.push(lines);
 	}
@@ -637,10 +638,10 @@ export class TetrisGame {
 			this.spinType = rotation;
 			if (this.spinType !== "") {
 				// console.log("Spin type: '" + this.spinType + "'");
-				this.player.send(JSON.stringify({type: "EFFECT", argument: "SPIN", value: this.spinType}))
+				this.player.emit("EFFECT", JSON.stringify({type: "SPIN", value: this.spinType}))
 			}
 			else
-				this.player.send(JSON.stringify({type: "EFFECT", argument: "USER_EFFECT", value: "rotate" }));
+				this.player.emit("EFFECT", JSON.stringify({type: "USER_EFFECT", value: "rotate" }));
 		}
 		this.placeShadow();
 	}
@@ -664,9 +665,9 @@ export class TetrisGame {
 		this.currentPiece.place(this.matrix);
 
 		if (this.currentPiece.isColliding(this.matrix, offset))
-			this.player.send(JSON.stringify({type: "EFFECT", argument: "BOARD", value: "sidehit"}));
+			this.player.emit("EFFECT", JSON.stringify({type: "BOARD", value: "sidehit"}));
 		else
-			this.player.send(JSON.stringify({type: "EFFECT", argument: "USER_EFFECT", value: "move"}));
+			this.player.emit("EFFECT", JSON.stringify({type: "USER_EFFECT", value: "move"}));
 
 		this.placeShadow();
 	}
@@ -675,7 +676,7 @@ export class TetrisGame {
 		if (!this.holdAllowed || !this.canSwap || this.over || this.fallInterval === -1)
 			return ;
 
-		this.player.send(JSON.stringify({type: "EFFECT", argument: "USER_EFFECT", value: "hold"}));
+		this.player.emit("EFFECT", JSON.stringify({type: "USER_EFFECT", value: "hold"}));
 		++this.keysPressed;
 		++this.holds;
 		this.holdPhase = true;
@@ -714,9 +715,9 @@ export class TetrisGame {
 
 	public async gameLoop() {
 		// console.log("Starting game loop");
-		this.player.send(JSON.stringify({type: "GAME_START", game: this.toJSON()}));
+		this.player.emit("GAME_START", {game: this.toJSON()});
 		this.sendInterval = setInterval(() => {
-			this.player.send(JSON.stringify({type: "GAME", game: this.toJSON()}));
+			this.player.emit("GAME", {game: this.toJSON()});
 		}, 1000 / 60) as unknown as number; // 60 times per second
 
 		await this.spawnPiece();
@@ -729,12 +730,12 @@ export class TetrisGame {
 		this.fallInterval = -1;
 		clearInterval(this.sendInterval);
 		this.sendInterval = -1;
-		this.player.send(JSON.stringify({type: "EFFECT", argument: "BOARD", value: "gameover"}));
-		this.player.send(JSON.stringify({type: "GAME", game: this.toJSON()}));
-		this.player.send(JSON.stringify({type: "STATS", argument: this.getStats()}));
+		this.player.emit("EFFECT", JSON.stringify({type: "BOARD", value: "gameover"}));
+		this.player.emit("GAME", {game: this.toJSON()});
+		this.player.emit("STATS", {stats: this.getStats()});
 		// console.log("isInRoom: ", this.isInRoom);
 		if (!this.isInRoom)
-			this.player.send(JSON.stringify({type: "GAME_FINISH"}));
+			this.player.emit("GAME_FINISH");
 	}
 
 	getStats() {

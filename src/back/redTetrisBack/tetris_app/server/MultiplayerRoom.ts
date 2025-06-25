@@ -2,6 +2,7 @@
 import { TetrisGame } from "./Game/TetrisGame";
 import { codeNameExists, isUpperCase } from "../utils";
 import { MultiplayerRoomPlayer } from "./MultiplayerRoomPlayer";
+import {Socket} from "socket.io";
 
 export class MultiplayerRoom {
 	private players:			MultiplayerRoomPlayer[];
@@ -10,7 +11,7 @@ export class MultiplayerRoom {
 	private playersRemaining:	number;
 	private settings:			any; // Object containing the settings of the game : {}
 
-	constructor(socket: WebSocket, username: string, isPrivate: boolean = false, codeName: string | undefined = undefined) {
+	constructor(socket: Socket, username: string, isPrivate: boolean = false, codeName: string | undefined = undefined) {
 		this.players = [];
 		this.isInGame = false;
 		if (codeName && codeName.length === 4 && isUpperCase(codeName) && !codeNameExists(codeName))
@@ -54,7 +55,7 @@ export class MultiplayerRoom {
 	}
 
 
-	public addPlayer(socket: WebSocket, username: string): void		{
+	public addPlayer(socket: Socket, username: string): void		{
 		if (this.players.find((player) => player.getUsername() === username)) {
 			socket.send(JSON.stringify({ type: "MULTIPLAYER_LEAVE" }));
 			return console.log("Player " + username + " already exists in room " + this.code);

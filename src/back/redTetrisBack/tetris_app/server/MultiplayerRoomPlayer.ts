@@ -1,14 +1,15 @@
 import { TetrisGame } from "./Game/TetrisGame";
+import {Socket} from "socket.io";
 // import { WebSocket } from "ws";
 
 export class MultiplayerRoomPlayer {
-	private readonly socket:	WebSocket;
+	private readonly socket:	Socket;
 	private readonly username:	string;
 	private owner:				boolean;
 	private left:				boolean;
 	private game:				TetrisGame | undefined;
 
-	constructor(socket: WebSocket, username: string, owner: boolean = false) {
+	constructor(socket: Socket, username: string, owner: boolean = false) {
 		this.socket = socket;
 		this.username = username;
 		this.owner = owner;
@@ -16,7 +17,7 @@ export class MultiplayerRoomPlayer {
 		this.game = undefined;
 	}
 
-	public getSocket():WebSocket						{ return this.socket; }
+	public getSocket():Socket						{ return this.socket; }
 	public getUsername(): string						{ return this.username; }
 	public isOwner(): boolean							{ return this.owner; }
 	public hasLeft(): boolean							{ return this.left; }

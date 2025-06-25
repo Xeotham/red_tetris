@@ -1,4 +1,4 @@
-import { arcadeGamesLst, multiplayerRoomLst } from "./api/controllers";
+import { arcadeGamesLst, multiplayerRoomLst } from "./socket/controllers";
 
 export interface    tetrisReq {
 	argument:	string;

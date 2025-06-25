@@ -2,7 +2,7 @@ import Fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
 import { Server } from "socket.io";
 import { config } from "dotenv";
-import tetrisRoutes from "../tetris_app/api/routes";
+import tetrisRoutes from "../tetris_app/socket/routes";
 
 config();
 
@@ -21,7 +21,7 @@ fastify.register(fastifyCors, {
 });
 
 // Register routes
-fastify.register(tetrisRoutes, { prefix: '/api/tetris' });
+// fastify.register(tetrisRoutes, { prefix: '/socket/tetris' });
 fastify.register((fastify)=>{
 	fastify.get('/health', async (request, reply) => {
 		// You can add more complex health checks here if needed
@@ -29,7 +29,6 @@ fastify.register((fastify)=>{
 	});
 })
 
-// Start the server
 fastify.listen({ port: parseInt(process.env.BACK_PORT!), host: "0.0.0.0" }, (err: Error | null, address: string) => {
 	if (err) {
 		fastify.log.error(err);
@@ -38,6 +37,7 @@ fastify.listen({ port: parseInt(process.env.BACK_PORT!), host: "0.0.0.0" }, (err
 
 	io.on('connection', (socket) => {
 		console.log(`Received ${JSON.stringify(socket.id)}`);
+		tetrisRoutes(socket);
 		socket.emit("message", "Hello from the server!");
 		socket.on("message", (message) => {
 			console.log(`Received message from client ${socket.id}: ${message}`);
