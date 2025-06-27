@@ -96,7 +96,7 @@ export abstract class ATetrimino {
 
 			const collides = () => {
 				for (let j = 0; j < struct.nbBlocks; ++j)
-					if (matrix.isMinoAt(this.coordinates.add(end.blocks[j]).add(dist)))
+					if (matrix.isMinoAt(this.coordinates.add(end!.blocks[j]).add(dist)))
 						return true;
 				return false;
 			}

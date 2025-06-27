@@ -13,7 +13,7 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      transcendence:
+      redTetris:
     restart: always
     init: true
   front:
@@ -32,10 +32,10 @@ services:
     volumes:
         - ./front/redTetrisFront:/app
     networks:
-      transcendence:
+      redTetris:
     restart: always
     init: true
 
 networks:
-  transcendence:
+  redTetris:
     driver: bridge

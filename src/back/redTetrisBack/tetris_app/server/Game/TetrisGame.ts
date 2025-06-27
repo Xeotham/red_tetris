@@ -10,10 +10,11 @@ import { L } from "./Pieces/L";
 import { J } from "./Pieces/J";
 import { O } from "./Pieces/O";
 import { I } from "./Pieces/I";
-import { clamp, delay, mod } from "./utils";
-import { idGenerator } from "./../../utils";
+import { delay } from "./utils";
+import { idGenerator } from "../../utils";
+import seedrandom from "seedrandom";
 
-const   idGen = idGenerator()
+const   idGen: any = idGenerator();
 
 export class TetrisGame {
 	private readonly player:			WebSocket;
@@ -50,6 +51,7 @@ export class TetrisGame {
 	private	lockInterval:				number;
 	private	sendInterval:				number;
 	private readonly gameId:			number;
+	private random:						seedrandom.PRNG;
 
 	// multiplayer
 
@@ -135,6 +137,7 @@ export class TetrisGame {
 		this.lockInterval = -1;
 		this.sendInterval = -1;
 		this.gameId = idGen.next().value;
+		this.random = seedrandom();
 
 		// multiplayer
 
@@ -242,6 +245,7 @@ export class TetrisGame {
 		});
 		this.initialState = JSON.parse(JSON.stringify(this));
 	}
+	public setRandomSeed(seed: string): void { this.random = seedrandom(seed.toString()); }
 
 	private shuffleBag(): ATetrimino[] {
 		const pieces: ATetrimino[] = [
@@ -254,7 +258,7 @@ export class TetrisGame {
 			new I(this.rotationType)
 		];
 
-		return pieces.sort(() => Math.random() - 0.5) as ATetrimino[]; // TODO : Use a seeded shuffle algorithm
+		return pieces.sort(() => this.random() - 0.5) as ATetrimino[]; // TODO : Use a seeded shuffle algorithm
 	}
 
 	private trySetInterval(interval: number = this.fallSpeed): void {

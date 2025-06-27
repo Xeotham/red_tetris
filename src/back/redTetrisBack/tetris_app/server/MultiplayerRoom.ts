@@ -9,6 +9,7 @@ export class MultiplayerRoom {
 	private code:				string;
 	private playersRemaining:	number;
 	private settings:			any; // Object containing the settings of the game : {}
+	private randomSeed:			number;
 
 	constructor(socket: WebSocket, username: string, isPrivate: boolean = false, codeName: string | undefined = undefined) {
 		this.players = [];
@@ -36,6 +37,7 @@ export class MultiplayerRoom {
 			"canRetry": true,
 		}
 		this.addPlayer(socket, username);
+		this.randomSeed = Math.floor(Math.random() * 1000000);
 	}
 
 	public getIsInGame(): boolean					{ return this.isInGame; }
@@ -120,8 +122,10 @@ export class MultiplayerRoom {
 		this.isInGame = true;
 
 		this.settings.isInRoom = true;
-		for (const player of this.players)
+		for (const player of this.players) {
 			player.setupGame(this.settings);
+			player.getGame()?.setRandomSeed(this.randomSeed.toString());
+		}
 		this.assignOpponents();
 		for (const player of this.players)
 			player.getGame()?.gameLoop().then(() => endOfGame(player));
