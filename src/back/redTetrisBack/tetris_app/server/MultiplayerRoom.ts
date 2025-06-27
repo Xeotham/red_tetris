@@ -46,7 +46,6 @@ export class MultiplayerRoom {
 	public getIsVersus(): boolean					{ return this.settings.isVersus == undefined ? false : this.settings.isVersus; }
 	public getCode(): string						{ return this.code; }
 
-	public changeCode(): void						{ this.code = this.generateInviteCode(); }
 	public setSettings(settings: any): void			{ this.settings = settings; this.sendSettingsToPlayers(); }
 	public addSetting(key: string, value: any): void{ this.settings[key] = value; this.sendSettingsToPlayers(); }
 	public addSettings(settings: any): void			{
@@ -120,8 +119,8 @@ export class MultiplayerRoom {
 			return ;
 		this.playersRemaining = this.players.length;
 		this.isInGame = true;
-
 		this.settings.isInRoom = true;
+
 		for (const player of this.players) {
 			player.setupGame(this.settings);
 			player.getGame()?.setRandomSeed(this.randomSeed.toString());

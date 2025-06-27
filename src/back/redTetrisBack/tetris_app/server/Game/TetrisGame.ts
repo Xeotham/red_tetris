@@ -380,8 +380,11 @@ export class TetrisGame {
 					this.player.send(JSON.stringify({type: "EFFECT", argument: "USER_EFFECT", value: "harddrop" }));
 				this.fallInterval = -1;
 				this.currentPiece.remove(this.matrix);
-				this.currentPiece.setTexture(this.currentPiece.getTexture() + "_LOCKED")
-				this.currentPiece.place(this.matrix, true);
+				// this.currentPiece.setTexture(this.currentPiece.getTexture() + "_LOCKED")
+				if (this.currentPiece.place(this.matrix, true) == "Lock Out") {
+					this.over = true;
+					return ;
+				}
 				this.currentPiece = null;
 				this.lockFrame = true;
 				this.shouldSpawn = true;
@@ -511,7 +514,10 @@ export class TetrisGame {
 			return ;
 		this.shadowPiece?.remove(this.matrix, true);
 		this.shadowPiece = new (this.currentPiece!.constructor as { new (coordinates: Pos, texture: string): ATetrimino })(
-			this.currentPiece.getCoordinates(), this.currentPiece.getTexture() + "_SHADOW");
+			this.currentPiece.getCoordinates(), "SHADOW");
+		// this.currentPiece.getCoordinates(), this.currentPiece.getTexture() + "_SHADOW");
+		this.shadowPiece.setName("SHADOW");
+		this.shadowPiece.setTexture("SHADOW");
 		this.shadowPiece.setCoordinates(this.currentPiece.getCoordinates());
 		this.shadowPiece.setRotation(this.currentPiece.getRotation());
 		while (this.shadowPiece.canFall(this.matrix))

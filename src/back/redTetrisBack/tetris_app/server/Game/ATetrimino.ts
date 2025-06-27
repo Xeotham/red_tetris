@@ -58,7 +58,7 @@ export abstract class ATetrimino {
 			SRS: SRS,
 			SRSX: SRSX
 		});
-	};
+	}
 
 
 	protected getStruct(): tc.pieceStruct {
@@ -82,7 +82,7 @@ export abstract class ATetrimino {
 		else
 			end = struct[tc.ROTATIONS[mod(this.rotation + 3, 4)]];
 		if (!end)
-			return "";
+			return "-1";
 
 		let startRotations: Pos[] = ((direction !== "180" && this.rotationType !== "original") ? start["SRS"] : start[this.rotationType]);
 		let endRotations: Pos[] = ((direction !== "180" && this.rotationType !== "original") ? start["SRS"] : end[this.rotationType]);
@@ -138,6 +138,7 @@ export abstract class ATetrimino {
 	public isColliding(matrix: Matrix, offset: Pos = new Pos(0, 0)): boolean {
 		const struct = this.getStruct();
 		const block: tc.block = struct[tc.ROTATIONS[this.rotation]];
+
 		for (let i = 0; i < struct.nbBlocks; ++i) {
 			const pos: Pos = this.coordinates.add(block?.blocks[i]).add(offset);
 			if (matrix.isMinoAt(pos))
@@ -146,24 +147,32 @@ export abstract class ATetrimino {
 		return false;
 	}
 
-	public place(matrix: Matrix, isSolid: boolean = false, isShadow: boolean = false): void {
+	public place(matrix: Matrix, isSolid: boolean = false, isShadow: boolean = false): string {
 		const struct = this.getStruct();
 		const block: tc.block = struct[tc.ROTATIONS[this.rotation]];
+		let outBlocks: number = 0;
+
 		for (let i = 0; i < struct.nbBlocks; ++i) {
 			const pos: Pos = this.coordinates.add(block?.blocks[i]);
 			if (pos.getY() < 0)
-				return ;
-			if (!isShadow || (isShadow && matrix.at(pos).isEmpty())) {
+				return "Top Out";
+			if (pos.getY() < matrix.getSize().getY() - tc.TETRIS_HEIGHT)
+				++outBlocks;
+			if (!isShadow || matrix.at(pos).isEmpty()) {
 				matrix.setAt(pos, new Mino(this.texture, isSolid));
 				if (isShadow)
 					matrix.at(pos).setShadow(true);
 			}
 		}
+		if (outBlocks >= struct.nbBlocks)
+			return "Lock Out";
+		return "";
 	}
 
 	public remove(matrix: Matrix, isShadow: boolean = false): void {
 		const struct = this.getStruct();
 		const block: tc.block = struct[tc.ROTATIONS[this.rotation]];
+
 		for (let i = 0; i < struct.nbBlocks; ++i) {
 			const pos: Pos = this.coordinates.add(block?.blocks[i]);
 			if (!isShadow || (isShadow && matrix.at(pos).getIsShadow()))
