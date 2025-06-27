@@ -715,9 +715,9 @@ export class TetrisGame {
 
 	public async gameLoop() {
 		// console.log("Starting game loop");
-		this.player.emit("GAME_START", {game: this.toJSON()});
+		this.player.emit("GAME_START", JSON.stringify({game: this.toJSON()}));
 		this.sendInterval = setInterval(() => {
-			this.player.emit("GAME", {game: this.toJSON()});
+			this.player.emit("GAME", JSON.stringify({game: this.toJSON()}));
 		}, 1000 / 60) as unknown as number; // 60 times per second
 
 		await this.spawnPiece();
@@ -731,7 +731,7 @@ export class TetrisGame {
 		clearInterval(this.sendInterval);
 		this.sendInterval = -1;
 		this.player.emit("EFFECT", JSON.stringify({type: "BOARD", value: "gameover"}));
-		this.player.emit("GAME", {game: this.toJSON()});
+		this.player.emit("GAME", JSON.stringify({game: this.toJSON()}));
 		this.player.emit("STATS", {stats: this.getStats()});
 		// console.log("isInRoom: ", this.isInRoom);
 		if (!this.isInRoom)

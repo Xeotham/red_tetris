@@ -24,10 +24,6 @@ const   Home = () => {
 	const   arcadeOnClick = () => {
 		console.log("arcadeOnClick");
 		navigate("/arcade-board");
-		// socket.emit("arcadeStart", {});
-		// socketGame((data) => {
-			// console.log(data);
-		// })
 	}
 
 	const   versusOnClick = () => {

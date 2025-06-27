@@ -1,8 +1,9 @@
 import Fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
-import { Server } from "socket.io";
+import {DefaultEventsMap, Server, Socket} from "socket.io";
 import { config } from "dotenv";
 import tetrisRoutes from "../tetris_app/socket/routes";
+import {tetrisArcade} from "../tetris_app/socket/controllers";
 
 config();
 
@@ -36,13 +37,17 @@ fastify.listen({ port: parseInt(process.env.BACK_PORT!), host: "0.0.0.0" }, (err
 	}
 
 	io.on('connection', (socket) => {
-		console.log(`Received ${JSON.stringify(socket.id)}`);
+		console.log(`${socket.id} connected!`);
+		socket.on("message", (message) => {console.log(`Message from ${socket.id}: ${message}`);});
 		tetrisRoutes(socket);
-		socket.emit("message", "Hello from the server!");
-		socket.on("message", (message) => {
-			console.log(`Received message from client ${socket.id}: ${message}`);
-		})
+		// tetrisRoutes();
+
 	});
+
+	io.on("arcadeStart", (socket) => {
+		console.log(`${socket.id} arcade start`);
+		// tetrisArcade(socket);
+	})
 
 	console.log(`🚀 Server listening at ${address}`);
 });

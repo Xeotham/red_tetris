@@ -18,15 +18,14 @@ const   getTexture = (type) => {
 	}
 }
 
-const   Mino = (type, width, height) => {
-	const texture = getTexture(type);
-
+const   Mino = ({type, width, height}) => {
+	const texture = getTexture(type.texture);
 	return (
 		<img src={texture} style={{ width: `${width}px`, height: `${height}px` }} alt={type} />
 	);
 }
 
-const   Rows = (row, width, height) => {
+const   Rows = ({row, width, height}) => {
 	return (
 		<div className={"rowContainer"} style={{ width: `${width}px`, height: `${height}px` }}>
 			<Mino type={row[0]} width={32} height={32} />
@@ -48,26 +47,26 @@ const   Matrix = ({ matrix, width, height }) => {
 		<div className={"matrixContainer"}>
 			<div className={"matrixGrid"}>
 				<div className={"colContainer"} style={{width: `${width}px`, height: `${height}px`}}>
-					<Rows row={matrix[0]} width={32 * 10} height={32}/>
-					<Rows row={matrix[1]} width={32 * 10} height={32}/>
-					<Rows row={matrix[2]} width={32 * 10} height={32}/>
-					<Rows row={matrix[3]} width={32 * 10} height={32}/>
-					<Rows row={matrix[4]} width={32 * 10} height={32}/>
-					<Rows row={matrix[5]} width={32 * 10} height={32}/>
-					<Rows row={matrix[6]} width={32 * 10} height={32}/>
-					<Rows row={matrix[7]} width={32 * 10} height={32}/>
-					<Rows row={matrix[8]} width={32 * 10} height={32}/>
-					<Rows row={matrix[9]} width={32 * 10} height={32}/>
-					<Rows row={matrix[10]} width={32 * 10} height={32}/>
-					<Rows row={matrix[11]} width={32 * 10} height={32}/>
-					<Rows row={matrix[12]} width={32 * 10} height={32}/>
-					<Rows row={matrix[13]} width={32 * 10} height={32}/>
-					<Rows row={matrix[14]} width={32 * 10} height={32}/>
-					<Rows row={matrix[15]} width={32 * 10} height={32}/>
-					<Rows row={matrix[16]} width={32 * 10} height={32}/>
-					<Rows row={matrix[17]} width={32 * 10} height={32}/>
-					<Rows row={matrix[18]} width={32 * 10} height={32}/>
 					<Rows row={matrix[19]} width={32 * 10} height={32}/>
+					<Rows row={matrix[20]} width={32 * 10} height={32}/>
+					<Rows row={matrix[21]} width={32 * 10} height={32}/>
+					<Rows row={matrix[22]} width={32 * 10} height={32}/>
+					<Rows row={matrix[23]} width={32 * 10} height={32}/>
+					<Rows row={matrix[24]} width={32 * 10} height={32}/>
+					<Rows row={matrix[25]} width={32 * 10} height={32}/>
+					<Rows row={matrix[26]} width={32 * 10} height={32}/>
+					<Rows row={matrix[27]} width={32 * 10} height={32}/>
+					<Rows row={matrix[28]} width={32 * 10} height={32}/>
+					<Rows row={matrix[29]} width={32 * 10} height={32}/>
+					<Rows row={matrix[30]} width={32 * 10} height={32}/>
+					<Rows row={matrix[31]} width={32 * 10} height={32}/>
+					<Rows row={matrix[32]} width={32 * 10} height={32}/>
+					<Rows row={matrix[33]} width={32 * 10} height={32}/>
+					<Rows row={matrix[34]} width={32 * 10} height={32}/>
+					<Rows row={matrix[35]} width={32 * 10} height={32}/>
+					<Rows row={matrix[36]} width={32 * 10} height={32}/>
+					<Rows row={matrix[37]} width={32 * 10} height={32}/>
+					<Rows row={matrix[38]} width={32 * 10} height={32}/>
 				</div>
 			</div>
 		</div>

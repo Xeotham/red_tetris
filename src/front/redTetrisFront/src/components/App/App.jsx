@@ -14,11 +14,11 @@ const   App = () => {
 	return (
 		<div className="App">
 			<Routes>
-				<Route path="/" element={ <Home socket={socket}/> } />
+				<Route path="/" element={ <Home /> } />
 				<Route path="/find-room" element={ <FindRooms/> }/>
 				<Route path="/:roomId" element={ <ChoseUsername /> } />
 				<Route path="/:roomId/:username" element={ <JoinRoom /> } />
-				<Route path="/arcade-board" element={ <ArcadeBoard socket={socket}/> } />
+				<Route path="/arcade-board" element={ <ArcadeBoard /> } />
 			</Routes>
 		</div>
 	)
