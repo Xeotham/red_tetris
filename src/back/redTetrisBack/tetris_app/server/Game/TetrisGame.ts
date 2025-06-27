@@ -27,7 +27,7 @@ export class TetrisGame {
 	private hold:						ATetrimino | null;
 
 	private level:						number;
-	private dropType:					"Normal" | "Soft" | "Hard";
+	private dropType:					"normal" | "soft" | "hard";
 	private lineClearGoal:				number;
 	private spinType:					string;
 	private lastClear:					string;
@@ -50,7 +50,7 @@ export class TetrisGame {
 	private	fallInterval:				number;
 	private	lockInterval:				number;
 	private	sendInterval:				number;
-	private readonly gameId:			number;
+	private readonly gameId:			string;
 
 	// multiplayer
 
@@ -111,7 +111,7 @@ export class TetrisGame {
 		this.hold = null;
 
 		this.level = tc.MIN_LEVEL;
-		this.dropType = "Normal";
+		this.dropType = "normal";
 		this.lineClearGoal = tc.FIXED_GOAL_SYSTEM[this.level];
 		this.spinType = "";
 		this.lastClear = "";
@@ -135,7 +135,7 @@ export class TetrisGame {
 		this.fallInterval = -1;
 		this.lockInterval = -1;
 		this.sendInterval = -1;
-		this.gameId = idGen.next().value;
+		this.gameId = player.id;
 
 		// multiplayer
 
@@ -224,7 +224,7 @@ export class TetrisGame {
 		};
 	}
 
-	public getGameId(): number { return this.gameId; }
+	public getGameId(): string { return this.gameId; }
 	public isOver(): boolean { return this.over; }
 	public getUsername(): string { return this.username; }
 	public getHasForfeit(): boolean { return this.hasForfeit; }
@@ -316,8 +316,8 @@ export class TetrisGame {
 		this.currentPiece.place(this.matrix);
 		this.placeShadow();
 
-		this.dropType === "Hard" ? this.dropType = "Normal" : true;
-		this.dropType === "Normal" ? this.fallSpeed = tc.FALL_SPEED(this.level) : tc.SOFT_DROP_SPEED(this.level);
+		this.dropType === "hard" ? this.dropType = "normal" : true;
+		this.dropType === "normal" ? this.fallSpeed = tc.FALL_SPEED(this.level) : tc.SOFT_DROP_SPEED(this.level);
 
 		await delay(this.spawnARE);
 
@@ -356,7 +356,7 @@ export class TetrisGame {
 		if (!this.currentPiece)
 			return ;
 		if (this.currentPiece.canFall(this.matrix)) {
-			if (this.dropType === "Soft")
+			if (this.dropType === "soft")
 				this.player.emit("EFFECT", JSON.stringify({type: "USER_EFFECT", value: "softdrop"}));
 			this.spinType = "";
 			this.currentPiece.remove(this.matrix);
@@ -367,17 +367,17 @@ export class TetrisGame {
 					this.resetLockPhase();
 				this.lowestReached = this.currentPiece.getCoordinates().getY();
 			}
-			if (this.dropType !== "Hard" && !this.currentPiece.canFall(this.matrix))
+			if (this.dropType !== "hard" && !this.currentPiece.canFall(this.matrix))
 				this.player.emit("EFFECT", JSON.stringify({type: "BOARD", value: "floor" }));
 		}
 		else {
 			if (this.shouldLock) {
 				clearInterval(this.fallInterval);
-				if (this.dropType === "Hard")
+				if (this.dropType === "hard")
 					this.player.emit("EFFECT", JSON.stringify({type: "USER_EFFECT", value: "harddrop" }));
 				this.fallInterval = -1;
 				this.currentPiece.remove(this.matrix);
-				this.currentPiece.setTexture(this.currentPiece.getTexture() + "_LOCKED")
+				// this.currentPiece.setTexture(this.currentPiece.getTexture() + "_LOCKED")
 				this.currentPiece.place(this.matrix, true);
 				this.currentPiece = null;
 				this.lockFrame = true;
@@ -501,19 +501,23 @@ export class TetrisGame {
 			// ^^^ restart the loop starting in fallPiece
 		}
 		this.placeShadow();
+			this.player.emit("GAME", JSON.stringify({game: this.toJSON()}));
 	}
 
 	private placeShadow(): void {
 		if (!this.currentPiece || !this.showShadowPiece)
 			return ;
 		this.shadowPiece?.remove(this.matrix, true);
-		this.shadowPiece = new (this.currentPiece!.constructor as { new (coordinates: Pos, texture: string): ATetrimino })(
-			this.currentPiece.getCoordinates(), this.currentPiece.getTexture() + "_SHADOW");
+		this.shadowPiece = new (this.currentPiece!.constructor as { new (rotationType: "original" | "SRS" | "SRSX",
+		      name: string, coordinates: Pos, texture: string): ATetrimino })(
+			this.rotationType, "SHADOW", this.currentPiece.getCoordinates(), "SHADOW");
+		this.shadowPiece.setName("SHADOW")
+		this.shadowPiece.setTexture("SHADOW")
+		console.log(JSON.stringify(this.shadowPiece as ATetrimino));
 		this.shadowPiece.setCoordinates(this.currentPiece.getCoordinates());
 		this.shadowPiece.setRotation(this.currentPiece.getRotation());
 		while (this.shadowPiece.canFall(this.matrix))
 			this.shadowPiece.setCoordinates(this.shadowPiece.getCoordinates().down());
-
 		this.shadowPiece.place(this.matrix, false, true);
 	}
 
@@ -597,7 +601,7 @@ export class TetrisGame {
 		this.awaitingGarbage.push(lines);
 	}
 
-	public changeFallSpeed(type: "Normal" | "Soft" | "Hard"): void {
+	public changeFallSpeed(type: "normal" | "soft" | "hard"): void {
 		if (this.over || type === this.dropType || this.fallInterval === -1)
 			return ;
 
@@ -606,15 +610,15 @@ export class TetrisGame {
 		this.resetLockPhase();
 		this.dropType = type;
 		switch (type) {
-			case "Normal":
+			case "normal":
 				this.fallSpeed = tc.FALL_SPEED(this.level);
 				// console.log("Changing fall speed to Normal: " + this.fallSpeed);
 				break;
-			case "Soft":
+			case "soft":
 				this.fallSpeed = tc.SOFT_DROP_SPEED(this.level) / this.softDropAmp;
 				// console.log("soft drop speed: " + tc.SOFT_DROP_SPEED(this.level) + " / " + this.softDropAmp + " = " + this.fallSpeed);
 				break;
-			case "Hard":
+			case "hard":
 				this.fallSpeed = tc.HARD_DROP_SPEED;
 				this.shouldLock = true;
 				break;
@@ -716,9 +720,9 @@ export class TetrisGame {
 	public async gameLoop() {
 		// console.log("Starting game loop");
 		this.player.emit("GAME_START", JSON.stringify({game: this.toJSON()}));
-		this.sendInterval = setInterval(() => {
-			this.player.emit("GAME", JSON.stringify({game: this.toJSON()}));
-		}, 1000 / 60) as unknown as number; // 60 times per second
+		// this.sendInterval = setInterval(() => {
+		// 	this.player.emit("GAME", JSON.stringify({game: this.toJSON()}));
+		// }, 1000 / 60) as unknown as number; // 60 times per second
 
 		await this.spawnPiece();
 		this.placeShadow();

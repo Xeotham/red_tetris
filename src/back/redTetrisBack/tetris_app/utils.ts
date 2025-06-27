@@ -8,13 +8,13 @@ export interface    tetrisReq {
 	prefix?:	any;
 }
 
-export const getTetrisGame = (gameId: number) => {
+export const getTetrisGame = (gameId: string) => {
 	if (arcadeGamesLst.find((game) => game.getGameId() === gameId))
 		return arcadeGamesLst.find((game) => game.getGameId() === gameId);
 	return multiplayerRoomLst.find((room => room.getGameById(gameId)))?.getGameById(gameId);
 }
 
-export const deleteTetrisGame = (gameId: number) => {
+export const deleteTetrisGame = (gameId: string) => {
 	getTetrisGame(gameId)?.setOver(true);
 	if (arcadeGamesLst.find((game) => game.getGameId() === gameId))
 		arcadeGamesLst.splice(arcadeGamesLst.indexOf(arcadeGamesLst.find((game) => game.getGameId() === gameId)!), 1);

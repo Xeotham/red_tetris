@@ -1,27 +1,35 @@
 import  "./Matrix.css"
+import {useState} from "react";
 
 const   getTexture = (type) => {
 	switch (type) {
-		case "I": return '/src/assets/textures/minimalist/I.png';
-		case "J": return '/src/assets/textures/minimalist/J.png';
-		case "L": return '/src/assets/textures/minimalist/L.png';
-		case "O": return '/src/assets/textures/minimalist/O.png';
-		case "S": return '/src/assets/textures/minimalist/S.png';
-		case "T": return '/src/assets/textures/minimalist/T.png';
-		case "Z": return '/src/assets/textures/minimalist/Z.png';
-		case "EMPTY": return '/src/assets/textures/minimalist/empty.png';
-		case "SHADOW": return '/src/assets/textures/minimalist/shadow.png';
+		case "I":       return '/src/assets/textures/minimalist/I.png';
+		case "J":       return '/src/assets/textures/minimalist/J.png';
+		case "L":       return '/src/assets/textures/minimalist/L.png';
+		case "O":       return '/src/assets/textures/minimalist/O.png';
+		case "S":       return '/src/assets/textures/minimalist/S.png';
+		case "T":       return '/src/assets/textures/minimalist/T.png';
+		case "Z":       return '/src/assets/textures/minimalist/Z.png';
+		case "EMPTY":   return '/src/assets/textures/minimalist/empty.png';
+		case "SHADOW":  return '/src/assets/textures/minimalist/shadow.png';
 		case "GARBAGE": return '/src/assets/textures/minimalist/garbage.png';
-		case "MATRIX": return '/src/assets/textures/minimalist/matrix.png';
-		case "HOLD": return '/src/assets/textures/minimalist/hold.png';
-		case "BAGS": return '/src/assets/textures/minimalist/bags.png';
+		case "MATRIX":  return '/src/assets/textures/minimalist/matrix.png';
+		case "HOLD":    return '/src/assets/textures/minimalist/hold.png';
+		case "BAGS":    return '/src/assets/textures/minimalist/bags.png';
 	}
 }
 
 const   Mino = ({type, width, height}) => {
-	const texture = getTexture(type.texture);
+	const   [currentType, setCurrentType] = useState("EMPTY");
+	const   [currentTexture, setCurrentTexture] = useState(getTexture("EMPTY"));
+
+	if (currentType !== type.texture) {
+		setCurrentType(type.texture);
+		setCurrentTexture(getTexture(type.texture));
+	}
+
 	return (
-		<img src={texture} style={{ width: `${width}px`, height: `${height}px` }} alt={type} />
+		<img src={currentTexture} style={{ width: `${width}px`, height: `${height}px` }} alt={type} />
 	);
 }
 
@@ -47,7 +55,6 @@ const   Matrix = ({ matrix, width, height }) => {
 		<div className={"matrixContainer"}>
 			<div className={"matrixGrid"}>
 				<div className={"colContainer"} style={{width: `${width}px`, height: `${height}px`}}>
-					<Rows row={matrix[19]} width={32 * 10} height={32}/>
 					<Rows row={matrix[20]} width={32 * 10} height={32}/>
 					<Rows row={matrix[21]} width={32 * 10} height={32}/>
 					<Rows row={matrix[22]} width={32 * 10} height={32}/>
@@ -67,6 +74,7 @@ const   Matrix = ({ matrix, width, height }) => {
 					<Rows row={matrix[36]} width={32 * 10} height={32}/>
 					<Rows row={matrix[37]} width={32 * 10} height={32}/>
 					<Rows row={matrix[38]} width={32 * 10} height={32}/>
+					<Rows row={matrix[39]} width={32 * 10} height={32}/>
 				</div>
 			</div>
 		</div>

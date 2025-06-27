@@ -13,7 +13,7 @@ export const BUFFER_WIDTH: number = TETRIS_WIDTH;
 export const BUFFER_HEIGHT: number = 20;
 
 export const MAX_LEVEL: number = 15;
-export const MIN_LEVEL: number = 1;
+export const MIN_LEVEL: number = 10;
 export const FALL_SPEED = (level: number): number => {
 	return Math.pow(0.8 - ((level - 1) * 0.007), level - 1) * 1000;
 }
@@ -40,9 +40,9 @@ export const SCORING: {[id:string]: number} = {
 	"Mini Spin Quad": 1600,
 	"Perfect Clear" : 3500,
 	"Back-to-Back Bonus" : 1.5,
-	"Normal Drop" : 0,
-	"Soft Drop" : 1,
-	"Hard Drop" : 2,
+	"normal Drop" : 0,
+	"soft Drop" : 1,
+	"hard Drop" : 2,
 }
 
 export const SCORE_CALCULUS = (score: string, level: number, isB2B: boolean) => {
@@ -51,7 +51,7 @@ export const SCORE_CALCULUS = (score: string, level: number, isB2B: boolean) => 
 		score = score.substring(0, score.indexOf("Spin") - 2) + score.substring(score.indexOf("Spin"));
 	if (SCORING[score] === undefined || score === "Zero")
 		return 0;
-	if (score === "Normal Drop" || score === "Soft Drop" || score === "Hard Drop")
+	if (score === "normal Drop" || score === "soft Drop" || score === "hard Drop")
 		return SCORING[score];
 	if (isB2B)
 		return SCORING[score] * level * SCORING["Back-to-Back Bonus"];

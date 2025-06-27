@@ -107,117 +107,73 @@ export const tetrisArcade = async (socket: Socket) => {
 // 		return reply.status(500).send({message: "Error in tetrisQuitRoom"});
 // 	}
 // }
-//
-// export const    retryGame = async (req: FastifyRequest<{Body: tetrisReq}>, reply: FastifyReply) => {
-// 	const   request = req.body;
-//
-// 	reply.status(200).send({message: "Forfeiting the game"});
-//
-// 	if (!request)
-// 		return reply.status(400).send({message: "No body"});
-//
-// 	let   game = getTetrisGame(request.gameId);
-// 	if (!game)
-// 		return reply.status(400).send({message: "Game not found"});
-//
-// 	game.retry();
-// 	reply.status(200).send({message: "Retrying the game"});
-// }
-//
-// export const    forfeitGame = async (req: FastifyRequest<{Body: tetrisReq}>, reply: FastifyReply) => {
-// 	const   request = req.body;
-//
-// 	reply.status(200).send({message: "Forfeiting the game"});
-//
-// 	if (!request)
-// 		return reply.status(400).send({message: "No body"});
-//
-// 	const   game = getTetrisGame(request.gameId);
-// 	if (!game)
-// 		return reply.status(400).send({message: "Game not found"});
-//
-// 	game.forfeit();
-// 	reply.status(200).send({message: "Forfeiting the game"});
-// }
-//
-// export const    movePiece = async (req: FastifyRequest<{Body: tetrisReq}>, reply: FastifyReply) => {
-// 	const   request = req.body;
-//
-// 	if (!request)
-// 		return reply.status(400).send({message: "No body"});
-//
-// 	const   game = getTetrisGame(request.gameId);
-// 	if (!game)
-// 		return reply.status(400).send({message: "Game not found"});
-//
-// 	switch (request.argument) {
-// 		case "left":
-// 		case "right":
-// 			game.move(request.argument);
-// 			reply.status(200).send({message: "Moving Piece " + request.argument})
-// 			return ;
-// 		default:
-// 			return reply.status(400).send({message: "Invalid argument"});
-// 	}
-// }
-//
-// export const    rotatePiece = async (req: FastifyRequest<{Body: tetrisReq}>, reply: FastifyReply) => {
-// 	const   request = req.body;
-//
-// 	if (!request)
-// 		return reply.status(400).send({message: "No body"});
-//
-// 	const   game = getTetrisGame(request.gameId);
-// 	if (!game)
-// 		return reply.status(400).send({message: "Game not found"});
-//
-// 	try {
-// 		switch (request.argument) {
-// 			case "clockwise":
-// 			case "counter-clockwise":
-// 			case "180":
-// 				reply.status(200).send({message: "Rotating piece " + request.argument});
-// 				return game?.rotate(request.argument);
-// 			default:
-// 				return reply.status(400).send({message: "Invalid argument"});
-// 		}
-// 	}
-// 	catch (error) {
-// 		console.error("Error in rotatePiece:", error);
-// 		return reply.status(500).send({message: "Error in rotatePiece"});
-// 	}
-// }
-//
-// export const    dropPiece = async (req: FastifyRequest<{Body: tetrisReq}>, reply: FastifyReply) => {
-// 	const   request = req.body;
-// 	if (!request)
-// 		return reply.status(400).send({message: "No body"});
-//
-// 	const   game = getTetrisGame(request.gameId);
-// 	if (!game)
-// 		return reply.status(400).send({message: "Game not found"});
-//
-// 	switch (request.argument) {
-// 		case "Hard":
-// 		case "Soft":
-// 		case "Normal":
-// 			game.changeFallSpeed(request.argument);
-// 			reply.status(200).send({message: request.argument + " Dropping the piece"});
-// 			return ;
-// 		default:
-// 			return reply.status(400).send({message: "Invalid argument"});
-// 	}
-// }
-//
-// export const    holdPiece = async (req: FastifyRequest<{Body: tetrisReq}>, reply: FastifyReply) => {
-// 	const   request = req.body;
-// 	if (!request)
-// 		return reply.status(400).send({message: "No body"});
-//
-// 	const   game = getTetrisGame(request.gameId);
-// 	if (!game)
-// 		return reply.status(400).send({message: "Game not found"});
-//
-// 	game.swap();
-// 	reply.status(200).send({message: "Holding the piece"});
-// }
+
+export const    retryGame = async (socket: Socket) => {
+
+	let   game = getTetrisGame(socket.id);
+	//TODO: Add error.
+
+	game?.retry();
+}
+
+export const    forfeitGame = async (socket: Socket) => {
+
+	const   game = getTetrisGame(socket.id);
+	//TODO: Add error.
+
+	game?.forfeit();
+}
+
+export const    movePiece = async (direction: string, socket: Socket) => {
+
+	const   game = getTetrisGame(socket.id);
+	// TODO: Add error.
+
+	switch (direction) {
+		case "left":
+		case "right":
+			game?.move(direction);
+			return ;
+		default:
+			return ; //TODO: Add error.
+	}
+}
+
+export const    rotatePiece = async (direction: string, socket: Socket) => {
+
+	const   game = getTetrisGame(socket.id);
+	// TODO: Add error.
+
+	switch (direction) {
+		case "clockwise":
+		case "counter-clockwise":
+		case "180":
+			return game?.rotate(direction);
+		default:
+			return ; //TODO: Add error.
+	}
+}
+
+export const    dropPiece = async (dropType: string, socket: Socket) => {
+
+	const   game = getTetrisGame(socket.id);
+	// TODO: Add error.
+
+	switch (dropType) {
+		case "hard":
+		case "soft":
+		case "normal":
+			game?.changeFallSpeed(dropType);
+			return ;
+		default:
+			return; //TODO: Add error.
+	}
+}
+
+export const    holdPiece = async (socket: Socket) => {
+
+	const   game = getTetrisGame(socket.id);
+	//TODO: Add error.
+
+	game?.swap();
+}

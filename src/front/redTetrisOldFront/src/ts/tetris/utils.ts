@@ -604,6 +604,7 @@ export const    getMinoTexture = (texture: string): HTMLImageElement | null => {
 		case "S_SHADOW":
 		case "T_SHADOW":
 		case "Z_SHADOW":
+		case "SHADOW":
 			return tetrisTexturesHandler.getTexture("SHADOW");
 		case "I_LOCKED":
 		case "I":

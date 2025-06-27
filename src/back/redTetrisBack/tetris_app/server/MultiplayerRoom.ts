@@ -94,7 +94,7 @@ export class MultiplayerRoom {
 		return this.players.length <= 0;
 	}
 
-	public getGameById(id: number): TetrisGame | undefined {
+	public getGameById(id: string): TetrisGame | undefined {
 		return this.players.find((player) => player.getGame()?.getGameId() === id)?.getGame();
 	}
 
