@@ -1,11 +1,13 @@
-import { FastifyRequest, FastifyReply } from "fastify";
-import { deleteTetrisGame, getTetrisGame, getTetrisRoom, tetrisReq } from "../utils";
-import { TetrisGame } from "../server/Game/TetrisGame";
-import { MultiplayerRoom } from "../server/MultiplayerRoom";
-import { Socket } from "socket.io";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.holdPiece = exports.dropPiece = exports.rotatePiece = exports.movePiece = exports.forfeitGame = exports.retryGame = exports.tetrisArcade = exports.multiplayerRoomLst = exports.arcadeGamesLst = void 0;
 
-export let   arcadeGamesLst: TetrisGame[] = [];
-export let   multiplayerRoomLst: MultiplayerRoom[] = [];
+const utils = require("../utils");
+const TetrisGame = require("../server/Game/TetrisGame");
+
+
+exports.arcadeGamesLst = [];
+exports.multiplayerRoomLst = [];
 
 // export const    tetrisMatchmaking = async (socket: WebSocket, req: FastifyRequest<{Querystring: {username: string}}>) => {
 // 	if (!req.query.username)
@@ -26,12 +28,13 @@ export let   multiplayerRoomLst: MultiplayerRoom[] = [];
 // 	multiplayerRoomLst.push(room);
 // }
 
-export const tetrisArcade = async (socket: Socket) => {
-	const tetrisGame = new TetrisGame(socket);
-	console.log("Arcade Game started for", socket.id);
-	arcadeGamesLst.push(tetrisGame);
-	tetrisGame.gameLoop();
+const tetrisArcade = async (socket) => {
+    const tetrisGame = new TetrisGame.TetrisGame(socket);
+    console.log("Arcade Game started for", socket.id);
+    exports.arcadeGamesLst.push(tetrisGame);
+    tetrisGame.gameLoop();
 };
+exports.tetrisArcade = tetrisArcade;
 
 // export const    tetrisCreateRoom = async (socket: WebSocket, req: FastifyRequest<{Querystring: {username: string, code?: string | undefined}}>) => {
 // 	const request = req.query;
@@ -108,72 +111,66 @@ export const tetrisArcade = async (socket: Socket) => {
 // 	}
 // }
 
-export const    retryGame = async (socket: Socket) => {
+const retryGame = async (socket) => {
+    let game = (0, utils.getTetrisGame)(socket.id);
+    //TODO: Add error.
+    game?.retry();
+};
+exports.retryGame = retryGame;
 
-	let   game = getTetrisGame(socket.id);
-	//TODO: Add error.
+const forfeitGame = async (socket) => {
+    const game = (0, utils.getTetrisGame)(socket.id);
+    //TODO: Add error.
+    game?.forfeit();
+};
+exports.forfeitGame = forfeitGame;
 
-	game?.retry();
-}
+const movePiece = async (direction, socket) => {
+    const game = (0, utils.getTetrisGame)(socket.id);
+    // TODO: Add error.
+    switch (direction) {
+        case "left":
+        case "right":
+            game?.move(direction);
+            return;
+        default:
+            return; //TODO: Add error.
+    }
+};
+exports.movePiece = movePiece;
 
-export const    forfeitGame = async (socket: Socket) => {
+const rotatePiece = async (direction, socket) => {
+    const game = (0, utils.getTetrisGame)(socket.id);
+    // TODO: Add error.
+    switch (direction) {
+        case "clockwise":
+        case "counter-clockwise":
+        case "180":
+            return game?.rotate(direction);
+        default:
+            return; //TODO: Add error.
+    }
+};
+exports.rotatePiece = rotatePiece;
 
-	const   game = getTetrisGame(socket.id);
-	//TODO: Add error.
+const dropPiece = async (dropType, socket) => {
+    const game = (0, utils.getTetrisGame)(socket.id);
+    // TODO: Add error.
+    switch (dropType) {
+        case "hard":
+        case "soft":
+        case "normal":
+            game?.changeFallSpeed(dropType);
+            return;
+        default:
+            return; //TODO: Add error.
+    }
+};
+exports.dropPiece = dropPiece;
 
-	game?.forfeit();
-}
-
-export const    movePiece = async (direction: string, socket: Socket) => {
-
-	const   game = getTetrisGame(socket.id);
-	// TODO: Add error.
-
-	switch (direction) {
-		case "left":
-		case "right":
-			game?.move(direction);
-			return ;
-		default:
-			return ; //TODO: Add error.
-	}
-}
-
-export const    rotatePiece = async (direction: string, socket: Socket) => {
-
-	const   game = getTetrisGame(socket.id);
-	// TODO: Add error.
-
-	switch (direction) {
-		case "clockwise":
-		case "counter-clockwise":
-		case "180":
-			return game?.rotate(direction);
-		default:
-			return ; //TODO: Add error.
-	}
-}
-
-export const    dropPiece = async (dropType: string, socket: Socket) => {
-
-	const   game = getTetrisGame(socket.id);
-	// TODO: Add error.
-
-	switch (dropType) {
-		case "hard":
-		case "soft":
-		case "normal":
-			game?.changeFallSpeed(dropType);
-			return ;
-		default:
-			return; //TODO: Add error.
-	}
-}
-
-export const    holdPiece = async (socket: Socket) => {
-
-	const   game = getTetrisGame(socket.id);
-	//TODO: Add error.
-
-	game?.swap();
-}
+const holdPiece = async (socket) => {
+    const game = (0, utils.getTetrisGame)(socket.id);
+    //TODO: Add error.
+    game?.swap();
+};
+exports.holdPiece = holdPiece;
