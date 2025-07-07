@@ -8,169 +8,115 @@ const TetrisGame = require("../server/Game/TetrisGame");
 
 exports.arcadeGamesLst = [];
 exports.multiplayerRoomLst = [];
-
-// export const    tetrisMatchmaking = async (socket: WebSocket, req: FastifyRequest<{Querystring: {username: string}}>) => {
-// 	if (!req.query.username)
-// 		return console.log("No username");
-//
-// 	for (const room of multiplayerRoomLst) {
-// 		if (room.getIsInGame() || room.isPrivate() || !room.getIsVersus() || room.getPlayers().length >= 2)
-// 			continue ;
-// 		console.log("Joining existing room with code: " + room.getCode());
-// 		room.addPlayer(socket, req.query.username);
-// 		return ;
-// 	}
-//
-// 	console.log("No room found, creating a new room");
-//
-// 	const room = new MultiplayerRoom(socket, req.query.username, false);
-// 	room.addSettings( {"isVersus": true, "isPrivate": false} );
-// 	multiplayerRoomLst.push(room);
-// }
+exports.users = {}; // { socketId: user }
 
 const tetrisArcade = async (socket) => {
-    const tetrisGame = new TetrisGame.TetrisGame(socket);
-    console.log("Arcade Game started for", socket.id);
-    exports.arcadeGamesLst.push(tetrisGame);
-    tetrisGame.gameLoop();
+	const tetrisGame = new TetrisGame.TetrisGame(socket);
+	console.log("Arcade Game started for", socket.id);
+	exports.arcadeGamesLst.push(tetrisGame);
+	exports.users[socket.id] = new utils.User();
+	exports.users[socket.id].game = tetrisGame;
+	tetrisGame.gameLoop().then(() => exports.users[socket.id].game = null);
 };
 exports.tetrisArcade = tetrisArcade;
 
-// export const    tetrisCreateRoom = async (socket: WebSocket, req: FastifyRequest<{Querystring: {username: string, code?: string | undefined}}>) => {
-// 	const request = req.query;
-// 	if (!request)
-// 		return;
-//
-// 	const room = new MultiplayerRoom(socket, request.username, false, request.code);
-// 	multiplayerRoomLst.push(room);
-// }
-//
-// export const	getMultiplayerRooms = async (request: FastifyRequest, reply: FastifyReply) => {
-// 	let rooms: {roomCode: string, nbPlayers: number}[] = [];
-//
-// 	for (const room of multiplayerRoomLst) {
-// 		if (room.isPrivate())
-// 			continue ;
-// 		rooms.push({roomCode: room.getCode(), nbPlayers: room.getPlayers().length});
-// 	}
-// 	return reply.send(rooms);
-// }
-//
-// export const    tetrisJoinRoom = async (socket: WebSocket, req: FastifyRequest<{Querystring: {username: string, code: string}}>) => {
-// 	const request = req.query;
-// 	if (!request)
-// 		return ;
-// 	const room = getTetrisRoom(request.code);
-// 	if (!room)
-// 		return tetrisCreateRoom(socket, req);
-//
-// 	room.addPlayer(socket, request.username);
-// }
-//
-// export const    tetrisRoomCommand = async (req: FastifyRequest<{Body: tetrisReq}>, reply: FastifyReply) => {
-// 	const request: tetrisReq = req.body;
-// 	if (!request)
-// 		return reply.status(400).send({message: "No body"});
-//
-// 	const room = getTetrisRoom(request.roomCode);
-// 	if (!room)
-// 		return reply.status(400).send({message: "Room not found"});
-//
-// 	switch (request.argument) {
-// 		case "start":
-// 			room.startGames();
-// 			break ;
-// 		case "settings":
-// 			room.setSettings(request.prefix);
-// 			break ;
-// 	}
-// 	reply.status(200).send({message: "Command received"});
-// }
-//
-// export const    tetrisQuitRoom = async (req: FastifyRequest<{Body: tetrisReq}>, reply: FastifyReply) => {
-// 	try {
-// 		const   request: tetrisReq = req.body;
-// 		if (!request)
-// 			return reply.status(400).send({message: "No body"});
-// 		if (!request.username)
-// 			return reply.status(400).send({message: "No username"});
-//
-// 		deleteTetrisGame(request.gameId);
-// 		const room = getTetrisRoom(request.roomCode);
-// 		if (room) {
-// 			console.log("Tetris QuitRoom with code : " + request?.roomCode + " for " + request?.username);
-// 			room.removePlayer(request.username);
-// 			if (room.isEmpty())
-// 				multiplayerRoomLst.splice(multiplayerRoomLst.indexOf(room), 1);
-// 		}
-// 		reply.status(200).send({message: "Quitting the room"});
-// 	}
-// 	catch (error) {
-// 		console.error("Error in tetrisQuitRoom:", error);
-// 		return reply.status(500).send({message: "Error in tetrisQuitRoom"});
-// 	}
-// }
 
-const retryGame = async (socket) => {
-    let game = (0, utils.getTetrisGame)(socket.id);
-    //TODO: Add error.
-    game?.retry();
+const rotatePiece = async (direction, user) => {
+	const game = user.game;
+	if (!game)
+		return; //TODO: Add error.
+	direction = (direction === user.keys.rotateClockwise ? "clockwise" :
+		(direction === user.keys.rotateCounterClockwise ? "counter-clockwise" : "180"));
+	return game?.rotate(direction);
 };
-exports.retryGame = retryGame;
 
-const forfeitGame = async (socket) => {
-    const game = (0, utils.getTetrisGame)(socket.id);
-    //TODO: Add error.
-    game?.forfeit();
+const dropPiece = async (dropType, user, keyType) => {
+	const game = user.game;
+	if (!game)
+		return ;
+	// TODO: Add error.
+	dropType = (dropType === user.keys.hardDrop ? "hard" : "soft");
+	if (dropType === "soft" && keyType === "keyUp")
+		dropType = "normal";
+	game?.changeFallSpeed(dropType);
 };
-exports.forfeitGame = forfeitGame;
 
-const movePiece = async (direction, socket) => {
-    const game = (0, utils.getTetrisGame)(socket.id);
-    // TODO: Add error.
-    switch (direction) {
-        case "left":
-        case "right":
-            game?.move(direction);
-            return;
-        default:
-            return; //TODO: Add error.
-    }
-};
-exports.movePiece = movePiece;
+const   movePiece = (direction, user, keyType) => {
+	const   arg = direction === user.keys.moveLeft ? user.moveLeft : user.moveRight;
+	const   opposite = direction === user.keys.moveLeft ? user.moveRight : user.moveLeft;
 
-const rotatePiece = async (direction, socket) => {
-    const game = (0, utils.getTetrisGame)(socket.id);
-    // TODO: Add error.
-    switch (direction) {
-        case "clockwise":
-        case "counter-clockwise":
-        case "180":
-            return game?.rotate(direction);
-        default:
-            return; //TODO: Add error.
-    }
-};
-exports.rotatePiece = rotatePiece;
+	if (keyType === "keyUp") {
+		arg.firstMove = true;
+		arg.timeout.clear();
+		if (opposite.timeout != null)
+			opposite.timeout.resume();
+		return ;
+	}
+	if (opposite.timeout != null && !opposite.firstMove) {
+		opposite.timeout?.pause();
+	}
+	const   repeat = async () => {
+		user.game?.move(direction === user.keys.moveLeft ? "left" : "right");
+		if (arg.firstMove) {
+			arg.firstMove = false;
+			arg.timeout = new utils.TimeoutKey(repeat, 150);
+		}
+		else {
+			arg.timeout?.clear();
+			arg.timeout = new utils.TimeoutKey(repeat, 40);
+		}
+	}
+	repeat();
+}
 
-const dropPiece = async (dropType, socket) => {
-    const game = (0, utils.getTetrisGame)(socket.id);
-    // TODO: Add error.
-    switch (dropType) {
-        case "hard":
-        case "soft":
-        case "normal":
-            game?.changeFallSpeed(dropType);
-            return;
-        default:
-            return; //TODO: Add error.
-    }
-};
-exports.dropPiece = dropPiece;
 
-const holdPiece = async (socket) => {
-    const game = (0, utils.getTetrisGame)(socket.id);
-    //TODO: Add error.
-    game?.swap();
-};
-exports.holdPiece = holdPiece;
+const keyDown = async (key, socket) => {
+	const user = exports.users[socket.id];
+	if (!user || !utils.getTetrisGame(socket.id))
+		return; // TODO : Add error.
+	key = key.toLowerCase();
+
+	switch (key) {
+		case user.keys.moveLeft:
+		case user.keys.moveRight:
+			movePiece(key, user, "keyDown");
+			break ;
+		case user.keys.rotateClockwise:
+		case user.keys.rotateCounterClockwise:
+		case user.keys.rotate180:
+			rotatePiece(key, user, "keyDown");
+			break ;
+		case user.keys.hardDrop:
+		case user.keys.softDrop:
+			dropPiece(key, user, "keyDown");
+			break ;
+		case user.keys.hold:
+			user.game?.swap();
+			break ;
+		case user.keys.forfeit:
+			user.game?.forfeit();
+			break ;
+		case user.keys.retry:
+			user.game?.retry();
+			break ;
+	}
+}
+exports.keyDown = keyDown;
+
+const keyUp = async (key, socket) => {
+	const user = exports.users[socket.id];
+	if (!user || !utils.getTetrisGame(socket.id))
+		return; // TODO : Add error.
+	key = key.toLowerCase();
+
+	switch (key) {
+		case user.keys.moveLeft:
+		case user.keys.moveRight:
+			movePiece(key, user, "keyUp");
+			break;
+		case user.keys.softDrop:
+			dropPiece(key, user, "keyUp");
+			break;
+	}
+}
+exports.keyUp = keyUp;

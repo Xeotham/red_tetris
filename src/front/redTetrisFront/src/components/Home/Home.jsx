@@ -9,15 +9,15 @@ import {sfxPlayer} from "../../sfxHandler.jsx";
 const   Home = () => {
 	const   navigate = useNavigate();
 
-	const   socket = new io('http://localhost:3000', {});
-	const   socketListeners = ev => listener => socket.on(ev, listener);
-	socketListeners("EFFECT")((data) => {
-		data = JSON.parse(data);
-		console.log (data);
-		return sfxPlayer(data.type, data.value).play()
-	});
-	const   socketGame = socketListeners("GAME");
-	const   socketGameStart = socketListeners("GAME_START");
+	// const   socket = new io('http://localhost:3000', {});
+	// const   socketListeners = ev => listener => socket.on(ev, listener);
+	// socketListeners("EFFECT")((data) => {
+	// 	data = JSON.parse(data);
+	// 	console.log (data);
+	// 	return sfxPlayer(data.type, data.value).play()
+	// });
+	// const   socketGame = socketListeners("GAME");
+	// const   socketGameStart = socketListeners("GAME_START");
 
 
 

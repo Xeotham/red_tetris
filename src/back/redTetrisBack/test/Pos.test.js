@@ -83,5 +83,30 @@ describe('Pos', () => {
 		expect(pos.right().getX()).to.equal(6);
 		expect(pos.getX()).to.equal(5);
 	});
+
+	it('should clamp position within bounds', () => {
+		const pos = new Pos(5, 5);
+		const min = new Pos(0, 0);
+		const max = new Pos(10, 10);
+		const clampedPos = pos.clamp(min, max);
+		expect(clampedPos.getX()).to.equal(5);
+		expect(clampedPos.getY()).to.equal(5);
+
+		const outOfBoundsPos = new Pos(-1, 15);
+		const clampedOutOfBounds = outOfBoundsPos.clamp(min, max);
+		expect(clampedOutOfBounds.getX()).to.equal(0);
+		expect(clampedOutOfBounds.getY()).to.equal(10);
+	});
+
+	it('should check equality of two positions', () => {
+		const pos1 = new Pos(3, 4);
+		const pos2 = new Pos(3, 4);
+		const pos3 = new Pos(5, 6);
+		expect(pos1.equals(pos2)).to.be.true;
+		expect(pos1.equals(pos3)).to.be.false;
+		expect(pos2.equals(pos3)).to.be.false;
+		expect(pos1).to.not.be.equal(pos2);
+	});
+
 });
 

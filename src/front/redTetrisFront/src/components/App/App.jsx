@@ -9,8 +9,6 @@ import ArcadeBoard from "../ArcadeBoard/ArcadeBoard.jsx";
 import {io} from "socket.io-client";
 
 const   App = () => {
-	const   socket = new io('http://localhost:3000', {});
-
 	return (
 		<div className="App">
 			<Routes>
