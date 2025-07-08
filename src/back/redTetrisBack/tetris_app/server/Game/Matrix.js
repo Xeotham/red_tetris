@@ -159,6 +159,15 @@ class Matrix {
 		}
 		return true;
 	}
+
+	print() {
+		for (let y = 0; y < this.size.getY(); ++y) {
+			for (let x = 0; x < this.size.getX(); ++x) {
+				process.stdout.write("[" + (this.matrix[y][x].getTexture() === "EMPTY" ? " " : this.matrix[y][x].getTexture()) + "] ");
+			}
+			process.stdout.write("\n");
+		}
+	}
 }
 exports.Matrix = Matrix;
 
