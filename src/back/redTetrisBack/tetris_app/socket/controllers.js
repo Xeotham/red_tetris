@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.holdPiece = exports.dropPiece = exports.rotatePiece = exports.movePiece = exports.forfeitGame = exports.retryGame = exports.tetrisArcade = exports.multiplayerRoomLst = exports.arcadeGamesLst = void 0;
 
 const utils = require("../utils");
-const TetrisGame = require("../server/Game/TetrisGame");
+const { TetrisGame } = require("../server/Game/TetrisGame");
 
 
 exports.arcadeGamesLst = [];
@@ -11,7 +11,7 @@ exports.multiplayerRoomLst = [];
 exports.users = {}; // { socketId: user }
 
 const tetrisArcade = async (socket) => {
-	const tetrisGame = new TetrisGame.TetrisGame(socket);
+	const tetrisGame = new TetrisGame(socket);
 	console.log("Arcade Game started for", socket.id);
 	exports.arcadeGamesLst.push(tetrisGame);
 	exports.users[socket.id] = new utils.User();

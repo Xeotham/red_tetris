@@ -11,6 +11,8 @@ const { Mino } = require("./Mino");
 class ATetrimino {
 
 	constructor(rotationType, name = "None", coordinates = new Pos(0, 0), texture = "Empty") {
+		if (new.target === ATetrimino)
+			throw new TypeError("Cannot construct ATetrimino instances directly, use a subclass instead.");
 		this.name = name;
 		this.coordinates = coordinates;
 		this.texture = texture;
@@ -32,7 +34,7 @@ class ATetrimino {
 			blocks.push(new Pos(jsonBlock.blocks[i].x, jsonBlock.blocks[i].y));
 		let original = [];
 		for (let i = 0; i < jsonBlock.original?.length || 0; ++i)
-			original.push(new Pos(jsonBlock.blocks[i].x, jsonBlock.blocks[i].y));
+			original.push(new Pos(jsonBlock.original[i].x, jsonBlock.original[i].y));
 		let SRS = [];
 		for (let i = 0; i < jsonBlock.SRS?.length || 0; ++i)
 			SRS.push(new Pos(jsonBlock.SRS[i].x, jsonBlock.SRS[i].y));
@@ -55,22 +57,53 @@ class ATetrimino {
 		return this.constructor.SpinCheck;
 	}
 
+	place(matrix, isSolid = false, isShadow = false) {
+		const struct = this.getStruct();
+		const block = struct[tc.ROTATIONS[this.rotation]];
+		for (let i = 0; i < struct.nbBlocks; ++i) {
+			const pos = this.coordinates.add(block?.blocks[i]);
+			if (pos.getY() < 0)
+				return;
+			if (!isShadow || (isShadow && matrix.at(pos).isEmpty())) {
+				matrix.setAt(pos, new Mino(this.texture, isSolid));
+				if (isShadow)
+					matrix.at(pos).setShadow(true);
+			}
+		}
+	}
+
+	remove(matrix, isShadow = false) {
+		const struct = this.getStruct();
+		const block = struct[tc.ROTATIONS[this.rotation]];
+		for (let i = 0; i < struct.nbBlocks; ++i) {
+			const pos = this.coordinates.add(block?.blocks[i]);
+			if (!isShadow || (isShadow && matrix.at(pos).getIsShadow()))
+				matrix.setAt(pos, new Mino("EMPTY", false));
+		}
+	}
+
 	rotate(direction, matrix) {
 		let rotationPointUsed = -1;
 		const struct = this.getStruct();
 		let start = struct[tc.ROTATIONS[this.rotation]];
 		let end = null;
 		if (direction === "clockwise")
-			end = struct[tc.ROTATIONS[(0, utils.mod)(this.rotation + 1, 4)]];
+			end = struct[tc.ROTATIONS[utils.mod(this.rotation + 1, 4)]];
 		else if (direction === "180")
-			end = struct[tc.ROTATIONS[(0, utils.mod)(this.rotation + 2, 4)]];
+			end = struct[tc.ROTATIONS[utils.mod(this.rotation + 2, 4)]];
 		else
-			end = struct[tc.ROTATIONS[(0, utils.mod)(this.rotation + 3, 4)]];
+			end = struct[tc.ROTATIONS[utils.mod(this.rotation + 3, 4)]];
 		if (!end)
 			return "";
+		// console.log("start :", start);
+		// console.log("end :", end);
 		let startRotations = ((direction !== "180" && this.rotationType !== "original") ? start["SRS"] : start[this.rotationType]);
-		let endRotations = ((direction !== "180" && this.rotationType !== "original") ? start["SRS"] : end[this.rotationType]);
+		let endRotations = ((direction !== "180" && this.rotationType !== "original") ? end["SRS"] : end[this.rotationType]);
+		console.log("direction :", direction, "rotationType", this.rotationType);
+		console.log("startRotations :", startRotations);
+		console.log("endRotations :", endRotations);
 		this.remove(matrix, false);
+
 		for (let i = 0; i < startRotations.length; ++i) {
 			const startPos = (direction === "180" ? new Pos(3, 3) : startRotations[i]);
 			const endPos = endRotations[i];
@@ -84,16 +117,17 @@ class ATetrimino {
 			if (!collides()) {
 				rotationPointUsed = i;
 				this.coordinates = this.coordinates.add(dist);
-				this.rotation = direction === "clockwise" ? (0, utils.mod)(this.rotation + 1, 4) :
-					direction === "180" ? (0, utils.mod)(this.rotation + 2, 4) : (0, utils.mod)(this.rotation + 3, 4);
+				this.rotation = direction === "clockwise" ? utils.mod(this.rotation + 1, 4) :
+					direction === "180" ? utils.mod(this.rotation + 2, 4) : utils.mod(this.rotation + 3, 4);
 				break;
 			}
 		}
 		this.place(matrix, false);
-		return this.getSpin(matrix, rotationPointUsed);
+		return this.#getSpin(matrix, rotationPointUsed);
 	}
 
-	getSpin(matrix, rotationPointUsed) {
+	#getSpin(matrix, rotationPointUsed) {
+		// console.log("rotationPointUsed", rotationPointUsed);
 		if (rotationPointUsed === -1)
 			return "-1";
 		if (this.canFall(matrix))
@@ -124,31 +158,6 @@ class ATetrimino {
 				return true;
 		}
 		return false;
-	}
-
-	place(matrix, isSolid = false, isShadow = false) {
-		const struct = this.getStruct();
-		const block = struct[tc.ROTATIONS[this.rotation]];
-		for (let i = 0; i < struct.nbBlocks; ++i) {
-			const pos = this.coordinates.add(block?.blocks[i]);
-			if (pos.getY() < 0)
-				return;
-			if (!isShadow || (isShadow && matrix.at(pos).isEmpty())) {
-				matrix.setAt(pos, new Mino(this.texture, isSolid));
-				if (isShadow)
-					matrix.at(pos).setShadow(true);
-			}
-		}
-	}
-
-	remove(matrix, isShadow = false) {
-		const struct = this.getStruct();
-		const block = struct[tc.ROTATIONS[this.rotation]];
-		for (let i = 0; i < struct.nbBlocks; ++i) {
-			const pos = this.coordinates.add(block?.blocks[i]);
-			if (!isShadow || (isShadow && matrix.at(pos).getIsShadow()))
-				matrix.setAt(pos, new Mino("EMPTY", false));
-		}
 	}
 
 	getCoordinates() { return this.coordinates; }

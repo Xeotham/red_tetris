@@ -26,7 +26,6 @@ class TetrisGame {
 		this.matrix = new Matrix(this.size.add(0, tc.BUFFER_HEIGHT));
 		this.currentPiece = null;
 		this.shadowPiece = null;
-		this.bags = [this.shuffleBag(), this.shuffleBag()];
 		this.hold = null;
 		this.level = tc.MIN_LEVEL;
 		this.dropType = "normal";
@@ -102,6 +101,7 @@ class TetrisGame {
 		// settings
 
 		this.rotationType = "SRS";
+		this.bags = [this.shuffleBag(), this.shuffleBag()];
 		this.showShadowPiece = true;
 		this.showBags = true;
 		this.holdAllowed = true;
@@ -344,6 +344,8 @@ class TetrisGame {
 					this.player.emit("EFFECT", JSON.stringify({ type: "CLEAR", value: "spin" }));
 				else if (this.B2B > 0)
 					this.player.emit("EFFECT", JSON.stringify({ type: "CLEAR", value: "btb" }));
+				else if (this.lastClear.includes("Quad"))
+					this.player.emit("EFFECT", JSON.stringify({ type: "CLEAR", value: "quad" }));
 				else
 					this.player.emit("EFFECT", JSON.stringify({ type: "CLEAR", value: "line" }));
 				if (this.combo >= 1) {
@@ -413,7 +415,6 @@ class TetrisGame {
 		this.shadowPiece = new this.currentPiece.constructor(this.rotationType, "SHADOW", this.currentPiece.getCoordinates(), "SHADOW");
 		this.shadowPiece.setName("SHADOW");
 		this.shadowPiece.setTexture("SHADOW");
-		// console.log(JSON.stringify(this.shadowPiece));
 		this.shadowPiece.setCoordinates(this.currentPiece.getCoordinates());
 		this.shadowPiece.setRotation(this.currentPiece.getRotation());
 		while (this.shadowPiece.canFall(this.matrix))
