@@ -38,6 +38,9 @@ const   Rows = ({row, width, height, id}) => {
 const   Matrix = ({ matrix, width, height, id }) => {
 	const   [size, setSize] = useState({ width: width || 320, height: height || 640 });
 
+	if (!matrix)
+		return ;
+
 	return (
 		<div className={"matrixContainer"}>
 			<div className={"matrixGrid"}>

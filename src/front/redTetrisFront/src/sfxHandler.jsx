@@ -1,42 +1,41 @@
 const   btbSounds = (sound) => {
 	switch(sound) {
-		case "btb_1": return new Audio("/src/assets/sfx/BejeweledSR/btb_1.ogg");
-		case "btb_2": return new Audio("/src/assets/sfx/BejeweledSR/btb_2.ogg");
-		case "btb_3": return new Audio("/src/assets/sfx/BejeweledSR/btb_3.ogg");
-		case "btb_break": return new Audio("/src/assets/sfx/BejeweledSR/btb_break.ogg");
+		case 1: return new Audio("/src/assets/sfx/BejeweledSR/btb_1.ogg");
+		case 2: return new Audio("/src/assets/sfx/BejeweledSR/btb_2.ogg");
+		case 3: return new Audio("/src/assets/sfx/BejeweledSR/btb_3.ogg");
+		case "break": return new Audio("/src/assets/sfx/BejeweledSR/btb_break.ogg");
 	}
 }
 
 const   clearSounds = (sound) => {
-	console.log(sound);
 	switch(sound) {
 		case "allclear": return new Audio("/src/assets/sfx/BejeweledSR/allclear.ogg");
 		case "btb": return new Audio("/src/assets/sfx/BejeweledSR/clearbtb.ogg");
 		case "line": return new Audio("/src/assets/sfx/BejeweledSR/clearline.ogg");
 		case "quad": return new Audio("/src/assets/sfx/BejeweledSR/clearquad.ogg");
-		case "clearspin": return new Audio("/src/assets/sfx/BejeweledSR/clearspin.ogg");
+		case "spin": return new Audio("/src/assets/sfx/BejeweledSR/clearspin.ogg");
 	}
 }
 
 const   comboSounds = (sound) => {
 	switch(sound) {
-		case "combo_1": return new Audio("/src/assets/sfx/BejeweledSR/combo_1.ogg");
-		case "combo_2": return new Audio("/src/assets/sfx/BejeweledSR/combo_2.ogg");
-		case "combo_3": return new Audio("/src/assets/sfx/BejeweledSR/combo_3.ogg");
-		case "combo_4": return new Audio("/src/assets/sfx/BejeweledSR/combo_4.ogg");
-		case "combo_5": return new Audio("/src/assets/sfx/BejeweledSR/combo_5.ogg");
-		case "combo_6": return new Audio("/src/assets/sfx/BejeweledSR/combo_6.ogg");
-		case "combo_7": return new Audio("/src/assets/sfx/BejeweledSR/combo_7.ogg");
-		case "combo_8": return new Audio("/src/assets/sfx/BejeweledSR/combo_8.ogg");
-		case "combo_9": return new Audio("/src/assets/sfx/BejeweledSR/combo_9.ogg");
-		case "combo_10": return new Audio("/src/assets/sfx/BejeweledSR/combo_10.ogg");
-		case "combo_11": return new Audio("/src/assets/sfx/BejeweledSR/combo_11.ogg");
-		case "combo_12": return new Audio("/src/assets/sfx/BejeweledSR/combo_12.ogg");
-		case "combo_13": return new Audio("/src/assets/sfx/BejeweledSR/combo_13.ogg");
-		case "combo_14": return new Audio("/src/assets/sfx/BejeweledSR/combo_14.ogg");
-		case "combo_15": return new Audio("/src/assets/sfx/BejeweledSR/combo_15.ogg");
-		case "combo_16": return new Audio("/src/assets/sfx/BejeweledSR/combo_16.ogg");
-		case "combobreak": return new Audio("/src/assets/sfx/BejeweledSR/combobreak.ogg");
+		case 1: return new Audio("/src/assets/sfx/BejeweledSR/combo_1.ogg");
+		case 2: return new Audio("/src/assets/sfx/BejeweledSR/combo_2.ogg");
+		case 3: return new Audio("/src/assets/sfx/BejeweledSR/combo_3.ogg");
+		case 4: return new Audio("/src/assets/sfx/BejeweledSR/combo_4.ogg");
+		case 5: return new Audio("/src/assets/sfx/BejeweledSR/combo_5.ogg");
+		case 6: return new Audio("/src/assets/sfx/BejeweledSR/combo_6.ogg");
+		case 7: return new Audio("/src/assets/sfx/BejeweledSR/combo_7.ogg");
+		case 8: return new Audio("/src/assets/sfx/BejeweledSR/combo_8.ogg");
+		case 9: return new Audio("/src/assets/sfx/BejeweledSR/combo_9.ogg");
+		case 10: return new Audio("/src/assets/sfx/BejeweledSR/combo_10.ogg");
+		case 11: return new Audio("/src/assets/sfx/BejeweledSR/combo_11.ogg");
+		case 12: return new Audio("/src/assets/sfx/BejeweledSR/combo_12.ogg");
+		case 13: return new Audio("/src/assets/sfx/BejeweledSR/combo_13.ogg");
+		case 14: return new Audio("/src/assets/sfx/BejeweledSR/combo_14.ogg");
+		case 15: return new Audio("/src/assets/sfx/BejeweledSR/combo_15.ogg");
+		case 16: return new Audio("/src/assets/sfx/BejeweledSR/combo_16.ogg");
+		case "break": return new Audio("/src/assets/sfx/BejeweledSR/combobreak.ogg");
 	}
 }
 
@@ -68,11 +67,11 @@ const   userEffectSounds = (sound) => {
 
 const   levelSounds = (sound) => {
 	switch(sound) {
-		case "level1": return new Audio("/src/assets/sfx/BejeweledSR/level1.ogg");
-		case "level5": return new Audio("/src/assets/sfx/BejeweledSR/level5.ogg");
-		case "level10": return new Audio("/src/assets/sfx/BejeweledSR/level10.ogg");
-		case "level15": return new Audio("/src/assets/sfx/BejeweledSR/level15.ogg");
-		case "levelup": return new Audio("/src/assets/sfx/BejeweledSR/levelup.ogg");
+		case 1: return new Audio("/src/assets/sfx/BejeweledSR/level1.ogg");
+		case 5: return new Audio("/src/assets/sfx/BejeweledSR/level5.ogg");
+		case 10: return new Audio("/src/assets/sfx/BejeweledSR/level10.ogg");
+		case 15: return new Audio("/src/assets/sfx/BejeweledSR/level15.ogg");
+		case "up": return new Audio("/src/assets/sfx/BejeweledSR/levelup.ogg");
 	}
 }
 
@@ -92,6 +91,8 @@ const   boardSounds = (sound) => {
 }
 
 export const    sfxPlayer = (type, sound) => {
+	console.log("SFX: ", type, ", ", sound)
+
 	switch(type) {
 		case "BTB":
 			return btbSounds(sound);
@@ -111,5 +112,7 @@ export const    sfxPlayer = (type, sound) => {
 			return new Audio("/src/assets/sfx/BejeweledSR/spin.ogg");
 		case "BOARD":
 			return boardSounds(sound);
+		default:
+			console.error("unknown type", type);
 	}
 }

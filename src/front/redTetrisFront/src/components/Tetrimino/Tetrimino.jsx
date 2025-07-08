@@ -1,7 +1,7 @@
 import "./Tetrimino.css"
 import {getTexture} from "../../utils.jsx";
 
-const   Tetrimino = ({minoType}) => {
+const   Tetrimino = ({minoType, texture}) => {
 	const    tetriminoPatterns = {
 		"I": [
 			[ 1, 1, 1, 1 ],
@@ -40,6 +40,9 @@ const   Tetrimino = ({minoType}) => {
 		)
 	}
 
+	if (!texture)
+		texture = getTexture(minoType);
+
 	return (
 		<div>
 			<div className="tetrimino">
@@ -47,7 +50,7 @@ const   Tetrimino = ({minoType}) => {
 					tetriminoPatterns[minoType].map((row, rowIndex) => (
 					<div key={rowIndex} className="tetriminoRow" style={{height: "32px"}}>
 						{row.map((cell, cellIndex) => (
-							<img src={cell ? getTexture(minoType) : getTexture("EMPTY")} alt={cellIndex}/>
+							<img src={cell ? texture : getTexture("EMPTY")} alt={cellIndex}/>
 						))}
 					</div>
 				))}

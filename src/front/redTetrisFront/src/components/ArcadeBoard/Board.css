@@ -13,9 +13,11 @@
 	justify-content: center;
 	align-items: center;
 	margin-right: 20px;
+	margin-bottom: 300px;
 }
 
 .boardMatrix {
+	margin-top: 100px;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
