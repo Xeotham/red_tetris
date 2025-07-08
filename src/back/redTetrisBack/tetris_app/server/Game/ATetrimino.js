@@ -99,9 +99,9 @@ class ATetrimino {
 		// console.log("end :", end);
 		let startRotations = ((direction !== "180" && this.rotationType !== "original") ? start["SRS"] : start[this.rotationType]);
 		let endRotations = ((direction !== "180" && this.rotationType !== "original") ? end["SRS"] : end[this.rotationType]);
-		console.log("direction :", direction, "rotationType", this.rotationType);
-		console.log("startRotations :", startRotations);
-		console.log("endRotations :", endRotations);
+		// console.log("direction :", direction, "rotationType", this.rotationType);
+		// console.log("startRotations :", startRotations);
+		// console.log("endRotations :", endRotations);
 		this.remove(matrix, false);
 
 		for (let i = 0; i < startRotations.length; ++i) {
@@ -160,6 +160,14 @@ class ATetrimino {
 		return false;
 	}
 
+	canSlide(matrix) {
+		return !this.isColliding(matrix, new Pos(1, 0)) || !this.isColliding(matrix, new Pos(-1, 0));
+	}
+
+	canFall(matrix) {
+		return !this.isColliding(matrix, new Pos(0, 1));
+	}
+
 	getCoordinates() { return this.coordinates; }
 	setCoordinates(pos) { this.coordinates = pos; }
 
@@ -171,13 +179,5 @@ class ATetrimino {
 
 	getRotation() { return this.rotation; }
 	setRotation(rotation) { this.rotation = rotation; }
-
-	canFall(matrix) {
-		return !this.isColliding(matrix, new Pos(0, 1));
-	}
-
-	canSlide(matrix) {
-		return !this.isColliding(matrix, new Pos(1, 0)) || !this.isColliding(matrix, new Pos(-1, 0));
-	}
 }
 exports.ATetrimino = ATetrimino;

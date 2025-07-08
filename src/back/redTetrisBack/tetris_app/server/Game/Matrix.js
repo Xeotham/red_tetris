@@ -167,6 +167,7 @@ class Matrix {
 			}
 			process.stdout.write("\n");
 		}
+		process.stdout.write("\n");
 	}
 }
 exports.Matrix = Matrix;

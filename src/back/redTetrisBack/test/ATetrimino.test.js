@@ -190,11 +190,180 @@ describe('ATetrimino', () => {
 
 		matrix.reset();
 		piece = new T("SRS", new Pos(5, 15));
-		for (let x = 0; x < 9; ++x)
+		for (let x = 1; x < 9; ++x)
 			matrix.setAt(new Pos(x, 19), new Mino("S", true));
 		piece.place(matrix, false);
-		matrix.print();
+		// matrix.print();
 		expect(piece.rotate("counter-clockwise", matrix)).to.equal("Mini T-Spin");
+		// matrix.print();
+		piece.remove(matrix);
+		piece.setRotation(tc.NORTH);
+		piece.setCoordinates(piece.coordinates.add(new Pos(-8, 0)));
+		piece.place(matrix, false);
+		// matrix.print();
+		expect(piece.rotate("clockwise", matrix)).to.equal("Mini T-Spin");
+		// matrix.print();
+		expect(piece.rotate("counter-clockwise", matrix)).to.equal("");
+		// matrix.print();
+		expect(piece.rotate("clockwise", matrix)).to.equal("Mini T-Spin");
+		expect(piece.rotate("clockwise", matrix)).to.equal("");
+		// matrix.print();
+		for (let i = 0; i < piece.getStruct().nbBlocks; ++i)
+			expect(matrix.at(piece.coordinates.add(piece.getStruct().south.blocks[i])).isEmpty()).to.be.false;
+
+		matrix.reset();
+		piece = new L("SRSX", new Pos(-2, 13));
+		piece.setRotation(tc.WEST);
+		for (let y = 15; y < 20; ++y)
+			matrix.setAt(new Pos(0, y), new Mino("S", true));
+		for (let y = 15; y < 19; ++y)
+			matrix.setAt(new Pos(2, y), new Mino("S", true));
+		matrix.setAt(new Pos(3, 19), new Mino("S", true));
+		piece.place(matrix)
+		expect(piece.rotate("180", matrix)).to.equal("Mini L-Spin");
+		// matrix.print();
+		for (let i = 17; i < 20; ++i)
+			expect(matrix.at(new Pos(1, i)).isEmpty()).to.be.false;
+		expect(matrix.at(new Pos(2, 19)).isEmpty()).to.be.false;
+		piece.remove(matrix);
+		piece.setRotation(tc.WEST);
+		piece.setCoordinates(new Pos(-2, 12));
+		piece.place(matrix)
+		// matrix.print();
+		expect(piece.rotate("180", matrix)).to.equal("");
+		// matrix.print();
+		for (let i = 12; i < 15; ++i)
+			expect(matrix.at(new Pos(1, i)).isEmpty()).to.be.false;
+		expect(matrix.at(new Pos(2, 14)).isEmpty()).to.be.false;
+
+		matrix.reset();
+		piece = new T("original", new Pos(-3, 5));
+		piece.setRotation(tc.EAST);
+		piece.place(matrix);
+		expect(piece.rotate("counter-clockwise", matrix)).to.equal("-1");
+		expect(piece.rotate("clockwise", matrix)).to.equal("-1");
+		expect(piece.rotate("180", matrix)).to.equal("-1");
+		expect(piece.getRotation()).to.equal(tc.EAST);
+		// matrix.print();
+		piece.remove(matrix);
+		piece.setCoordinates(new Pos(0, 5));
+		piece.setRotation(tc.EAST);
+		piece.place(matrix);
+		expect(piece.rotate("counter-clockwise", matrix)).to.equal("");
+		expect(piece.rotate("clockwise", matrix)).to.equal("");
+		expect(piece.rotate("180", matrix)).to.equal("");
+		expect(piece.getRotation()).to.equal(tc.WEST);
+		// matrix.print();
+		piece.remove(matrix);
 	});
 
+	it('Should return if the piece is colliding with another piece in the matrix', () => {
+		const matrix = new Matrix(new Pos(10, 20));
+		let piece = new S("SRS", new Pos(5, 16));
+		piece.place(matrix, false);
+		// matrix.print();
+		expect(piece.isColliding(matrix, new Pos(0, 0))).to.be.false;
+		expect(piece.isColliding(matrix, new Pos(1, 0))).to.be.true; // Colliding with the side
+		expect(piece.isColliding(matrix, new Pos(-1, 0))).to.be.false;
+		expect(piece.isColliding(matrix, new Pos(0, -1))).to.be.false;
+		expect(piece.isColliding(matrix, new Pos(0, 1))).to.be.true; // Colliding with the side
+		piece.remove(matrix);
+
+		piece.setCoordinates(new Pos(1, 2));
+		piece.place(matrix);
+		matrix.setAt(new Pos(5, 5), new Mino("I", true));
+		// matrix.print();
+		expect(piece.isColliding(matrix, new Pos(0, 0))).to.be.false;
+		expect(piece.isColliding(matrix, new Pos(1, 0))).to.be.true;
+		expect(piece.isColliding(matrix, new Pos(-1, 0))).to.be.false;
+		expect(piece.isColliding(matrix, new Pos(0, -1))).to.be.false;
+		expect(piece.isColliding(matrix, new Pos(0, 1))).to.be.true;
+		expect(piece.isColliding(matrix, new Pos(2, 0))).to.be.true;
+		expect(piece.isColliding(matrix, new Pos(1, 1))).to.be.true;
+
+		matrix.setAt(new Pos(3, 4), new Mino("I", true));
+		piece.remove(matrix);
+		expect(piece.isColliding(matrix, new Pos(0, 0))).to.be.false; // Works even if the piece is not placed
+	});
+
+	it('Should return if the piece can slide in the matrix', () => {
+		const matrix = new Matrix(new Pos(10, 20));
+		let piece = new S("SRS", new Pos(5, 16));
+		piece.place(matrix, false);
+		expect(piece.canSlide(matrix)).to.be.true;
+		matrix.setAt(new Pos(6, 19), new Mino("I", true));
+		// matrix.print();
+		expect(piece.canSlide(matrix)).to.be.false;
+		piece.remove(matrix);
+		piece.setCoordinates(new Pos(2, 16));
+		piece.place(matrix);
+		// matrix.print();
+		expect(piece.canSlide(matrix)).to.be.true;
+		matrix.setAt(new Pos(4, 18), new Mino("I", true));
+		// matrix.print();
+		expect(piece.canSlide(matrix)).to.be.false;
+	});
+
+	it('Should return if the piece can fall in the matrix', () => {
+		const matrix = new Matrix(new Pos(10, 20));
+		let piece = new Z("SRS", new Pos(0, 5));
+		piece.place(matrix, false);
+		expect(piece.canFall(matrix)).to.be.true;
+		// matrix.print();
+		matrix.setAt(new Pos(2, 9), new Mino("I", true));
+		expect(piece.canFall(matrix)).to.be.true;
+		matrix.setAt(new Pos(3, 9), new Mino("I", true));
+		// matrix.print();
+		expect(piece.canFall(matrix)).to.be.false;
+		piece.remove(matrix);
+		piece.setCoordinates(piece.getCoordinates().up());
+		piece.place(matrix, false);
+		expect(piece.canFall(matrix)).to.be.true;
+		matrix.setAt(new Pos(2, 7), new Mino("I", true));
+		// matrix.print();
+		expect(piece.canFall(matrix)).to.be.false;
+	});
+
+	it('Should get and set the coordinates of the piece', () => {
+		const piece = new S("SRS", new Pos(5, 5));
+		expect(piece.getCoordinates().getX()).to.equal(5);
+		expect(piece.getCoordinates().getY()).to.equal(5);
+		piece.setCoordinates(new Pos(10, 10));
+		expect(piece.getCoordinates().getX()).to.equal(10);
+		expect(piece.getCoordinates().getY()).to.equal(10);
+		piece.setCoordinates(new Pos(-1, -1));
+		expect(piece.getCoordinates().getX()).to.equal(-1);
+		expect(piece.getCoordinates().getY()).to.equal(-1);
+	});
+
+	it('Should get and set the texture of the piece', () => {
+		const piece = new S("SRS", new Pos(5, 5));
+		expect(piece.getTexture()).to.equal("S");
+		piece.setTexture("NewTexture");
+		expect(piece.getTexture()).to.equal("NewTexture");
+		piece.setTexture("S");
+		expect(piece.getTexture()).to.equal("S");
+	});
+
+	it('Should get and set the name of the piece', () => {
+		const piece = new S("SRS", new Pos(5, 5));
+		expect(piece.getName()).to.equal("S");
+		piece.setName("NewName");
+		expect(piece.getName()).to.equal("NewName");
+		piece.setName("S");
+		expect(piece.getName()).to.equal("S");
+	});
+
+	it('Should get and set the rotation of the piece', () => {
+		const piece = new S("SRS", new Pos(5, 5));
+		expect(piece.getRotation()).to.equal(tc.NORTH);
+		piece.setRotation(tc.EAST);
+		expect(piece.getRotation()).to.equal(tc.EAST);
+		piece.setRotation(tc.SOUTH);
+		expect(piece.getRotation()).to.equal(tc.SOUTH);
+		piece.setRotation(tc.WEST);
+		expect(piece.getRotation()).to.equal(tc.WEST);
+		piece.setRotation(tc.NORTH);
+		expect(piece.getRotation()).to.equal(tc.NORTH);
+	});
 });
