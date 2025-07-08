@@ -1,10 +1,11 @@
-import  "./ArcadeBoard.css";
+import  "./Board.css";
 import Matrix from "../Matrix/Matrix.jsx";
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { address } from "../../main.jsx";
+import {sfxPlayer} from "../../sfxHandler.jsx";
 
-const   arcadeBoard = () => {
+const   board = () => {
 	const   startingMatrix = [["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
 									["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
 									["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
@@ -77,18 +78,20 @@ const   arcadeBoard = () => {
 			data = JSON.parse(data);
 			setMatrix(data.game.matrix);
 		})
+
+		socket.on("EFFECT", (data) => {
+			data = JSON.parse(data);
+			return sfxPlayer(data.type, data.value).play()
+		});
+
 		gameControllers(abortController);
 	}, []);
 
 	return (
-		<div className={"arcadeBoard"}>
-			<div className={"title"}>ARCADE BOARD</div>
-			<div className={"arcadeBoardContent"}>
-				<p>Welcome to the Arcade Board!</p>
-				<Matrix matrix={matrix} />
-			</div>
+		<div className={"board"}>
+				<Matrix matrix={matrix}  />
 		</div>
 	);
 }
 
-export default arcadeBoard;
+export default board;
