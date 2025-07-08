@@ -1,0 +1,8 @@
+.tetrimino {
+	display: grid;
+	grid-row: auto;
+	grid-column: auto;
+}
+
+.tetriminoRow {
+}

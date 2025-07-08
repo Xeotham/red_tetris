@@ -8,11 +8,12 @@ const   btbSounds = (sound) => {
 }
 
 const   clearSounds = (sound) => {
+	console.log(sound);
 	switch(sound) {
 		case "allclear": return new Audio("/src/assets/sfx/BejeweledSR/allclear.ogg");
-		case "clearbtb": return new Audio("/src/assets/sfx/BejeweledSR/clearbtb.ogg");
-		case "clearline": return new Audio("/src/assets/sfx/BejeweledSR/clearline.ogg");
-		case "clearquad": return new Audio("/src/assets/sfx/BejeweledSR/clearquad.ogg");
+		case "btb": return new Audio("/src/assets/sfx/BejeweledSR/clearbtb.ogg");
+		case "line": return new Audio("/src/assets/sfx/BejeweledSR/clearline.ogg");
+		case "quad": return new Audio("/src/assets/sfx/BejeweledSR/clearquad.ogg");
 		case "clearspin": return new Audio("/src/assets/sfx/BejeweledSR/clearspin.ogg");
 	}
 }
