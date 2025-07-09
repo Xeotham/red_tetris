@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { address } from "../../main.jsx";
 import {sfxPlayer} from "../../sfxHandler.jsx";
+import Hold from "../Hold/Hold.jsx";
+import Bags from "../Bags/Bags.jsx";
 
 const   board = () => {
 	const   startingMatrix = [["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
@@ -47,8 +49,22 @@ const   board = () => {
 									["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"],
 									["EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY", "EMPTY"]]
 	const	[socket, setSocket] = useState(() => io(`http://${address}`));
-	const   [matrix, setMatrix] = useState(startingMatrix);
 	const   [abortController, setAbortController] = useState(new AbortController());
+	const   [game, setGame] = useState({
+		matrix: null,
+		bags: null,
+		hold: null,
+		canSwap: null,
+		gameId: null,
+		score: null,
+		level: null,
+		time: null,
+		awaitingGarbage: null,
+		linesCleared: null,
+		lineClearGoal: null,
+		piecesPlaced: null,
+		piecesPerSecond: null
+	});
 
 	const gameControllers = async (abortController) => {
 		const   signal = abortController.signal;
@@ -71,25 +87,41 @@ const   board = () => {
 
 		socket.on("GAME_START" , (data) => {
 			data = JSON.parse(data);
-			setMatrix(data.game.matrix);
+			setGame(data.game);
+			// console.log(game);
 		})
 
 		socket.on("GAME", (data) => {
 			data = JSON.parse(data);
-			setMatrix(data.game.matrix);
+			setGame(data.game);
+			// console.log(game);
 		})
 
 		socket.on("EFFECT", (data) => {
 			data = JSON.parse(data);
-			return sfxPlayer(data.type, data.value).play()
+			const sfx = sfxPlayer(data.type, data.value);
+
+			console.log(sfx);
+			sfx.play();
+
 		});
 
 		gameControllers(abortController);
 	}, []);
 
+	// console.log(game);
+
 	return (
 		<div className={"board"}>
-				<Matrix matrix={matrix}  />
+			<div className={"boardHold"}>
+				<Hold holdPiece={{hold: game.hold, canSwap: game.canSwap}} />
+			</div>
+			<div className={"boardMatrix"}>
+				<Matrix matrix={game.matrix} width={320} height={640} />
+			</div>
+			<div className={"boardBag"}>
+				<Bags bags={game.bags} />
+			</div>
 		</div>
 	);
 }
