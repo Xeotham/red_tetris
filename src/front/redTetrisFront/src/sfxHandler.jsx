@@ -91,7 +91,7 @@ const   boardSounds = (sound) => {
 }
 
 export const    sfxPlayer = (type, sound) => {
-	console.log("SFX: ", type, ", ", sound)
+	// console.log("SFX: ", type, ", ", sound)
 
 	switch(type) {
 		case "BTB":

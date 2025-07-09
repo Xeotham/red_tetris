@@ -31,8 +31,8 @@ class MultiplayerRoomPlayer {
 	getSocket() { return this.socket; }
 	getUsername() { return this.username; }
 	isOwner() { return this.owner; }
-	getGame() { return this.game; }
 	setOwner(owner) { this.owner = owner; }
+	getGame() { return this.game; }
 	setGame(game) { this.game = game; }
 
 	setupGame(settings) {

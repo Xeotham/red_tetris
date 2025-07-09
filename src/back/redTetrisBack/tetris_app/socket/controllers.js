@@ -6,14 +6,14 @@ const utils = require("../utils");
 const { TetrisGame } = require("../server/Game/TetrisGame");
 const { MultiplayerRoomPlayer } = require("../server/MultiplayerRoomPlayer");
 const { MultiplayerRoom } = require("../server/MultiplayerRoom");
-const {deleteTetrisGame} = require("../utils");
+const { deleteTetrisGame, log } = require("../utils");
 
 exports.arcadeGames = {}; // { socketId: MultiplayerRoomPlayer }
 exports.multiplayerRoomLst = []; // [MultiplayerRoom]
 
 const tetrisArcade = async (socket) => {
 	const tetrisGame = new TetrisGame(socket);
-	console.log("Arcade Game started for", socket.id);
+	log("Arcade Game started for", socket.id);
 	exports.arcadeGames[socket.id] = new MultiplayerRoomPlayer(socket, true);
 	exports.arcadeGames[socket.id].setGame(tetrisGame);
 	tetrisGame.gameLoop().then(() => exports.arcadeGames[socket.id].game = null);
@@ -35,7 +35,7 @@ const quitMultiplayerRoom = async (socket, roomCode) => {
 	deleteTetrisGame(socket.id);
 	const room = utils.getTetrisRoom(roomCode);
 	if (room) {
-		console.log("Quit room with code : " + room.getCode() + " for player : " + socket.id);
+		log("Quit room with code : " + room.getCode() + " for player : " + socket.id);
 		room.removePlayer(socket);
 		if (room.isEmpty())
 			exports.multiplayerRoomLst.splice(exports.multiplayerRoomLst.indexOf(room), 1);

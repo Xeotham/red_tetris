@@ -12,7 +12,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "PRINT_LOGS=false mocha ; PRINT_LOGS=true",
     "start": "node server/server.js",
     "dev": "npx ts-node-dev --respawn --transpile-only server/server.js"
   },

@@ -101,7 +101,7 @@ const   board = () => {
 			data = JSON.parse(data);
 			const sfx = sfxPlayer(data.type, data.value);
 
-			console.log(sfx);
+			// console.log(sfx);
 			sfx.play();
 
 		});
@@ -110,7 +110,7 @@ const   board = () => {
 	}, []);
 
 	// console.log(game);
-
+	console.log("address:", address, "Socket:", socket.id);
 	return (
 		<div className={"board"}>
 			<div className={"boardHold"}>

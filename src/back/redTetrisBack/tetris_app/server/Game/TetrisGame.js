@@ -14,13 +14,14 @@ const { O } = require("./Pieces/O");
 const { I } = require("./Pieces/I");
 const utils_1 = require("./utils");
 const seedRandom = require("seedrandom");
+const { log } = require("./../../../server/server");
 
 
 class 	TetrisGame {
 
-	constructor(player, username = null) {
-		this.player = player;
-		this.username = username ? username : player.id;
+	constructor(socket, username = null) {
+		this.player = socket;
+		this.username = username ? username : socket.id;
 		this.size = new Pos(tc.TETRIS_WIDTH, tc.TETRIS_HEIGHT);
 		this.matrix = new Matrix(this.size.add(0, tc.BUFFER_HEIGHT));
 		this.bags = [];
@@ -49,7 +50,7 @@ class 	TetrisGame {
 		this.fallInterval = -1;
 		this.lockInterval = -1;
 		this.sendInterval = -1;
-		this.gameId = player.id;
+		this.gameId = socket.id;
 
 		// multiplayer
 
@@ -148,7 +149,7 @@ class 	TetrisGame {
 		if (!settings || this.fallInterval !== -1)
 			return;
 		Object.keys(settings).forEach((key) => {
-			// console.log("Setting " + key + " to " + settings[key]);
+			// log("Setting " + key + " to " + settings[key]);
 			if (key in this && settings[key] !== undefined) {
 				this[key] = settings[key];
 			}
@@ -171,11 +172,11 @@ class 	TetrisGame {
 
 	#trySetInterval(interval = this.fallSpeed) {
 		if (this.over)
-			return console.log("Game is over, not launching fall interval");
+			return log("Game is over, not launching fall interval");
 		if (this.fallInterval !== -1)
-			return console.log("Fall interval already set, not launching another one");
+			return log("Fall interval already set, not launching another one");
 		if (interval < 0)
-			return console.log("interval is negative, not launching");
+			return log("interval is negative, not launching");
 		this.fallInterval = setInterval(() => this.#fallPiece(), interval);
 	}
 
@@ -189,7 +190,7 @@ class 	TetrisGame {
 	}
 
 	async #spawnPiece() {
-		// console.log("#spawnPiece, currentPiece: ", this.currentPiece);
+		// log("#spawnPiece, currentPiece: ", this.currentPiece);
 		clearInterval(this.fallInterval);
 		this.fallInterval = -1;
 		this.shouldLock = false;
@@ -197,7 +198,7 @@ class 	TetrisGame {
 		this.spinType = "";
 		if (this.holdPhase) { // If swap was called, we are in hold phase
 			this.holdPhase = false;
-			// console.log("Hold phase");
+			// log("Hold phase");
 			this.currentPiece?.remove(this.matrix);
 			this.currentPiece?.setRotation(tc.NORTH);
 			if (this.hold && this.currentPiece) {
@@ -218,7 +219,7 @@ class 	TetrisGame {
 			return;
 		this.currentPiece.setCoordinates(new Pos(3 - 2, tc.BUFFER_HEIGHT - 3 - 2)); // -2 to take piece inner size into account
 		if (this.currentPiece.isColliding(this.matrix)) {
-			console.log("Piece is colliding at spawn, game over");
+			log("Piece is colliding at spawn, game over");
 			this.over = true;
 			return;
 		}
@@ -237,18 +238,18 @@ class 	TetrisGame {
 		this.msSinceLockPhase = 0;
 		this.nbMoves = 0;
 		this.lowestReached = this.currentPiece?.getCoordinates().getY() || 0;
-		// console.log("Stopping countdown for lock phase");
+		// log("Stopping countdown for lock phase");
 	}
 
 	async #extendedLockDown(lowestReached) {
 		++this.msSinceLockPhase;
-		// console.log("msSinceLockPhase: ", this.msSinceLockPhase);
+		// log("msSinceLockPhase: ", this.msSinceLockPhase);
 		if (lowestReached < this.lowestReached)
 			return this.#resetLockPhase();
 		if ((!this.infiniteMovement && this.nbMoves > 14) ||
 			(this.lockTime >= 0 && this.msSinceLockPhase >= this.lockTime)) {
-			// console.log("Lock phase reached, locking piece at " + this.msSinceLockPhase + " ms");
-			// this.lockTime >= 500 ? console.log("Max time reached") : console.log("Max moves reached");
+			// log("Lock phase reached, locking piece at " + this.msSinceLockPhase + " ms");
+			// this.lockTime >= 500 ? log("Max time reached") : log("Max moves reached");
 			this.shouldLock = true;
 			this.#resetLockPhase();
 			this.shouldLock = true;
@@ -510,11 +511,11 @@ class 	TetrisGame {
 		switch (type) {
 			case "normal":
 				this.fallSpeed = tc.FALL_SPEED(this.level);
-				// console.log("Changing fall speed to Normal: " + this.fallSpeed);
+				// log("Changing fall speed to Normal: " + this.fallSpeed);
 				break;
 			case "soft":
 				this.fallSpeed = tc.SOFT_DROP_SPEED(this.level) / this.softDropAmp;
-				// console.log("soft drop speed: " + tc.SOFT_DROP_SPEED(this.level) + " / " + this.softDropAmp + " = " + this.fallSpeed);
+				// log("soft drop speed: " + tc.SOFT_DROP_SPEED(this.level) + " / " + this.softDropAmp + " = " + this.fallSpeed);
 				break;
 			case "hard":
 				this.fallSpeed = tc.HARD_DROP_SPEED;
@@ -528,18 +529,18 @@ class 	TetrisGame {
 		if (!this.currentPiece)
 			return;
 		let rotation = this.currentPiece.rotate(direction, this.matrix);
-		// console.log("rotation: " + rotation);
+		// log("rotation: " + rotation);
 		if (rotation !== "-1") {
 			++this.keysPressed;
 			if (this.isInLockPhase) {
 				if (!this.infiniteMovement)
 					++this.nbMoves;
-				// console.log("nbMoves: " + this.nbMoves);
+				// log("nbMoves: " + this.nbMoves);
 				this.msSinceLockPhase = 0;
 			}
 			this.spinType = rotation;
 			if (this.spinType !== "") {
-				// console.log("Spin type: '" + this.spinType + "'");
+				// log("Spin type: '" + this.spinType + "'");
 				this.player.emit("EFFECT", JSON.stringify({ type: "SPIN", value: this.spinType }));
 			}
 			else
@@ -559,7 +560,7 @@ class 	TetrisGame {
 		if (this.isInLockPhase) {
 			if (!this.infiniteMovement)
 				++this.nbMoves;
-			// console.log("nbMoves: " + this.nbMoves);
+			// log("nbMoves: " + this.nbMoves);
 			this.msSinceLockPhase = 0;
 		}
 		this.currentPiece.remove(this.matrix);
@@ -612,8 +613,7 @@ class 	TetrisGame {
 	}
 
 	async gameLoop() {
-		// console.log("Starting game loop");
-		this.player.emit("GAME_START", JSON.stringify({ game: this.toJSON() }));
+		// log("Starting game loop");
 		// this.sendInterval = setInterval(() => {
 		// 	this.player.emit("GAME", JSON.stringify({game: this.toJSON()}));
 		// }, 1000 / 60) as unknown as number; // 60 times per second
@@ -621,6 +621,7 @@ class 	TetrisGame {
 		await this.#spawnPiece();
 		this.#placeShadow();
 		this.#trySetInterval();
+		this.player.emit("GAME_START", JSON.stringify({ game: this.toJSON() }));
 		await this.#gameLoopIteration();
 		clearInterval(this.fallInterval);
 		this.fallInterval = -1;
