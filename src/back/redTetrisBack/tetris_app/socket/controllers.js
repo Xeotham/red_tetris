@@ -1,34 +1,48 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.holdPiece = exports.dropPiece = exports.rotatePiece = exports.movePiece = exports.forfeitGame = exports.retryGame = exports.tetrisArcade = exports.multiplayerRoomLst = exports.arcadeGamesLst = void 0;
+exports.holdPiece = exports.dropPiece = exports.rotatePiece = exports.movePiece = exports.forfeitGame = exports.retryGame = exports.tetrisArcade = exports.multiplayerRoomLst = exports.arcadeGames = void 0;
 
 const utils = require("../utils");
 const { TetrisGame } = require("../server/Game/TetrisGame");
+const { MultiplayerRoomPlayer } = require("../server/MultiplayerRoomPlayer");
+const { MultiplayerRoom } = require("../server/MultiplayerRoom");
+const {deleteTetrisGame} = require("../utils");
 
-
-exports.arcadeGamesLst = [];
-exports.multiplayerRoomLst = [];
-exports.users = {}; // { socketId: user }
+exports.arcadeGames = {}; // { socketId: MultiplayerRoomPlayer }
+exports.multiplayerRoomLst = []; // [MultiplayerRoom]
 
 const tetrisArcade = async (socket) => {
 	const tetrisGame = new TetrisGame(socket);
 	console.log("Arcade Game started for", socket.id);
-	exports.arcadeGamesLst.push(tetrisGame);
-	exports.users[socket.id] = new utils.User();
-	exports.users[socket.id].game = tetrisGame;
-	tetrisGame.gameLoop().then(() => exports.users[socket.id].game = null);
+	exports.arcadeGames[socket.id] = new MultiplayerRoomPlayer(socket, true);
+	exports.arcadeGames[socket.id].setGame(tetrisGame);
+	tetrisGame.gameLoop().then(() => exports.arcadeGames[socket.id].game = null);
+	// TODO : Delete the player or close the socket? Send a message to the player?
 };
 exports.tetrisArcade = tetrisArcade;
 
 
-const rotatePiece = async (direction, user) => {
-	const game = user.game;
-	if (!game)
-		return; //TODO: Add error.
-	direction = (direction === user.keys.rotateClockwise ? "clockwise" :
-		(direction === user.keys.rotateCounterClockwise ? "counter-clockwise" : "180"));
-	return game?.rotate(direction);
-};
+const joinMultiplayerRoom = async (socket, roomCode) => {
+	const room = utils.getTetrisRoom(roomCode);
+	if (!room)
+		return exports.multiplayerRoomLst.push(new MultiplayerRoom(socket, true, roomCode));
+	room.addPlayer(socket);
+}
+exports.joinMultiplayerRoom = joinMultiplayerRoom;
+
+
+const quitMultiplayerRoom = async (socket, roomCode) => {
+	deleteTetrisGame(socket.id);
+	const room = utils.getTetrisRoom(roomCode);
+	if (room) {
+		console.log("Quit room with code : " + room.getCode() + " for player : " + socket.id);
+		room.removePlayer(socket);
+		if (room.isEmpty())
+			exports.multiplayerRoomLst.splice(exports.multiplayerRoomLst.indexOf(room), 1);
+	}
+}
+exports.quitMultiplayerRoom = quitMultiplayerRoom;
+
 
 const dropPiece = async (dropType, user, keyType) => {
 	const game = user.game;
@@ -40,6 +54,7 @@ const dropPiece = async (dropType, user, keyType) => {
 		dropType = "normal";
 	game?.changeFallSpeed(dropType);
 };
+
 
 const   movePiece = (direction, user, keyType) => {
 	const   arg = direction === user.keys.moveLeft ? user.moveLeft : user.moveRight;
@@ -71,20 +86,23 @@ const   movePiece = (direction, user, keyType) => {
 
 
 const keyDown = async (key, socket) => {
-	const user = exports.users[socket.id];
-	if (!user || !utils.getTetrisGame(socket.id))
+	const user = utils.getTetrisUser(socket.id);
+	if (!user || !user.game)
 		return; // TODO : Add error.
 	key = key.toLowerCase();
 
 	switch (key) {
-		case user.keys.moveLeft:
-		case user.keys.moveRight:
-			movePiece(key, user, "keyDown");
-			break ;
 		case user.keys.rotateClockwise:
 		case user.keys.rotateCounterClockwise:
 		case user.keys.rotate180:
-			rotatePiece(key, user, "keyDown");
+			const direction = (key === user.keys.rotateClockwise ? "clockwise" :
+				(key === user.keys.rotateCounterClockwise ? "counter-clockwise" : "180"));
+			user.game?.rotate(direction);
+			// rotatePiece(key, user, "keyDown");
+			break ;
+		case user.keys.moveLeft:
+		case user.keys.moveRight:
+			movePiece(key, user, "keyDown");
 			break ;
 		case user.keys.hardDrop:
 		case user.keys.softDrop:
@@ -103,9 +121,10 @@ const keyDown = async (key, socket) => {
 }
 exports.keyDown = keyDown;
 
+
 const keyUp = async (key, socket) => {
-	const user = exports.users[socket.id];
-	if (!user || !utils.getTetrisGame(socket.id))
+	const user = utils.getTetrisUser(socket.id);
+	if (!user || !user.game)
 		return; // TODO : Add error.
 	key = key.toLowerCase();
 

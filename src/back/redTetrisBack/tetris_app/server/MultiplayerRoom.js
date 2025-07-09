@@ -3,15 +3,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MultiplayerRoom = void 0;
 
 const utils = require("../utils");
-const MultiplayerRoomPlayer = require("./MultiplayerRoomPlayer");
+const { MultiplayerRoomPlayer } = require("./MultiplayerRoomPlayer");
 
 
 class MultiplayerRoom {
 
-	constructor(socket, username, isPrivate = false, codeName = undefined) {
-		this.players = [];
+	constructor(socket, isPrivate = true, codeName = undefined) {
+		this.players = {}; // { socketId: MultiplayerRoomPlayer }
 		this.isInGame = false;
-		if (codeName && codeName.length === 4 && (0, utils.isUpperCase)(codeName) && !(0, utils.codeNameExists)(codeName))
+		if (codeName && codeName.length === 4 && utils.isUpperCase(codeName) && !utils.codeNameExists(codeName))
 			this.code = codeName;
 		else
 			this.code = this.generateInviteCode();
@@ -33,7 +33,7 @@ class MultiplayerRoom {
 			"isLevelling": false,
 			"canRetry": true,
 		};
-		this.addPlayer(socket, username);
+		this.addPlayer(socket);
 	}
 
 	getIsInGame() { return this.isInGame; }
@@ -51,34 +51,36 @@ class MultiplayerRoom {
 		this.sendSettingsToPlayers();
 	}
 
-	addPlayer(socket, username) {
-		if (this.players.find((player) => player.getUsername() === username)) {
-			socket.send(JSON.stringify({ type: "MULTIPLAYER_LEAVE" }));
-			return console.log("Player " + username + " already exists in room " + this.code);
+	addPlayer(socket) {
+		if (this.players[socket.id]) {
+			socket.emit(JSON.stringify({ type: "MULTIPLAYER_LEAVE" }));
+			return console.log("Player " + socket.id + " already exists in room " + this.code);
 		}
 		if (this.players.length <= 0) {
-			socket.send(JSON.stringify({ type: "MULTIPLAYER_JOIN", argument: "OWNER" }));
-			this.players.push(new MultiplayerRoomPlayer.MultiplayerRoomPlayer(socket, username, true));
+			socket.emit(JSON.stringify({ type: "MULTIPLAYER_JOIN", argument: "OWNER" }));
+			this.players[socket.id] = new MultiplayerRoomPlayer(socket, true);
 		}
 		else {
-			this.players.push(new MultiplayerRoomPlayer.MultiplayerRoomPlayer(socket, username));
+			this.players[socket.id] = new MultiplayerRoomPlayer(socket);
 			this.settings.canRetry = false;
 		}
-		socket.send(JSON.stringify({ type: "MULTIPLAYER_JOIN", argument: this.code }));
+		socket.emit(JSON.stringify({ type: "MULTIPLAYER_JOIN", argument: this.code }));
 		this.sendSettingsToPlayers();
 	}
 
-	removePlayer(username) {
-		const player = this.players.find((player) => player.getUsername() === username);
+	removePlayer(socket) {
+		const player = this.players[socket.id];
+		// const player = this.players.find((player) => player.getUsername() === username);
 		if (!player)
-			return;
+			return ;
 		player.getGame()?.forfeit();
-		player.getSocket()?.send(JSON.stringify({ type: "MULTIPLAYER_LEAVE" }));
-		this.players.splice(this.players.indexOf(player), 1);
-		const nonOwner = this.players.find((aPlayer => !aPlayer.isOwner()));
+		player.getSocket()?.emit(JSON.stringify({ type: "MULTIPLAYER_LEAVE" }));
+		delete this.players[socket.id];
+		// this.players.splice(this.players.indexOf(player), 1);
+		const nonOwner = Object.values(this.players).find((aPlayer => !aPlayer.isOwner()));
 		if (player.isOwner() && nonOwner !== undefined) {
 			nonOwner.setOwner(true);
-			nonOwner.getSocket().send(JSON.stringify({ type: "MULTIPLAYER_JOIN", argument: "OWNER" }));
+			nonOwner.getSocket().emit(JSON.stringify({ type: "MULTIPLAYER_JOIN", argument: "OWNER" }));
 		}
 		if (this.players.length === 1)
 			this.settings.canRetry = true;
@@ -89,8 +91,8 @@ class MultiplayerRoom {
 		return this.players.length <= 0;
 	}
 
-	getGameById(id) {
-		return this.players.find((player) => player.getGame()?.getGameId() === id)?.getGame();
+	getGameById(socketId) {
+		return this.players[socketId]?.getGame() || undefined;
 	}
 
 	generateInviteCode() {
@@ -99,10 +101,10 @@ class MultiplayerRoom {
 		let result = "";
 		for (let i = 0; i < length; i++)
 			result += characters.charAt(Math.floor(Math.random() * characters.length));
-		if ((0, utils.codeNameExists)(result))
+		if (utils.codeNameExists(result))
 			return this.generateInviteCode();
-		for (const player of this.players) {
-			player.getSocket().send(JSON.stringify({ type: "MULTIPLAYER_JOIN", argument: result }));
+		for (const player of Object.values(this.players)) {
+			player.getSocket().emit(JSON.stringify({ type: "MULTIPLAYER_JOIN", argument: result }));
 		}
 		return result;
 	}
@@ -110,47 +112,52 @@ class MultiplayerRoom {
 	startGames() {
 		if (this.isInGame)
 			return;
+
 		this.playersRemaining = this.players.length;
 		this.isInGame = true;
 		this.settings.isInRoom = true;
+
 		for (const player of this.players)
 			player.setupGame(this.settings);
 		this.assignOpponents();
 		for (const player of this.players)
 			player.getGame()?.gameLoop().then(() => endOfGame(player));
+
 		const sendOpponentsGames = () => {
-			for (let i = 0; i < this.players.length; ++i) {
+			const players = Object.values(this.players);
+			for (let i = 0; i < players.length; ++i) {
 				let lost = 0;
 				let games = [];
-				for (let j = i + 1; j - lost < 6; ++j) {
-					j %= this.players.length;
+				for (let j = i + 1; j - lost < 6; j++) {
+					j %= players.length;
 					if (j === i)
-						break;
-					if (this.players[j].getGame()?.isOver() || this.players[j].getGame() === undefined) {
+						break ;
+					if (players[j].getGame()?.isOver() || players[j].getGame() === undefined) {
 						++lost;
-						continue;
+						continue ;
 					}
-					games.push(this.players[j].getGame()?.toJSON());
+					games.push(players[j]);
 				}
-				this.players[i].getSocket().send(JSON.stringify({ type: "MULTIPLAYER_OPPONENTS_GAMES", argument: games }));
+				players[i].getSocket().emit(JSON.stringify({ type: "MULTIPLAYER_OPPONENTS_GAMES", argument: games }));
 			}
 		};
 		const interval = setInterval(sendOpponentsGames, 1000 / 10);
+
 		const endOfGame = (player) => {
 			console.log("End of game for player " + player.getUsername() + " is at place " + this.playersRemaining);
-			player.getSocket().send(JSON.stringify({ type: "MULTIPLAYER_FINISH", argument: this.playersRemaining }));
+			player.getSocket().emit(JSON.stringify({ type: "MULTIPLAYER_FINISH", argument: this.playersRemaining }));
 			--this.playersRemaining;
 			if (player.getGame()?.getHasForfeit())
 				this.removePlayer(player.getUsername());
 			if (this.playersRemaining === 1)
-				this.players.find((player) => !player.getGame()?.isOver())?.getGame()?.setOver(true);
+				Object.values(this.players).find((player) => !player.getGame()?.isOver())?.getGame()?.setOver(true);
 			this.assignOpponents();
 			if (this.playersRemaining >= 1)
-				return;
-			this.players.forEach((player) => {
-				player.getSocket().send(JSON.stringify({ type: "GAME_FINISH" }));
+				return ;
+			Object.values(this.players).forEach((player) => {
+				player.getSocket().emit(JSON.stringify({ type: "GAME_FINISH" }));
 				if (!player.getGame()?.getHasForfeit())
-					player.getSocket().send(JSON.stringify({ type: "MULTIPLAYER_JOIN", argument: this.code }));
+					player.getSocket().emit(JSON.stringify({ type: "MULTIPLAYER_JOIN", argument: this.code }));
 				player.setGame(undefined);
 			});
 			this.sendSettingsToPlayers();
@@ -161,20 +168,22 @@ class MultiplayerRoom {
 
 	assignOpponents() {
 		if (this.playersRemaining <= 1 || this.players.length <= 1)
-			return;
+			return ;
 		let opponent;
-		for (const player of this.players) {
+		const playersArray = Object.values(this.players);
+		for (const player of playersArray) {
 			do {
-				opponent = this.players[Math.floor(Math.random() * this.players.length)];
+				opponent = playersArray[Math.floor(Math.random() * playersArray.length)];
 			} while (opponent === undefined || opponent === player ||
-			opponent.getGame() === undefined || opponent.getGame()?.isOver() || opponent.getGame()?.getHasForfeit());
+					opponent.getGame() === undefined || opponent.getGame()?.isOver() ||
+					opponent.getGame()?.getHasForfeit());
 			player.getGame()?.setOpponent(opponent.getGame());
 		}
 	}
 
 	sendSettingsToPlayers() {
 		this.settings.nbPlayers = this.players.length;
-		for (const player of this.players) {
+		for (const player of Object.values(this.players)) {
 			player.getSocket().send(JSON.stringify({ type: "MULTIPLAYER_JOIN", argument: "SETTINGS", value: this.settings }));
 		}
 	}

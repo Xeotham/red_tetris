@@ -13,17 +13,17 @@ const { J } = require("./Pieces/J");
 const { O } = require("./Pieces/O");
 const { I } = require("./Pieces/I");
 const utils_1 = require("./utils");
-const utils_2 = require("./../../utils");
-const idGen = (0, utils_2.idGenerator)();
+const seedRandom = require("seedrandom");
 
 
-class TetrisGame {
+class 	TetrisGame {
 
 	constructor(player, username = null) {
 		this.player = player;
 		this.username = username ? username : player.id;
 		this.size = new Pos(tc.TETRIS_WIDTH, tc.TETRIS_HEIGHT);
 		this.matrix = new Matrix(this.size.add(0, tc.BUFFER_HEIGHT));
+		this.bags = [];
 		this.currentPiece = null;
 		this.shadowPiece = null;
 		this.hold = null;
@@ -100,8 +100,8 @@ class TetrisGame {
 
 		// settings
 
+		this.rng = seedRandom(Date.now().toString());
 		this.rotationType = "SRS";
-		this.bags = [this.shuffleBag(), this.shuffleBag()];
 		this.showShadowPiece = true;
 		this.showBags = true;
 		this.holdAllowed = true;
@@ -159,14 +159,14 @@ class TetrisGame {
 	#shuffleBag() {
 		const pieces = [
 			new S(this.rotationType),
-			new T(this.rotationType),
 			new Z(this.rotationType),
 			new L(this.rotationType),
 			new J(this.rotationType),
+			new T(this.rotationType),
 			new O(this.rotationType),
 			new I(this.rotationType)
 		];
-		return pieces.sort(() => Math.random() - 0.5); // TODO : Use a seeded shuffle algorithm
+		return pieces.sort(() => this.rng() - 0.5); // TODO : Use a seeded shuffle algorithm
 	}
 
 	#trySetInterval(interval = this.fallSpeed) {
@@ -617,6 +617,7 @@ class TetrisGame {
 		// this.sendInterval = setInterval(() => {
 		// 	this.player.emit("GAME", JSON.stringify({game: this.toJSON()}));
 		// }, 1000 / 60) as unknown as number; // 60 times per second
+		this.bags = [this.#shuffleBag(), this.#shuffleBag()];
 		await this.#spawnPiece();
 		this.#placeShadow();
 		this.#trySetInterval();
@@ -680,7 +681,7 @@ class TetrisGame {
 
 	async retry() {
 		if (this.isOver() || !this.canRetry)
-			return;
+			return ;
 		clearInterval(this.fallInterval);
 		this.fallInterval = -1;
 		clearInterval(this.lockInterval);
@@ -690,12 +691,14 @@ class TetrisGame {
 		Object.assign(this, restoredState);
 		this.matrix = matrix;
 		this.matrix.reset();
+		this.rng = seedRandom(Date.now().toString());
 		this.bags = [this.#shuffleBag(), this.#shuffleBag()];
 		await this.#spawnPiece();
 		this.#placeShadow();
 		this.#trySetInterval();
 		this.hold = null;
 		this.beginningTime = Date.now();
+		this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
 	}
 }
 exports.TetrisGame = TetrisGame;
