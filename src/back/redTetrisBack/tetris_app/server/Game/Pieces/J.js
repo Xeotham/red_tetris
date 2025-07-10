@@ -18,6 +18,10 @@ class J extends ATetrimino {
 	}
 
 	getSpinSpecific(matrix, major, minor, rotationPointUsed) {
+		if (rotationPointUsed === -1)
+			return "-1";
+		if (this.canFall(matrix))
+			return "";
 		if (this.canSlide(matrix) || !this.isColliding(matrix, new Pos(0, -1)))
 			return "";
 		return "Mini J-Spin";

@@ -39,7 +39,7 @@ exports.getTetrisRoom = getTetrisRoom;
 
 
 const codeNameExists = (code) => {
-	return controllers.multiplayerRoomLst.find((room) => { return room.getCode() === code; });
+	return !!(controllers.multiplayerRoomLst.find((room) => room.getCode() === code ));
 };
 exports.codeNameExists = codeNameExists;
 

@@ -6,7 +6,7 @@ const tc = require("./tetrisConstants");
 const { Pos } = require("./Pos");
 const utils = require("./utils");
 const { Mino } = require("./Mino");
-// const { log } = require("./../../../server/server");
+// const { dlog } = require("./../../../server/server");
 
 
 class ATetrimino {
@@ -96,13 +96,13 @@ class ATetrimino {
 			end = struct[tc.ROTATIONS[utils.mod(this.rotation + 3, 4)]];
 		if (!end)
 			return "";
-		// log("start :", start);
-		// log("end :", end);
+		// dlog("start : " + start);
+		// dlog("end : " + end);
 		let startRotations = ((direction !== "180" && this.rotationType !== "original") ? start["SRS"] : start[this.rotationType]);
 		let endRotations = ((direction !== "180" && this.rotationType !== "original") ? end["SRS"] : end[this.rotationType]);
-		// log("direction :", direction, "rotationType", this.rotationType);
-		// log("startRotations :", startRotations);
-		// log("endRotations :", endRotations);
+		// dlog("direction : " + direction + "rotationType " + this.rotationType);
+		// dlog("startRotations :", startRotations);
+		// dlog("endRotations :", endRotations);
 		this.remove(matrix, false);
 
 		for (let i = 0; i < startRotations.length; ++i) {
@@ -128,7 +128,7 @@ class ATetrimino {
 	}
 
 	#getSpin(matrix, rotationPointUsed) {
-		// log("rotationPointUsed", rotationPointUsed);
+		// dlog("rotationPointUsed", rotationPointUsed);
 		if (rotationPointUsed === -1)
 			return "-1";
 		if (this.canFall(matrix))

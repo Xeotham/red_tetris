@@ -366,4 +366,65 @@ describe('ATetrimino', () => {
 		piece.setRotation(tc.NORTH);
 		expect(piece.getRotation()).to.equal(tc.NORTH);
 	});
+
+	it('Should return the spin type for each piece', () => {
+		const matrix = new Matrix(new Pos(10, 20));
+		const piece = new S("SRS", new Pos(3, 3));
+
+		piece.place(matrix);
+			expect(piece.getSpinSpecific(matrix, 0, 0, -1)).to.equal("-1"); // No rotation
+		matrix.setAt(new Pos(6, 7), new Mino("I", true));
+		expect(piece.getSpinSpecific(matrix, 0, 0, 0)).to.equal("");
+		matrix.setAt(new Pos(8, 5), new Mino("I", true));
+		expect(piece.getSpinSpecific(matrix, 0, 0, 1)).to.equal("");
+		matrix.setAt(new Pos(4, 6), new Mino("I", true));
+		expect(piece.getSpinSpecific(matrix, 0, 0, 2)).to.equal("");
+		matrix.setAt(new Pos(5, 5), new Mino("I", true));
+		expect(piece.getSpinSpecific(matrix, 0, 0, 3)).to.equal("Mini S-Spin");
+		expect(piece.getSpinSpecific(matrix, 0, 0, -1)).to.equal("-1");
+		// matrix.print();
+
+		matrix.reset();
+		const piece2 = new O("SRS", new Pos(3, 13));
+		piece2.place(matrix);
+		expect(piece2.getSpinSpecific(matrix, 0, 0, 3)).to.equal("");
+		expect(piece2.getSpinSpecific(matrix, -5, 9, 1)).to.equal("");
+		expect(piece2.getSpinSpecific(matrix, -1,-1, -1)).to.equal("");
+		// matrix.print();
+		piece2.remove(matrix);
+		piece2.setCoordinates(new Pos(5, 16));
+		piece2.place(matrix);
+		matrix.setAt(new Pos(7, 18), new Mino("I", true));
+		matrix.setAt(new Pos(8, 17), new Mino("I", true));
+		expect(piece2.getSpinSpecific(matrix, 0, 0, 3)).to.equal("");
+		expect(piece2.getSpinSpecific(matrix, -5, 9, 1)).to.equal("");
+		expect(piece2.getSpinSpecific(matrix, -1,-1, -1)).to.equal("");
+		// matrix.print();
+
+		matrix.reset();
+		const piece3 = new I("SRS", new Pos(5, 14));
+		piece3.setRotation(tc.EAST);
+		piece3.place(matrix);
+		expect(piece3.getSpinSpecific(matrix, 0, 0, -1)).to.equal("-1");
+		expect(piece3.getSpinSpecific(matrix, 0, 0, 0)).to.equal("");
+		matrix.setAt(new Pos(8, 17), new Mino("O", true));
+		expect(piece3.getSpinSpecific(matrix, 0, 0, 0)).to.equal("");
+		matrix.setAt(new Pos(9, 15), new Mino("O", true));
+		expect(piece3.getSpinSpecific(matrix, 0, 0, 0)).to.equal("Mini I-Spin");
+		// matrix.print();
+
+		matrix.reset();
+		const piece4 = new J("SRS", new Pos(6, 15));
+		piece4.setRotation(tc.WEST);
+		piece4.place(matrix);
+		expect(piece4.getSpinSpecific(matrix, 0, 0, -1)).to.equal("-1");
+		expect(piece4.getSpinSpecific(matrix, 0, 0, 0)).to.equal("");
+		matrix.setAt(new Pos(7, 19), new Mino("O", true));
+		expect(piece4.getSpinSpecific(matrix, 0, 0, 0)).to.equal("");
+		matrix.setAt(new Pos(9, 16), new Mino("O", true));
+		// matrix.print();
+		expect(piece4.getSpinSpecific(matrix, 0, 0, 0)).to.equal("Mini J-Spin");
+
+	});
+
 });

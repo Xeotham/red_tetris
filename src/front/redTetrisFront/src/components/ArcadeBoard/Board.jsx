@@ -89,13 +89,13 @@ const   board = () => {
 			data = JSON.parse(data);
 			setGame(data.game);
 			// console.log(game);
-		})
+		});
 
 		socket.on("GAME", (data) => {
 			data = JSON.parse(data);
 			setGame(data.game);
 			// console.log(game);
-		})
+		});
 
 		socket.on("EFFECT", (data) => {
 			data = JSON.parse(data);
@@ -110,7 +110,6 @@ const   board = () => {
 	}, []);
 
 	// console.log(game);
-	console.log("address:", address, "Socket:", socket.id);
 	return (
 		<div className={"board"}>
 			<div className={"boardHold"}>

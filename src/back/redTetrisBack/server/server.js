@@ -4,7 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.io = exports.fastify = exports.log = void 0;
+exports.io = exports.fastify = exports.dlog = void 0;
+
+const dlog = (message) => {
+	if (process.env.PRINT_LOGS === "true")
+		console.log(message);
+}
+exports.dlog = dlog;
 
 const fastify = __importDefault(require("fastify"));
 const cors = __importDefault(require("@fastify/cors"));
@@ -12,21 +18,13 @@ const socket_io = require("socket.io");
 const dotenv = require("dotenv");
 const { quitMultiplayerRoom } = require("../tetris_app/socket/controllers");
 const routes = __importDefault(require("../tetris_app/socket/routes"));
-// const routes = __importDefault(require("./../../../"));
 
 
 
 dotenv.config({ path : __dirname + "/../../../.env" });
-// log("Environment variables loaded:", process.env.BACK_PORT);
+// dlog("Environment variables loaded: " + process.env.BACK_PORT);
 exports.fastify = (0, fastify.default)();
 exports.address = process.env.VITE_API_ADDRESS;
-
-
-const log = (message) => {
-	if (process.env.PRINT_LOGS === "true")
-		console.log(message);
-}
-exports.log = log;
 
 
 exports.io = new socket_io.Server(exports.fastify.server, {
@@ -57,23 +55,23 @@ if (require.main === module) {
 			process.exit(1);
 		}
 		exports.io.on('connection', (socket) => {
-			log(`${socket.id} connected!`);
+			dlog(`${socket.id} connected!`);
 
 			socket.on("message", (message) => {
-				log(`Message from ${socket.id}: ${message}`);
+				dlog(`Message from ${socket.id}: ${message}`);
 			});
 			(0, routes.default)(socket);
 			// tetrisRoutes();
 
 			socket.on('disconnect', () => {
 				// Handle disconnection
-				log(`${socket.id} disconnected!`);
+				dlog(`${socket.id} disconnected!`);
 				quitMultiplayerRoom(socket);
 			});
 		});
-		log(`🚀 Server listening at ${address}`);
+		dlog(`🚀 Server listening at ${address}`);
 	});
 }
 else {
-	log("Server module loaded, but not running. Use 'node server.js' to start the server.");
+	dlog("Server module loaded, but not running. Use 'node server.js' to start the server.");
 }
