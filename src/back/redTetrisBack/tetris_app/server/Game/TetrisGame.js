@@ -623,10 +623,10 @@ class 	TetrisGame {
 		// this.sendInterval = setInterval(() => {
 		// 	this.player.emit("GAME", JSON.stringify({game: this.toJSON()}));
 		// }, 1000 / 60) as unknown as number; // 60 times per second
+		this.rng = seedRandom(this.seed);
 		this.bags = [this.#shuffleBag(), this.#shuffleBag()];
 		await this.spawnPiece();
 		this.#placeShadow();
-		// console.log("Game loop started for " + this.username);
 		this.trySetInterval();
 		this.player.emit("GAME_START", JSON.stringify({ game: this.toJSON() }));
 		await this.#gameLoopIteration();
@@ -642,7 +642,7 @@ class 	TetrisGame {
 	}
 
 	#getStats() {
-		const stats = {
+		return {
 			level: this.level,
 			isInRoom: this.isInRoom,
 			gameTime: this.gameTime,
@@ -679,7 +679,6 @@ class 	TetrisGame {
 			miniSpinTriple: this.allLinesClear["Mini Spin Triple"],
 			miniSpinQuad: this.allLinesClear["Mini Spin Quad"],
 		};
-		return stats;
 	}
 
 	forfeit() {
