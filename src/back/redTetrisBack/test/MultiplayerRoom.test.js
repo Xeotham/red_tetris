@@ -25,7 +25,7 @@ describe('MultiplayerRoom', () => {
 	});
 
 	it('Should return if the room is in game', () => {
-		const room = new MultiplayerRoom(clientSocket, true, "TEST");
+		const room = new MultiplayerRoom(clientSocket, true, undefined);
 		expect(room.getIsInGame()).to.be.false;
 		room.startGames();
 		expect(room.getIsInGame()).to.be.true;
@@ -68,6 +68,8 @@ describe('MultiplayerRoom', () => {
 		multiplayerRoomLst.push(room);
 		expect(codeNameExists(room.getCode())).to.be.true;
 		multiplayerRoomLst.splice(multiplayerRoomLst.indexOf(room), 1);
+		const room2 = new MultiplayerRoom(clientSocket, true, "INVALID CODE");
+		expect(room2.getCode()).to.not.equal("INVALID CODE");
 	});
 
 	it('Should set all the settings at once', () => {

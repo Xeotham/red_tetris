@@ -33,6 +33,8 @@ class MultiplayerRoom {
 			"level": 4,
 			"isLevelling": false,
 			"canRetry": true,
+			"resetSeedOnRetry": true,
+			"seed": Date.now().toString(),
 		};
 		this.addPlayer(socket);
 	}

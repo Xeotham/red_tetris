@@ -6,13 +6,13 @@ const expect = chai.expect;
 const should = chai.should();
 
 describe('Pos', () => {
-	it('should create a Pos with x and y', () => {
+	it('Should create a Pos with x and y', () => {
 		const pos = new Pos(5, 10);
 		expect(pos.getX()).to.equal(5);
 		expect(pos.getY()).to.equal(10);
 	});
 
-	it('should create a Pos from another Pos', () => {
+	it('Should create a Pos from another Pos', () => {
 		const original = new Pos(3, 4);
 		const pos = new Pos(original);
 		expect(pos.getX()).to.equal(3);
@@ -30,7 +30,16 @@ describe('Pos', () => {
 		expect(pos.getY()).to.equal(1);
 	});
 
-	it('should add two positions', () => {
+	it('Should add two positions (x, y)', () => {
+		const pos1 = new Pos(2, 3);
+		const result = pos1.add(4, 5);
+		expect(result.getX()).to.equal(6);
+		expect(result.getY()).to.equal(8);
+		expect(pos1.getX()).to.equal(2);
+		expect(pos1.getY()).to.equal(3);
+	});
+
+	it('Should add two positions (Pos)', () => {
 		const pos1 = new Pos(2, 3);
 		const pos2 = new Pos(4, 5);
 		const result = pos1.add(pos2);
@@ -42,7 +51,16 @@ describe('Pos', () => {
 		expect(pos2.getY()).to.equal(5);
 	});
 
-	it('should subtract two positions', () => {
+	it('Should subtract two positions (x, y)', () => {
+		const pos1 = new Pos(5, 7);
+		const result = pos1.subtract(2, 3);
+		expect(result.getX()).to.equal(3);
+		expect(result.getY()).to.equal(4);
+		expect(pos1.getX()).to.equal(5);
+		expect(pos1.getY()).to.equal(7);
+	});
+
+	it('Should subtract two positions (Pos)', () => {
 		const pos1 = new Pos(5, 7);
 		const pos2 = new Pos(2, 3);
 		const result = pos1.subtract(pos2);
@@ -54,13 +72,13 @@ describe('Pos', () => {
 		expect(pos2.getY()).to.equal(3);
 	});
 
-	it('should calculate distance to another position', () => {
+	it('Should calculate distance to another position', () => {
 		const pos1 = new Pos(0, 0);
 		const pos2 = new Pos(3, 4);
 		expect(pos1.distanceTo(pos2)).to.equal(5); // 3-4-5 triangle
 	});
 
-	it('should calculate distance to another position as a Pos', () => {
+	it('Should calculate distance to another position as a Pos', () => {
 		const pos1 = new Pos(5, 5);
 		const pos2 = new Pos(1, 1);
 		const distancePos = pos1.distanceToPos(pos2);
@@ -72,7 +90,7 @@ describe('Pos', () => {
 		expect(pos2.getY()).to.equal(1);
 	});
 
-	it('should move up, down, left, and right', () => {
+	it('Should move up, down, left, and right', () => {
 		const pos = new Pos(5, 5);
 		expect(pos.up().getY()).to.equal(4);
 		expect(pos.getY()).to.equal(5);
@@ -84,7 +102,7 @@ describe('Pos', () => {
 		expect(pos.getX()).to.equal(5);
 	});
 
-	it('should clamp position within bounds', () => {
+	it('Should clamp position within bounds', () => {
 		const pos = new Pos(5, 5);
 		const min = new Pos(0, 0);
 		const max = new Pos(10, 10);
@@ -98,7 +116,7 @@ describe('Pos', () => {
 		expect(clampedOutOfBounds.getY()).to.equal(10);
 	});
 
-	it('should check equality of two positions', () => {
+	it('Should check equality of two positions', () => {
 		const pos1 = new Pos(3, 4);
 		const pos2 = new Pos(3, 4);
 		const pos3 = new Pos(5, 6);

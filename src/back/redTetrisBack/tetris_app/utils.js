@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.isUpperCase = exports.codeNameExists = exports.getTetrisRoom = exports.deleteTetrisGame = exports.getTetrisGame = exports.getTetrisUser = void 0;
 
 const controllers = require("./socket/controllers");
+const { MultiplayerRoom } = require("./server/MultiplayerRoom");
 
 
 const getTetrisUser = (socketId) => {

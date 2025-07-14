@@ -18,6 +18,10 @@ class T extends ATetrimino {
 	}
 
 	getSpinSpecific(matrix, major, minor, rotationPointUsed) {
+		if (rotationPointUsed === -1)
+			return "-1";
+		if (this.canFall(matrix))
+			return "";
 		if (major >= 2 && minor >= 1)
 			return "T-Spin";
 		if (minor >= 2 && minor >= 1 && rotationPointUsed === 4)

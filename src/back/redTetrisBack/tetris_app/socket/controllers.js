@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.holdPiece = exports.dropPiece = exports.rotatePiece = exports.movePiece = exports.forfeitGame = exports.retryGame = exports.tetrisArcade = exports.multiplayerRoomLst = exports.arcadeGames = void 0;
+exports.holdPiece = exports.forfeitGame = exports.retryGame = exports.tetrisArcade = exports.multiplayerRoomLst = exports.arcadeGames = void 0;
 
+const MultiplayerRoom = require("../server/MultiplayerRoom");
 const utils = require("../utils");
 const { TetrisGame } = require("../server/Game/TetrisGame");
 const { MultiplayerRoomPlayer } = require("../server/MultiplayerRoomPlayer");
-const { MultiplayerRoom } = require("../server/MultiplayerRoom");
 const { deleteTetrisGame } = require("../utils");
 const { dlog } = require("../../server/server");
 
@@ -26,14 +26,14 @@ exports.tetrisArcade = tetrisArcade;
 const joinMultiplayerRoom = async (socket, roomCode) => {
 	const room = utils.getTetrisRoom(roomCode);
 	if (!room)
-		return exports.multiplayerRoomLst.push(new MultiplayerRoom(socket, true, roomCode));
+		return exports.multiplayerRoomLst.push(new MultiplayerRoom.MultiplayerRoom(socket, true, roomCode));
 	room.addPlayer(socket);
 }
 exports.joinMultiplayerRoom = joinMultiplayerRoom;
 
 
 const quitMultiplayerRoom = async (socket, roomCode) => {
-	deleteTetrisGame(socket.id);
+	utils.deleteTetrisGame(socket.id);
 	const room = utils.getTetrisRoom(roomCode);
 	if (room) {
 		dlog("Quit room with code : " + room.getCode() + " for player : " + socket.id);
@@ -45,15 +45,16 @@ const quitMultiplayerRoom = async (socket, roomCode) => {
 exports.quitMultiplayerRoom = quitMultiplayerRoom;
 
 
-const dropPiece = async (dropType, user, keyType) => {
+const dropPiece = async (key, user, keyType) => {
 	const game = user.game;
 	if (!game)
 		return ;
 	// TODO: Add error.
-	dropType = (dropType === user.keys.hardDrop ? "hard" : "soft");
+	let dropType = (key === user.keys.hardDrop ? "hard" : "soft");
 	if (dropType === "soft" && keyType === "keyUp")
 		dropType = "normal";
-	game?.changeFallSpeed(dropType);
+	// console.log("So drop type is : " + dropType);
+	await game?.changeFallSpeed(dropType);
 };
 
 
@@ -107,10 +108,10 @@ const keyDown = async (key, socket) => {
 			break ;
 		case user.keys.hardDrop:
 		case user.keys.softDrop:
-			dropPiece(key, user, "keyDown");
+			await (dropPiece(key, user, "keyDown"));
 			break ;
 		case user.keys.hold:
-			user.game?.swap();
+			await (user.game?.swap());
 			break ;
 		case user.keys.forfeit:
 			user.game?.forfeit();
@@ -135,7 +136,7 @@ const keyUp = async (key, socket) => {
 			movePiece(key, user, "keyUp");
 			break;
 		case user.keys.softDrop:
-			dropPiece(key, user, "keyUp");
+			await (dropPiece(key, user, "keyUp"));
 			break;
 	}
 }

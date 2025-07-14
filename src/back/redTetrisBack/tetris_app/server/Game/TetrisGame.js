@@ -19,15 +19,15 @@ const { dlog } = require("./../../../server/server");
 
 class 	TetrisGame {
 
-	constructor(socket, username = null) {
+	constructor(socket, username = undefined) {
 		this.player = socket;
 		this.username = username ? username : socket.id;
 		this.size = new Pos(tc.TETRIS_WIDTH, tc.TETRIS_HEIGHT);
 		this.matrix = new Matrix(this.size.add(0, tc.BUFFER_HEIGHT));
 		this.bags = [];
-		this.currentPiece = null;
-		this.shadowPiece = null;
-		this.hold = null;
+		this.currentPiece = undefined;
+		this.shadowPiece = undefined;
+		this.hold = undefined;
 		this.level = tc.MIN_LEVEL;
 		this.dropType = "normal";
 		this.lineClearGoal = tc.FIXED_GOAL_SYSTEM[this.level];
@@ -101,7 +101,9 @@ class 	TetrisGame {
 
 		// settings
 
-		this.rng = seedRandom(Date.now().toString());
+		this.resetSeedOnRetry = true; // If true, the seed will be reset on retry
+		this.seed = Date.now().toString();
+		this.rng = seedRandom(this.seed);
 		this.rotationType = "SRS";
 		this.showShadowPiece = true;
 		this.showBags = true;
@@ -170,13 +172,14 @@ class 	TetrisGame {
 		return pieces.sort(() => this.rng() - 0.5); // TODO : Use a seeded shuffle algorithm
 	}
 
-	#trySetInterval(interval = this.fallSpeed) {
+	trySetInterval(interval = this.fallSpeed) {
 		if (this.over)
 			return dlog("Game is over, not launching fall interval");
 		if (this.fallInterval !== -1)
 			return dlog("Fall interval already set, not launching another one");
 		if (interval < 0)
 			return dlog("interval is negative, not launching");
+		// console.log("Setting fall interval to " + interval);
 		this.fallInterval = setInterval(() => this.#fallPiece(), interval);
 	}
 
@@ -189,16 +192,17 @@ class 	TetrisGame {
 		return piece;
 	}
 
-	async #spawnPiece() {
-		// dlog("#spawnPiece, currentPiece: ", this.currentPiece);
+	async spawnPiece() {
+		// dlog("spawnPiece, currentPiece: ", this.currentPiece);
+		// dlog("Spawning new piece");
 		clearInterval(this.fallInterval);
 		this.fallInterval = -1;
 		this.shouldLock = false;
 		this.shouldSpawn = false;
 		this.spinType = "";
 		if (this.holdPhase) { // If swap was called, we are in hold phase
-			this.holdPhase = false;
 			// dlog("Hold phase");
+			this.holdPhase = false;
 			this.currentPiece?.remove(this.matrix);
 			this.currentPiece?.setRotation(tc.NORTH);
 			if (this.hold && this.currentPiece) {
@@ -227,7 +231,7 @@ class 	TetrisGame {
 		this.#placeShadow();
 		this.dropType === "hard" ? this.dropType = "normal" : true;
 		this.dropType === "normal" ? this.fallSpeed = tc.FALL_SPEED(this.level) : tc.SOFT_DROP_SPEED(this.level);
-		await (0, utils_1.delay)(this.spawnARE);
+		await utils_1.delay(this.spawnARE);
 	}
 
 	#resetLockPhase() {
@@ -250,12 +254,11 @@ class 	TetrisGame {
 			(this.lockTime >= 0 && this.msSinceLockPhase >= this.lockTime)) {
 			// dlog("Lock phase reached, locking piece at " + this.msSinceLockPhase + " ms");
 			// this.lockTime >= 500 ? dlog("Max time reached") : dlog("Max moves reached");
-			this.shouldLock = true;
 			this.#resetLockPhase();
 			this.shouldLock = true;
 			clearInterval(this.fallInterval);
 			this.fallInterval = -1;
-			this.#trySetInterval(1);
+			this.trySetInterval(1);
 		}
 	}
 
@@ -286,7 +289,7 @@ class 	TetrisGame {
 				this.currentPiece.remove(this.matrix);
 				// this.currentPiece.setTexture(this.currentPiece.getTexture() + "_LOCKED")
 				this.currentPiece.place(this.matrix, true);
-				this.currentPiece = null;
+				this.currentPiece = undefined;
 				this.lockFrame = true;
 				this.shouldSpawn = true;
 				this.isInLockPhase = false;
@@ -358,11 +361,11 @@ class 	TetrisGame {
 			else
 				this.player.emit("EFFECT", JSON.stringify({ type: "LOCK", value: "lock" }));
 		}
-		this.completionPhase();
+		this.#completionPhase();
 		return;
 	}
 
-	async completionPhase() {
+	async #completionPhase() {
 		if (this.currentPiece?.canFall(this.matrix))
 			this.score += tc.SCORE_CALCULUS(this.dropType + " Drop", 0, false);
 		if (this.lockFrame) {
@@ -400,8 +403,8 @@ class 	TetrisGame {
 				this.player.emit("EFFECT", JSON.stringify({ type: "LEVEL", value: "up" }));
 		}
 		if (this.shouldSpawn) {
-			await this.#spawnPiece();
-			this.#trySetInterval();
+			await this.spawnPiece();
+			this.trySetInterval();
 			// ^^^ restart the loop starting in #fallPiece
 		}
 		this.#placeShadow();
@@ -501,9 +504,11 @@ class 	TetrisGame {
 		this.awaitingGarbage.push(lines);
 	}
 
-	changeFallSpeed(type) {
+	async changeFallSpeed(type) {
+		// console.log("over: " + this.over + ", type: " + type + ", dropType: " + this.dropType + ", fallInterval: " + this.fallInterval);
 		if (this.over || type === this.dropType || this.fallInterval === -1)
 			return;
+		// console.log("So drop type in game is : " + type);
 		clearInterval(this.fallInterval);
 		this.fallInterval = -1;
 		this.#resetLockPhase();
@@ -522,7 +527,7 @@ class 	TetrisGame {
 				this.shouldLock = true;
 				break;
 		}
-		this.#trySetInterval();
+		this.trySetInterval();
 	}
 
 	rotate(direction) {
@@ -575,8 +580,9 @@ class 	TetrisGame {
 	}
 
 	async swap() {
+		// console.log("holdAllowed: " + this.holdAllowed + ", canSwap: " + this.canSwap + ", over: " + this.over + ", fallInterval: " + this.fallInterval);
 		if (!this.holdAllowed || !this.canSwap || this.over || this.fallInterval === -1)
-			return;
+			return ;
 		this.player.emit("EFFECT", JSON.stringify({ type: "USER_EFFECT", value: "hold" }));
 		++this.keysPressed;
 		++this.holds;
@@ -586,8 +592,8 @@ class 	TetrisGame {
 		clearInterval(this.fallInterval);
 		this.fallInterval = -1;
 		this.#resetLockPhase();
-		await this.#spawnPiece();
-		this.#trySetInterval();
+		await this.spawnPiece();
+		this.trySetInterval();
 		this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
 	}
 
@@ -597,8 +603,8 @@ class 	TetrisGame {
 				if (!this.over) {
 					this.gameTime = Date.now() - this.beginningTime;
 					this.piecesPerSecond = parseFloat((this.piecesPlaced / (this.gameTime / 1000)).toFixed(2));
-					setTimeout(Iteration, 1); // Schedule the next iteration
-					return;
+					setTimeout(Iteration, 10); // Schedule the next iteration
+					return ;
 				}
 				this.keysPerSecond = parseFloat((this.keysPressed / (this.gameTime / 1000)).toFixed(2));
 				this.keysPerPiece = parseFloat((this.keysPressed / this.piecesPlaced).toFixed(2));
@@ -618,9 +624,10 @@ class 	TetrisGame {
 		// 	this.player.emit("GAME", JSON.stringify({game: this.toJSON()}));
 		// }, 1000 / 60) as unknown as number; // 60 times per second
 		this.bags = [this.#shuffleBag(), this.#shuffleBag()];
-		await this.#spawnPiece();
+		await this.spawnPiece();
 		this.#placeShadow();
-		this.#trySetInterval();
+		// console.log("Game loop started for " + this.username);
+		this.trySetInterval();
 		this.player.emit("GAME_START", JSON.stringify({ game: this.toJSON() }));
 		await this.#gameLoopIteration();
 		clearInterval(this.fallInterval);
@@ -688,16 +695,17 @@ class 	TetrisGame {
 		clearInterval(this.lockInterval);
 		this.lockInterval = -1;
 		const matrix = this.matrix;
-		const restoredState = JSON.parse(JSON.stringify(this.initialState));
-		Object.assign(this, restoredState);
+		Object.assign(this, JSON.parse(JSON.stringify(this.initialState)));
 		this.matrix = matrix;
 		this.matrix.reset();
-		this.rng = seedRandom(Date.now().toString());
+		if (this.resetSeedOnRetry)
+			this.seed = Date.now().toString();
+		this.rng = seedRandom(this.seed);
 		this.bags = [this.#shuffleBag(), this.#shuffleBag()];
-		await this.#spawnPiece();
+		await this.spawnPiece();
 		this.#placeShadow();
-		this.#trySetInterval();
-		this.hold = null;
+		this.trySetInterval();
+		this.hold = undefined;
 		this.beginningTime = Date.now();
 		this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
 	}

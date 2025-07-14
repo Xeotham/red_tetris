@@ -25,10 +25,10 @@ describe('Tetris Utils', () => {
 
 	it('Should await for a delay specified in the argument', async () => {
 		let start = Date.now();
-		await delay(50);
+		await delay(20);
 		let end = Date.now();
-		expect(end - start).to.be.at.least(49);
-		expect(end - start).to.be.below(100);
+		expect(end - start).to.be.at.least(19);
+		expect(end - start).to.be.below(40);
 		start = Date.now();
 		await delay(25);
 		end = Date.now();

@@ -34,12 +34,6 @@ exports.io = new socket_io.Server(exports.fastify.server, {
 	},
 });
 
-// Register the CORS plugin
-// exports.fastify.register(cors.default, {
-//     origin: `*`, // Allow all origins, or specify your frontend's origin
-//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', "PATCH"],
-// });
-
 // Register routes
 exports.fastify.register((fastify) => {
 	fastify.get('/health', async (request, reply) => {

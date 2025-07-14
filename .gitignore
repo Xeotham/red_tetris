@@ -8,4 +8,5 @@ fastify-blog/
 !src/front/redTetrisFront/vite.config.js
 .data/back/*
 .data/front/*
+*.nyc_output
 .idea

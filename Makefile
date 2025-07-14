@@ -75,6 +75,18 @@ rm_logs:
 	fi
 	@ echo "$(GREEN)Logs deleted!$(BASE_COLOR)"
 
+tests:
+	@ if ! docker ps | grep -q back; then \
+		echo "$(DARK_RED)Back image not found! Please run 'make up' first.$(BASE_COLOR)"; \
+	else \
+		echo "$(RED)Running tests for back...$(BASE_COLOR)"; \
+		cd src/back/redTetrisBack && npm run testcov ; cd ../../..; \
+		echo "$(DARK_GREEN)Tests for back completed!$(BASE_COLOR)"; \
+		echo "$(RED)Running tests for front...$(BASE_COLOR)"; \
+		cd src/front/redTetrisFront && npm run testcov ; cd ../../..; \
+		echo "$(DARK_GREEN)Tests for front completed!$(BASE_COLOR)"; \
+ 	fi
+
 clean: down
 	@ echo "$(RED)Removing all docker image...$(BASE_COLOR)"
 	@ docker system prune -af >/dev/null
@@ -102,4 +114,4 @@ re: down up
 fre: clean up
 
 .PHONY:
-	help up down logs rm_logs clean re
+	help up down logs rm_logs tests clean re

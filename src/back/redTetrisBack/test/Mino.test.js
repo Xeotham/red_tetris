@@ -29,6 +29,9 @@ describe('Mino', () => {
 		const mino = new Mino();
 		mino.setTexture("GREEN");
 		expect(mino.getTexture()).to.equal("GREEN");
+		mino.setTexture("EMPTY");
+		expect(mino.getTexture()).to.equal("EMPTY");
+		expect(mino.isSolid()).to.be.false;
 	});
 
 	it('Should set and get solid state correctly', () => {

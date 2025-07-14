@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MultiplayerRoomPlayer = void 0;
 
-const TetrisGame = require("./Game/TetrisGame");
+const { TetrisGame } = require("./Game/TetrisGame");
 
 
 class MultiplayerRoomPlayer {
@@ -36,7 +36,7 @@ class MultiplayerRoomPlayer {
 	setGame(game) { this.game = game; }
 
 	setupGame(settings) {
-		const game = new TetrisGame.TetrisGame(this.socket, this.username);
+		const game = new TetrisGame(this.socket, this.username);
 		game.setSettings(settings);
 		this.game = game;
 	}
