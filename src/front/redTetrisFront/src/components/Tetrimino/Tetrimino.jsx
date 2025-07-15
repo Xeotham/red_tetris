@@ -1,5 +1,5 @@
 import "./Tetrimino.css"
-import {getTexture} from "../../utils.jsx";
+import { getTexture } from "../../utils.jsx";
 
 const   Tetrimino = ({minoType, texture}) => {
 	const    tetriminoPatterns = {

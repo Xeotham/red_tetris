@@ -158,7 +158,7 @@ class MultiplayerRoom {
 				playerArrayEnd.find((player) => !player.getGame()?.isOver())?.getGame()?.setOver(true);
 			this.#assignOpponents();
 			if (this.playersRemaining >= 1)
-				return;
+				return ;
 			this.isInGame = false;
 			playerArrayEnd.forEach((player) => {
 				player.getSocket().emit("GAME_FINISH");

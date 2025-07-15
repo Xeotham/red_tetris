@@ -1,9 +1,9 @@
 import  "./Board.css";
 import Matrix from "../Matrix/Matrix.jsx";
 import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 import { address } from "../../main.jsx";
-import {sfxPlayer} from "../../sfxHandler.jsx";
+import { sfxPlayer } from "../../sfxHandler.jsx";
 import Hold from "../Hold/Hold.jsx";
 import Bags from "../Bags/Bags.jsx";
 
@@ -102,7 +102,7 @@ const   board = () => {
 			const sfx = sfxPlayer(data.type, data.value);
 
 			// console.log(sfx);
-			sfx.play();
+			sfx?.play();
 
 		});
 

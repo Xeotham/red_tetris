@@ -30,10 +30,6 @@ describe('Server', () => {
 		console.log = originalConsoleLog; // Restore original console.log
 	});
 
-	it('Should set up the routes correctly', async () => {
-		// console.log("default :", routes);
-	});
-
 });
 
 

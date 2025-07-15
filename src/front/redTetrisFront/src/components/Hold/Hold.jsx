@@ -1,6 +1,6 @@
 import './Hold.css'
-import {useState} from "react";
-import {getTexture} from "../../utils.jsx";
+import { useState } from "react";
+import { getTexture } from "../../utils.jsx";
 import Tetrimino from "../Tetrimino/Tetrimino.jsx";
 
 const   HoldPiece = ({ type, canSwap }) => {

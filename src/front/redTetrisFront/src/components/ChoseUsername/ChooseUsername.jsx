@@ -1,6 +1,6 @@
-import {useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 
-const   ChoseUsername = () => {
+const   ChooseUsername = () => {
 
 	const   { roomId } = useParams();
 
@@ -12,4 +12,4 @@ const   ChoseUsername = () => {
 	)
 }
 
-export default ChoseUsername;
+export default ChooseUsername;

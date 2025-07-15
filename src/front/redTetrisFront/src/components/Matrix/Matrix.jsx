@@ -1,6 +1,6 @@
 import  "./Matrix.css"
-import {useState} from "react";
-import {getTexture} from "../../utils.jsx";
+import { useState } from "react";
+import { getTexture } from "../../utils.jsx";
 
 const   Mino = ({type, width, height, id}) => {
 	const   [currentType, setCurrentType] = useState("EMPTY");

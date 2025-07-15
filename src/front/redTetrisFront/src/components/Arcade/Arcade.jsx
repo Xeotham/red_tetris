@@ -1,9 +1,4 @@
 import  "./Arcade.css";
-import Matrix from "../Matrix/Matrix.jsx";
-import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
-import { address } from "../../main.jsx";
-import {sfxPlayer} from "../../sfxHandler.jsx";
 import Board from "../ArcadeBoard/Board.jsx";
 
 const   arcade = () => {

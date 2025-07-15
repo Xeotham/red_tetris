@@ -1,9 +1,7 @@
-const assert = require('assert');
 const chai = require('chai');
 const { Mino } = require('./../tetris_app/server/Game/Mino.js');
 
 const expect = chai.expect;
-const should = chai.should();
 
 describe('Mino', () => {
 	it('Should create a Mino with default texture and not solid state', () => {
