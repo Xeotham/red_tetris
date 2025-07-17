@@ -6,3 +6,8 @@
 
 .tetriminoRow {
 }
+
+.mino {
+	user-select: none;
+	-webkit-user-drag: none;
+}

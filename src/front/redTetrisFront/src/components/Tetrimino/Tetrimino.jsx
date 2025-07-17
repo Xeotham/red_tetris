@@ -2,40 +2,24 @@ import "./Tetrimino.css"
 import { getTexture } from "../../utils.jsx";
 
 const   Tetrimino = ({minoType, texture}) => {
-	const    tetriminoPatterns = {
-		"I": [
-			[ 1, 1, 1, 1 ],
-		],
-		"J": [
-			[ 1, 0, 0 ],
-			[ 1, 1, 1 ],
-		],
-		"L": [
-			[ 0, 0, 1 ],
-			[ 1, 1, 1 ],
-		],
-		"O": [
-			[ 1, 1 ],
-			[ 1, 1 ],
-		],
-		"S": [
-			[ 0 ,1, 1 ],
-			[ 1, 1, 0 ],
-		],
-		"T": [
-			[ 0, 1, 0 ],
-			[ 1, 1, 1 ],
-		],
-		"Z": [
-			[ 1, 1, 0 ],
-			[ 0, 1, 1 ],
-		],
+
+	const   getTetriminoPattern = (type) => {
+		switch (type) {
+			case "I": return  [[ 1, 1, 1, 1 ]];
+			case "J": return  [[ 1, 0, 0 ], [ 1, 1, 1 ]];
+			case "L": return  [[ 0, 0, 1 ], [ 1, 1, 1 ]];
+			case "O": return  [[ 1, 1 ], [ 1, 1 ]];
+			case "S": return  [[ 0 ,1, 1 ], [ 1, 1, 0 ]];
+			case "T": return  [[ 0, 1, 0 ], [ 1, 1, 1 ]];
+			case "Z": return  [[ 1, 1, 0 ], [ 0, 1, 1 ]];
+			default: return [[ 0 ]]; // Empty or unknown type
+		}
 	}
 
 	if (!minoType || minoType === "EMPTY") {
 		return (
 			<div className="tetrimino">
-				<img src={getTexture("EMPTY")} alt="empty" />
+				<img className={"mino"} src={getTexture("EMPTY")} alt="empty" />
 			</div>
 		)
 	}
@@ -47,11 +31,13 @@ const   Tetrimino = ({minoType, texture}) => {
 		<div>
 			<div className="tetrimino">
 				{
-					tetriminoPatterns[minoType].map((row, rowIndex) => (
+					getTetriminoPattern(minoType).map((row, rowIndex) => (
 					<div key={rowIndex} className="tetriminoRow" style={{height: "32px"}}>
-						{row.map((cell, cellIndex) => (
-							<img src={cell ? texture : getTexture("EMPTY")} alt={cellIndex}/>
-						))}
+						{
+							row.map((cell, cellIndex) => (
+							<img key={cellIndex} className={"mino"} src={cell ? texture : getTexture("EMPTY")} alt={cellIndex}/>
+						))
+						}
 					</div>
 				))}
 			</div>
