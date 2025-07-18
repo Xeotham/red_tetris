@@ -551,7 +551,7 @@ export interface    loadTetrisArgs {
 	rooms?: roomInfo[];
 }
 
-export interface    tetrisReq {
+export interface    multetrisReq {
 	argument:	string;
 	gameId:		number;
 	username?:	string;

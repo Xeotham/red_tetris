@@ -102,7 +102,7 @@ class 	TetrisGame {
 
 		// settings
 
-		this.resetSeedOnRetry = true; // If true, the seed will be reset on retry
+		this.resetSeedOnRetry = true;
 		this.seed = Date.now().toString();
 		this.rng = seedRandom(this.seed);
 		this.rotationType = "SRSX";
@@ -117,7 +117,8 @@ class 	TetrisGame {
 		this.softDropAmp = 1;
 		this.isLevelling = true;
 		this.canRetry = true;
-		this.initialState = JSON.parse(JSON.stringify(this));
+		this.initialState = this.#clone();
+		console.log("Initial state beginning: ", this.initialState);
 	}
 
 	toJSON() {
@@ -139,6 +140,72 @@ class 	TetrisGame {
 			piecesPlaced: this.piecesPlaced,
 			piecesPerSecond: this.piecesPerSecond,
 		};
+	}
+
+	#clone() {
+		return ({
+			currentPiece: this.currentPiece,
+			shadowPiece: this.shadowPiece,
+			hold: this.hold,
+			level: this.level,
+			dropType: this.dropType,
+			lineCleared: this.linesCleared,
+			lineClearGoal: this.lineClearGoal = tc.FIXED_GOAL_SYSTEM[this.level],
+			combo: this.combo,
+			B2B: this.B2B,
+			canSwap: this.canSwap,
+			holdPhase: this.holdPhase,
+			shouldSpawn: this.shouldSpawn,
+			fallSpeed: this.fallSpeed,
+			over: this.over,
+			hasForfeit: this.hasForfeit,
+			shouldLock: this.shouldLock,
+			isInLockPhase: this.isInLockPhase,
+			lockFrame: this.lockFrame,
+			nbMoves: this.nbMoves,
+			lowestReached: this.lowestReached,
+			msSinceLockPhase: this.msSinceLockPhase,
+			opponent: this.opponent,
+			awaitingGarbage: this.awaitingGarbage,
+			garbageRespite: this.garbageRespite,
+			isInRoom: this.isInRoom,
+			beginningTime: this.beginningTime,
+			totalTime: this.totalTime,
+			gameTime: this.gameTime,
+			maxCombo: this.maxCombo,
+			piecesPlaced: this.piecesPlaced,
+			piecesPerSecond: this.piecesPerSecond,
+			attacksSent: this.attacksSent,
+			attacksSentPerMinute: this.attacksSentPerMinute,
+			attacksReceived: this.attacksReceived,
+			attacksReceivedPerMinute: this.attacksReceivedPerMinute,
+			keysPressed: this.keysPressed,
+			keysPerPiece: this.keysPerPiece,
+			keysPerSecond: this.keysPerSecond,
+			holds: this.holds,
+			score: this.score,
+			linesCleared: this.linesCleared,
+			linesPerMinute: this.linesPerMinute,
+			maxB2B: this.maxB2B,
+			perfectClears: this.perfectClears,
+			allLinesClear: JSON.parse(JSON.stringify(this.allLinesClear)),
+			place: this.place,
+			resetSeedOnRetry: this.resetSeedOnRetry,
+			seed: this.seed,
+			rng: this.rng,
+			rotationType: this.rotationType,
+			showShadowPiece: this.showShadowPiece,
+			showBags: this.showBags,
+			holdAllowed: this.holdAllowed,
+			showHold: this.showHold,
+			infiniteHold: this.infiniteHold,
+			infiniteMovement: this.infiniteMovement,
+			lockTime: this.lockTime,
+			spawnARE: this.spawnARE,
+			softDropAmp: this.softDropAmp,
+			isLevelling: this.isLevelling,
+			canRetry: this.canRetry,
+		});
 	}
 
 	getGameId() { return this.gameId; }
@@ -510,6 +577,10 @@ class 	TetrisGame {
 		if (this.over || type === this.dropType || this.fallInterval === -1)
 			return;
 		// console.log("So drop type in game is : " + type);
+		if (type !== "normal") {
+			++this.nbMoves;
+			++this.keysPressed;
+		}
 		clearInterval(this.fallInterval);
 		this.fallInterval = -1;
 		this.#resetLockPhase();
@@ -696,8 +767,8 @@ class 	TetrisGame {
 		clearInterval(this.lockInterval);
 		this.lockInterval = -1;
 		const matrix = this.matrix;
-		Object.assign(this, JSON.parse(JSON.stringify(this.initialState)));
-		this.matrix = matrix;
+		console.log("Initial state: ", this.initialState);
+		Object.assign(this, this.initialState);
 		this.matrix.reset();
 		if (this.resetSeedOnRetry)
 			this.seed = Date.now().toString();
