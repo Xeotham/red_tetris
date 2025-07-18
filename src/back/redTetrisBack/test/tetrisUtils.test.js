@@ -2,7 +2,7 @@ const assert = require('assert');
 const chai = require('chai');
 const { isUpperCase, getTetrisGame, getTetrisUser, deleteTetrisGame, getTetrisRoom, codeNameExists, TimeoutKey } = require("../tetris_app/utils");
 const { io } = require("socket.io-client");
-const { MultiplayerRoomPlayer } = require("../tetris_app/server/MultiplayerRoomPlayer");
+const { Player } = require("../tetris_app/server/Player");
 const controllers = require("../tetris_app/socket/controllers");
 const { MultiplayerRoom } = require("../tetris_app/server/MultiplayerRoom");
 const { TetrisGame } = require("../tetris_app/server/Game/TetrisGame");
@@ -26,7 +26,7 @@ describe('TetrisUtils', () => {
 	});
 
 	it('Should return the user inside arcadeGames or multiplayerRoomLst', () => {
-		const player = new MultiplayerRoomPlayer(clientSocket, true);
+		const player = new Player(clientSocket, true);
 		controllers.arcadeGames[clientSocket.id] = player;
 		expect(controllers.arcadeGames[clientSocket.id]).to.equal(player);
 		expect(controllers.arcadeGames[clientSocket.id]).to.equal(getTetrisUser(clientSocket.id));
@@ -42,7 +42,7 @@ describe('TetrisUtils', () => {
 	});
 
 	it('Should return the game inside arcadeGames or multiplayerRoomLst with a given Id', () => {
-		const player = new MultiplayerRoomPlayer(clientSocket, true);
+		const player = new Player(clientSocket, true);
 		const game = new TetrisGame(clientSocket);
 		player.setGame(game);
 		controllers.arcadeGames[clientSocket.id] = player;
@@ -62,7 +62,7 @@ describe('TetrisUtils', () => {
 	});
 
 	it('Should delete the game for a given Id', () => {
-		const player = new MultiplayerRoomPlayer(clientSocket, true);
+		const player = new Player(clientSocket, true);
 		const game = new TetrisGame(clientSocket);
 		player.setGame(game);
 		controllers.arcadeGames[clientSocket.id] = player;

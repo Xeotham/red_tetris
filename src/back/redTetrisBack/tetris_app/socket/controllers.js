@@ -5,17 +5,17 @@ exports.holdPiece = exports.forfeitGame = exports.retryGame = exports.tetrisArca
 const MultiplayerRoom = require("../server/MultiplayerRoom");
 const utils = require("../utils");
 const { TetrisGame } = require("../server/Game/TetrisGame");
-const { MultiplayerRoomPlayer } = require("../server/MultiplayerRoomPlayer");
+const { Player } = require("../server/Player");
 const { deleteTetrisGame } = require("../utils");
 const { dlog } = require("../../server/server");
 
-exports.arcadeGames = {}; // { socketId: MultiplayerRoomPlayer }
+exports.arcadeGames = {}; // { socketId: Player }
 exports.multiplayerRoomLst = []; // [MultiplayerRoom]
 
 const tetrisArcade = async (socket) => {
 	const tetrisGame = new TetrisGame(socket);
 	dlog("Arcade Game started for " + socket.id);
-	exports.arcadeGames[socket.id] = new MultiplayerRoomPlayer(socket, true);
+	exports.arcadeGames[socket.id] = new Player(socket, true);
 	exports.arcadeGames[socket.id].setGame(tetrisGame);
 	tetrisGame.gameLoop().then(() => utils.deleteTetrisGame(socket.id));
 	// TODO : Delete the player or close the socket? Send a message to the player?

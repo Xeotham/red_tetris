@@ -3,14 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MultiplayerRoom = void 0;
 
 const utils = require("../utils");
-const { MultiplayerRoomPlayer } = require("./MultiplayerRoomPlayer");
+const { Player } = require("./Player");
 const { dlog } = require("./../../server/server");
 
 
 class MultiplayerRoom {
 
 	constructor(socket, isPrivate = true, codeName = undefined) {
-		this.players = {}; // { socketId: MultiplayerRoomPlayer }
+		this.players = {}; // { socketId: Player }
 		this.isInGame = false;
 		if (codeName && codeName.length === 4 && utils.isUpperCase(codeName) && !utils.codeNameExists(codeName))
 			this.code = codeName;
@@ -63,11 +63,11 @@ class MultiplayerRoom {
 		socket.emit("MULTIPLAYER_JOIN", JSON.stringify({ argument: this.code }));
 		// console.log("sending MULTIPLAYER_JOIN 2");
 		if (Object.values(this.players).length <= 0) {
-			this.players[socket.id] = new MultiplayerRoomPlayer(socket, true);
+			this.players[socket.id] = new Player(socket, true);
 			socket.emit("MULTIPLAYER_JOIN_OWNER");
 		}
 		else {
-			this.players[socket.id] = new MultiplayerRoomPlayer(socket);
+			this.players[socket.id] = new Player(socket);
 			this.settings.canRetry = false;
 		}
 		this.sendSettingsToPlayers();
@@ -149,7 +149,8 @@ class MultiplayerRoom {
 
 		const endOfGame = (player) => {
 			const playerArrayEnd = Object.values(this.players);
-			dlog("End of game for player " + player.getUsername() + " is at place " + this.playersRemaining);
+			dlog("End of game for player " + player.getUsername() + " is at place " + this.playersRemaining + " in room " + this.code);
+			player.getGame().place = this.playersRemaining;
 			player.getSocket().emit("MULTIPLAYER_FINISH", JSON.stringify({ argument: this.playersRemaining }));
 			--this.playersRemaining;
 			if (player.getGame()?.getHasForfeit())

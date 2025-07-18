@@ -98,6 +98,7 @@ class 	TetrisGame {
 			"Mini Spin Triple": 0,
 			"Mini Spin Quad": 0,
 		};
+		this.place = undefined;
 
 		// settings
 
@@ -678,6 +679,7 @@ class 	TetrisGame {
 			miniSpinDouble: this.allLinesClear["Mini Spin Double"],
 			miniSpinTriple: this.allLinesClear["Mini Spin Triple"],
 			miniSpinQuad: this.allLinesClear["Mini Spin Quad"],
+			place: this.place,
 		};
 	}
 

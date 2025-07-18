@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MultiplayerRoomPlayer = void 0;
+exports.Player = void 0;
 
 const { TetrisGame } = require("./Game/TetrisGame");
 
 
-class MultiplayerRoomPlayer {
+class Player {
 	constructor(socket, owner = false) {
 		this.socket = socket;
 		this.username = socket.id;
@@ -41,4 +41,4 @@ class MultiplayerRoomPlayer {
 		this.game = game;
 	}
 }
-exports.MultiplayerRoomPlayer = MultiplayerRoomPlayer;
+exports.Player = Player;

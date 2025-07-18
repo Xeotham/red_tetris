@@ -1,0 +1,170 @@
+/*html, body, #root {*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    margin: 0;*/
+/*    padding: 0;*/
+/*}*/
+
+.full {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+}
+
+.tetrisWindowBkg {
+    /*width: 100%;*/
+    /*height: 100%;*/
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /*margin: 0;*/
+    padding: 0;
+    background-color: #9860ec;
+    /*margin-top: 3%;*/
+    margin-left: -8%;
+    width: 80vw;
+    height: 90vh;
+    /*justify-content: center;*/
+    /*align-items: center;*/
+    border-radius: 20px;
+    box-shadow: 0 0 0 #000000, 0 0 10px #000000, 20px 20px 10px #000
+}
+
+.backButton {
+    position: inherit;
+    align-items: center;
+    justify-content: center;
+    margin-top: -10%;
+    width: 35%;
+    height: 100%;
+    background-color: #511695;
+    border-radius: 100px;
+    cursor: pointer;
+    text-shadow: #1a1a1a 1px 1px 1px;
+    text-align: center;
+    font-family: 'play_pretend', 'Arial', sans-serif;
+    font-size: 2vmin;
+    user-select: none;
+}
+
+.playerText {
+    width: 30%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(231, 170, 44);
+    margin-left: 10%;
+    margin-top: -10%;
+    font-size: 2.5vmin;
+}
+
+.playButton {
+    position: inherit;
+    align-items: flex-start;
+    justify-content: left;
+    width: 70%;
+    height: 100%;
+    margin-left: 3%;
+    margin-right: 3%;
+    background-color: #511695;
+    border-radius: 100px;
+    cursor: pointer;
+    text-shadow: #1a1a1a 1px 1px 1px;
+    text-align: left;
+    font-family: 'play_pretend', 'Arial', sans-serif;
+    font-size: 2vmin;
+    user-select: none;
+}
+
+.copyCodeBox {
+    position: inherit;
+    align-items: center;
+    justify-content: center;
+    width: 20%;
+    height: 100%;
+    background-color: #e7aa2c;
+    text-shadow: #1a1a1a 1px 1px 1px;
+    cursor: pointer;
+    border-radius: 100px;
+    white-space: normal;
+    font-size: 1.5vmin;
+    word-wrap: break-word;
+}
+
+.participantsText {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    color: rgb(231, 170, 44);
+    margin-left: 4%;
+    margin-top: 1%;
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+    font-size: 2vmin;
+}
+
+.settingsTitle {
+    display: flex;
+    margin-top: 0.75%;
+    margin-bottom: .2%;
+    width: 100%;
+    height: 33%;
+    align-items: center;
+    justify-content: center;
+    color: rgb(231, 170, 44);
+    font-size: 2vmin;
+}
+
+.roomSettingsForm {
+    height: 50%;
+    width: 90%;
+    /*margin-left: 5%;*/
+    /*margin-right: 5%;*/
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 5%;
+}
+
+.settingBox {
+    flex: 1 1 0;
+    flex-flow: column nowrap;
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #511695;
+    border-radius: 20px;
+    box-shadow: 0 0 0 #000000, 0 0 10px #000000, 20px 20px 10px #000;
+    /*margin-right: 2%; !* Optional: space between boxes *!*/
+    font-size: 1.8vmin;
+}
+
+.inSettingBox {
+    flex: 1 1 0;
+    /*width: 100%;*/
+    /*height: 100%;*/
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: right;
+    font-size: .5vmin;
+}
+
+.labelSettings {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(231, 170, 44);
+    font-size: 2vmin;
+}

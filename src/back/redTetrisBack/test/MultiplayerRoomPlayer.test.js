@@ -1,6 +1,6 @@
 const assert = require('assert');
 const chai = require('chai');
-const { MultiplayerRoomPlayer } = require('./../tetris_app/server/MultiplayerRoomPlayer.js');
+const { Player } = require('../tetris_app/server/Player.js');
 const { io, Socket } = require("socket.io-client");
 const { address } = require("../server/server");
 const { TetrisGame } = require("../tetris_app/server/Game/TetrisGame");
@@ -8,7 +8,7 @@ const { TetrisGame } = require("../tetris_app/server/Game/TetrisGame");
 const expect = chai.expect;
 const should = chai.should();
 
-describe('MultiplayerRoomPlayer', () => {
+describe('Player', () => {
 
 	let clientSocket;
 
@@ -22,8 +22,8 @@ describe('MultiplayerRoomPlayer', () => {
 		if (clientSocket.connected) clientSocket.disconnect();
 	});
 
-	it('should create a MultiplayerRoomPlayer with a socket', () => {
-		const player = new MultiplayerRoomPlayer(clientSocket);
+	it('should create a Player with a socket', () => {
+		const player = new Player(clientSocket);
 		expect(player.getSocket().id).to.equal(clientSocket.id);
 		expect(player.getUsername()).to.equal(clientSocket.id);
 		expect(player.isOwner()).to.be.false;
@@ -31,24 +31,24 @@ describe('MultiplayerRoomPlayer', () => {
 	});
 
 	it('Should get the socket', () => {
-		const player = new MultiplayerRoomPlayer(clientSocket);
+		const player = new Player(clientSocket);
 		expect(player.getSocket()).to.equal(clientSocket);
 	});
 
 	it('Should get the username (socket id)', () => {
-		const player = new MultiplayerRoomPlayer(clientSocket);
+		const player = new Player(clientSocket);
 		expect(player.getUsername()).to.equal(clientSocket.id);
 	});
 
 	it('Should set and get the owner status', () => {
-		const player = new MultiplayerRoomPlayer(clientSocket);
+		const player = new Player(clientSocket);
 		expect(player.isOwner()).to.be.false;
 		player.setOwner(true);
 		expect(player.isOwner()).to.be.true;
 	});
 
 	it('Should set and get the game', () => {
-		const player = new MultiplayerRoomPlayer(clientSocket);
+		const player = new Player(clientSocket);
 		expect(player.getGame()).to.be.undefined;
 		const game = new TetrisGame(clientSocket);
 		player.setGame(game);
@@ -56,7 +56,7 @@ describe('MultiplayerRoomPlayer', () => {
 	});
 
 	it('Should setup a game with settings', () => {
-		const player = new MultiplayerRoomPlayer(clientSocket);
+		const player = new Player(clientSocket);
 		const settings = {
 			showBags: false,
 			holdAllowed: false,
