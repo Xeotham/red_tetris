@@ -12,7 +12,7 @@ const   Mino = ({type, width, height, id}) => {
 	}
 
 	return (
-		<img src={currentTexture} style={{ width: `${width}px`, height: `${height}px` }} alt={type} id={id} />
+		<img className={"mino"} src={currentTexture} style={{ width: `${width}px`, height: `${height}px`  }} alt={type} id={id} />
 	);
 }
 
@@ -39,7 +39,7 @@ const   Matrix = ({ matrix, width, height, id }) => {
 	const   [size, setSize] = useState({ width: width || 320, height: height || 640 });
 
 	if (!matrix)
-		return ;
+		matrix = Array.from({ length: 40 }, () => Array.from({ length: 10 }, () => ({ texture: "EMPTY" })));
 
 	return (
 		<div className={"matrixContainer"}>

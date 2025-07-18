@@ -105,7 +105,7 @@ class 	TetrisGame {
 		this.resetSeedOnRetry = true; // If true, the seed will be reset on retry
 		this.seed = Date.now().toString();
 		this.rng = seedRandom(this.seed);
-		this.rotationType = "SRS";
+		this.rotationType = "SRSX";
 		this.showShadowPiece = true;
 		this.showBags = true;
 		this.holdAllowed = true;
@@ -409,7 +409,7 @@ class 	TetrisGame {
 			// ^^^ restart the loop starting in #fallPiece
 		}
 		this.#placeShadow();
-		this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
+		// this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
 	}
 
 	#placeShadow() {
@@ -553,7 +553,7 @@ class 	TetrisGame {
 				this.player.emit("EFFECT", JSON.stringify({ type: "USER_EFFECT", value: "rotate" }));
 		}
 		this.#placeShadow();
-		this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
+		// this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
 	}
 
 	move(direction) {
@@ -577,7 +577,7 @@ class 	TetrisGame {
 		else
 			this.player.emit("EFFECT", JSON.stringify({ type: "USER_EFFECT", value: "move" }));
 		this.#placeShadow();
-		this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
+		// this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
 	}
 
 	async swap() {
@@ -595,7 +595,7 @@ class 	TetrisGame {
 		this.#resetLockPhase();
 		await this.spawnPiece();
 		this.trySetInterval();
-		this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
+		// this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
 	}
 
 	async #gameLoopIteration() {
@@ -621,9 +621,9 @@ class 	TetrisGame {
 
 	async gameLoop() {
 		// dlog("Starting game loop");
-		// this.sendInterval = setInterval(() => {
-		// 	this.player.emit("GAME", JSON.stringify({game: this.toJSON()}));
-		// }, 1000 / 60) as unknown as number; // 60 times per second
+		this.sendInterval = setInterval(() => {
+			this.player.emit("GAME", JSON.stringify({game: this.toJSON()}));
+		}, 1000 / 55); // 60 times per second
 		this.rng = seedRandom(this.seed);
 		this.bags = [this.#shuffleBag(), this.#shuffleBag()];
 		await this.spawnPiece();
@@ -637,7 +637,7 @@ class 	TetrisGame {
 		this.sendInterval = -1;
 		this.player.emit("EFFECT", JSON.stringify({ type: "BOARD", value: "gameover" }));
 		this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
-		this.player.emit("STATS", { stats: this.#getStats() });
+		this.player.emit("STATS", JSON.stringify({ stats: this.#getStats() }));
 		if (!this.isInRoom)
 			this.player.emit("GAME_FINISH");
 	}

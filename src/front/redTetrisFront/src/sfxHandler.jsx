@@ -1,5 +1,7 @@
 const   btbSounds = (sound) => {
-	switch(sound) {
+	const   btb_value = sound > 3 ? 3 : sound;
+
+	switch(btb_value) {
 		case 1: return new Audio("/src/assets/sfx/BejeweledSR/btb_1.ogg");
 		case 2: return new Audio("/src/assets/sfx/BejeweledSR/btb_2.ogg");
 		case 3: return new Audio("/src/assets/sfx/BejeweledSR/btb_3.ogg");
@@ -82,10 +84,10 @@ const   userEffectSounds = (sound) => {
 
 const   levelSounds = (sound) => {
 	switch(sound) {
-		case 1: return new Audio("/src/assets/sfx/BejeweledSR/level1.ogg");
-		case 5: return new Audio("/src/assets/sfx/BejeweledSR/level5.ogg");
-		case 10: return new Audio("/src/assets/sfx/BejeweledSR/level10.ogg");
-		case 15: return new Audio("/src/assets/sfx/BejeweledSR/level15.ogg");
+		case "1": return new Audio("/src/assets/sfx/BejeweledSR/level1.ogg");
+		case "5": return new Audio("/src/assets/sfx/BejeweledSR/level5.ogg");
+		case "10": return new Audio("/src/assets/sfx/BejeweledSR/level10.ogg");
+		case "15": return new Audio("/src/assets/sfx/BejeweledSR/level15.ogg");
 		case "up": return new Audio("/src/assets/sfx/BejeweledSR/levelup.ogg");
 		default:
 			console.error("Unknown sound " + sound);

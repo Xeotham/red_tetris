@@ -1,3 +1,5 @@
+/* Board Related (Matrix, Hold, Bags) Styles */
+
 .board {
 	width: 100%;
 	height: 100%;
@@ -22,4 +24,142 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+}
+
+/* Styles for the stats display of the end screen */
+
+.statsDisplay {
+	padding: 30px 100px 175px 100px;
+	position: absolute;
+	z-index: 100;
+	align-items: center;
+	display: flex;
+	background-color: rgba(54, 40, 92, 0.9);
+}
+
+.endTitle {
+	display: inline-block;
+	font-size: 30px;
+	font-weight: bold;
+	text-align: center;
+	color: white;
+	margin-bottom: 20px;
+}
+
+.score {
+	font-size: 20px;
+	font-weight: bold;
+	text-align: center;
+	color: white;
+	margin-bottom: 20px;
+}
+
+/* Styles for the info table */
+
+.infoTable {
+	display: grid;
+	grid-template-columns: auto auto; /* Two columns: one for title, one for value */
+	gap: 10px; /* Space between rows and columns */
+	align-items: center; /* Align items vertically */
+}
+
+.infoTitle {
+	font-weight: bold;
+	text-align: left; /* Align text to the right for titles */
+	margin-right: 70px; /* Space between title and value */
+}
+
+.infoValue {
+	font-weight: normal;
+	text-align: left; /* Align text to the left for values */
+}
+
+.infoSpacing {
+	margin-bottom: 10px; /* Space between rows */
+	width: 100%;
+}
+
+
+/* Styles for the clears table */
+
+.clearsTable {
+	display: grid;
+	grid-template-columns: repeat(6, auto);
+	gap: 10px; /* Space between rows and columns */
+	align-items: center; /* Align items vertically */
+}
+
+.clearsInfoTitle {
+	font-weight: bold;
+	text-align: center; /* Align text to the right for titles */
+	margin-right: 70px; /* Space between title and value */
+	background-color: #4411a3;
+	padding: 2px 2px;
+	width: 100%;
+	height: 100%;
+}
+
+.clearsInfoKey {
+	font-weight: bold;
+	text-align: left; /* Align text to the right for keys */
+}
+
+.clearsInfoValue {
+	font-weight: normal;
+	text-align: center; /* Align text to the left for values */
+}
+
+/* Styles for current score */
+.gameStats {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	bottom: 20%;
+	left: 0;
+	transform: translateX(-50%); /* Adjust for the width of the stats */
+	width: 300px;
+	border-radius: 5px;
+	/*background-color: #4411a3;*/
+
+	color: white;
+	font-size: 20px;
+	text-align: right;
+}
+
+.gameStatsInfo {
+	display: flex;
+	margin-bottom: 15px;
+	flex-direction: column;
+	justify-content: right;
+	width: 100%;
+}
+
+
+/* Back Home button */
+
+.backHomeButton {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: fixed; /* Position relative to the viewport */
+	bottom: 100px; /* Distance from the bottom of the viewport */
+	left: 50%; /* Center horizontally in the viewport */
+	transform: translateX(-50%); /* Adjust for the button's width */
+	background-color: #4411a3;
+	color: white;
+	border: none;
+	width: 60%;
+	height: 80px;
+	padding: 10px 20px;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 30px;
+}
+
+.backHomeButton:hover {
+	box-shadow: 2px 2px 0 #000000, 2px -2px 10px #000000, -2px 2px 10px #000;
+	width: 65%;
+	background-color: #4411a3;
 }

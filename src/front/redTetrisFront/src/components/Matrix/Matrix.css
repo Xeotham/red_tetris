@@ -17,3 +17,8 @@
 	top: 50%;
 	left: 50%;
 }
+
+.mino {
+	user-select: none;
+	-webkit-user-drag: none;
+}
