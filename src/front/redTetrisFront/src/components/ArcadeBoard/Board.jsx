@@ -91,19 +91,31 @@ const   EndDisplay = ({stats, display = false}) => {
 	);
 }
 
-const   GameStats = ({gameInfo}) => {
+const   ScoreDisplay = ({score}) => {
 	return (
-		<div className={"gameStats"}>
-			<div className={"gameStatsInfo"}>{"Score: " + gameInfo.score}</div>
-			<div className={"gameStatsInfo"}>{"Level: " + gameInfo.level}</div>
-			<div className={"gameStatsInfo"}>{"Time: " + new Date(gameInfo.time || 0).toISOString().substring(14, 23)}</div>
-			<div className={"gameStatsInfo"}>{"Goal: " + gameInfo.linesCleared + " / " + gameInfo.lineClearGoal}</div>
-			<div className={"gameStatsInfo"}>{"Pieces: " + gameInfo.piecesPlaced + ", " + gameInfo.piecesPerSecond + "/s"}</div>
+		<div className={"scoreDisplay"}>
+			<div className={"scoreDisplayTitle"}>Score:</div>
+			<div className={"scoreDisplayValue"}>{ score }</div>
 		</div>
 	)
 }
 
-const   board = () => {
+const   GameStats = ({gameInfo}) => {
+	return (
+		<div className={"gameStats"}>
+			<div className={"gameStatsKey"}>{"Level:"}</div>
+			<div className={"gameStatsValue"}>{gameInfo.level}</div>
+			<div className={"gameStatsKey"}>{"Time:"}</div>
+			<div className={"gameStatsValue"}>{new Date(gameInfo.time || 0).toISOString().substring(14, 23)}</div>
+			<div className={"gameStatsKey"}>{"Goal:"}</div>
+			<div className={"gameStatsValue"}>{gameInfo.linesCleared + " / " + gameInfo.lineClearGoal}</div>
+			<div className={"gameStatsKey"}>{"Pieces:"}</div>
+			<div className={"gameStatsValue"}>{gameInfo.piecesPlaced + ", " + gameInfo.piecesPerSecond + "/s"}</div>
+		</div>
+	)
+}
+
+const board = () => {
 
 	const [socket, setSocket] = useState(() => io(`http://${address}`));
 	const [abortController, setAbortController] = useState(new AbortController());
@@ -224,6 +236,7 @@ const   board = () => {
 				<Bags bags={game.bags}/>
 			</div>
 			<GameStats gameInfo={game} />
+			<ScoreDisplay score={game.score} />
 			<EndDisplay stats={stats} display={displayStats}/>
 		</div>
 	);

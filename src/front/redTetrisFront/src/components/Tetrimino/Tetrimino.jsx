@@ -1,8 +1,7 @@
 import "./Tetrimino.css"
 import { getTexture } from "../../utils.jsx";
 
-const   Tetrimino = ({minoType, texture}) => {
-
+const   Tetrimino = ({minoType, texture, minoSize}) => {
 	const   getTetriminoPattern = (type) => {
 		switch (type) {
 			case "I": return  [[ 1, 1, 1, 1 ]];
@@ -19,7 +18,7 @@ const   Tetrimino = ({minoType, texture}) => {
 	if (!minoType || minoType === "EMPTY") {
 		return (
 			<div className="tetrimino">
-				<img className={"mino"} src={getTexture("EMPTY")} alt="empty" />
+				<img className={"mino"} src={getTexture("EMPTY")} style={{width: `${minoSize}px`, height: `${minoSize}px` }} alt="empty" />
 			</div>
 		)
 	}
@@ -32,10 +31,10 @@ const   Tetrimino = ({minoType, texture}) => {
 			<div className="tetrimino">
 				{
 					getTetriminoPattern(minoType).map((row, rowIndex) => (
-					<div key={rowIndex} className="tetriminoRow" style={{height: "32px"}}>
+					<div key={rowIndex} className="tetriminoRow" style={{height: `${minoSize ? minoSize : 32}px`}}>
 						{
 							row.map((cell, cellIndex) => (
-							<img key={cellIndex} className={"mino"} src={cell ? texture : getTexture("EMPTY")} alt={cellIndex}/>
+							<img key={cellIndex} className={"mino"} style={{width: `${minoSize ? minoSize : 32}px`, height: `${minoSize ? minoSize : 32}px` }} src={cell ? texture : getTexture("EMPTY")} alt={cellIndex}/>
 						))
 						}
 					</div>

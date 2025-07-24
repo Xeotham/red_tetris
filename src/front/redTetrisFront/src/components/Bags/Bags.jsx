@@ -15,15 +15,15 @@ const   Bags = ({ bags }) => {
 				Bag
 			</div>
 			<div className="bagBody">
-				<Tetrimino minoType={bagToPrint[0].name} />
+				<Tetrimino minoType={bagToPrint[0].name} minoSize={28} />
 				<div className={"spaceHolder"}/>
-				<Tetrimino minoType={bagToPrint[1].name} />
+				<Tetrimino minoType={bagToPrint[1].name} minoSize={28} />
 				<div className={"spaceHolder"}/>
-				<Tetrimino minoType={bagToPrint[2].name} />
+				<Tetrimino minoType={bagToPrint[2].name} minoSize={28} />
 				<div className={"spaceHolder"}/>
-				<Tetrimino minoType={bagToPrint[3].name} />
+				<Tetrimino minoType={bagToPrint[3].name} minoSize={28} />
 				<div className={"spaceHolder"}/>
-				<Tetrimino minoType={bagToPrint[4].name} />
+				<Tetrimino minoType={bagToPrint[4].name} minoSize={28} />
 			</div>
 		</div>
 	)
