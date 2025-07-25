@@ -16,3 +16,10 @@ export const   getTexture = (type) => {
 		default: 	    return '/src/assets/textures/minimalist/empty.png';
 	}
 }
+
+
+export const getRandomUsername = (ad_seed, no_seed) => {
+	const adjectives = ["Quick", "Brave", "Clever", "Swift", "Bold"];
+	const nouns = ["Fox", "Lion", "Eagle", "Tiger", "Wolf"];
+	return adjectives[Math.floor(ad_seed * adjectives.length)] + nouns[Math.floor(no_seed * nouns.length)];
+};

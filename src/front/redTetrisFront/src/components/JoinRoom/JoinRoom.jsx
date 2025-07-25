@@ -113,26 +113,26 @@ const   JoinRoom = () => {
 					<div className="inSettingBox">
 						<label id="lockTime" className="labelSettings" htmlFor="lock-time">Lock time : </label>
 						<input type="number" id="lock-time" name="lock-time" style={{width: "25%"}}
-							   disabled={dis} value={s.lockTime || "500"}/>
+							   disabled={dis} defaultValue={s.lockTime || "500"}/>
 					</div>
 
 					<div className="inSettingBox">
 						<label id="spawnARE" className="labelSettings" htmlFor="spawn-ARE">Spawn ARE : </label>
 						<input type="number" id="spawn-ARE" name="spawn-ARE" style={{width: "25%"}}
-							   disabled={dis} value={s.spawnARE || "0"}/>
+							   disabled={dis} defaultValue={s.spawnARE || "0"}/>
 					</div>
 
 					<div className="inSettingBox">
 						<label id="softDropAmp" className="labelSettings" htmlFor="soft-drop-amp">SoftDrop amplifier
 							: </label>
 						<input type="number" id="soft-drop-amp" name="soft-drop-amp" style={{width: "25%"}}
-							   disabled={dis} value={s.softDropAmp || "1.5"}/>
+							   disabled={dis} defaultValue={s.softDropAmp || "1.5"}/>
 					</div>
 
 					<div className="inSettingBox">
 						<label id="level" className="labelSettings" htmlFor="level">Level : </label>
 						<input type="number" id="level" name="level" style={{width: "25%"}}
-							   disabled={dis} value={s.level || "4"}/>
+							   disabled={dis} defaultValue={s.level || "4"}/>
 					</div>
 
 					<div className="inSettingBox">
@@ -147,9 +147,8 @@ const   JoinRoom = () => {
 					<div className="inSettingBox">
 						<label id="seed" className="labelSettings" htmlFor="seed">Seed : </label>
 						<input type="text" id="seed" name="seed" style={{width: "50%"}}
-							   disabled={dis} value={s.seed || Date.now()}/>
+							   disabled={dis} defaultValue={s.seed || Date.now()}/>
 					</div>
-
 					<div className="inSettingBox">
 						<label id="resetSeedOnRetry" className="labelSettings" htmlFor="reset-seed-on-retry">
 							Reset seed on retry : </label>

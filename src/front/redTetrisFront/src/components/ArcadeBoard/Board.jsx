@@ -59,7 +59,7 @@ const   EndDisplay = ({stats, display = false}) => {
 				<div className={"clearsInfoTitle"}>Quad</div>
 
 				<div className={"clearsInfoKey"}>Clears</div>
-				<div className={"clearsInfoValue"}>X</div>
+				<div className={"clearsInfoValueEmpty"}></div>
 				<div className={"clearsInfoValue"}>{stats?.single}</div>
 				<div className={"clearsInfoValue"}>{stats?.double}</div>
 				<div className={"clearsInfoValue"}>{stats?.triple}</div>
@@ -70,14 +70,14 @@ const   EndDisplay = ({stats, display = false}) => {
 				<div className={"clearsInfoValue"}>{stats?.tspinSingle}</div>
 				<div className={"clearsInfoValue"}>{stats?.tspinDouble}</div>
 				<div className={"clearsInfoValue"}>{stats?.tspinTriple}</div>
-				<div className={"clearsInfoValue"}>X</div>
+				<div className={"clearsInfoValueEmpty"}></div>
 
 				<div className={"clearsInfoKey"}>Mini Tspin</div>
 				<div className={"clearsInfoValue"}>{stats?.miniTspinZero}</div>
 				<div className={"clearsInfoValue"}>{stats?.miniTspinSingle}</div>
-				<div className={"clearsInfoValue"}>X</div>
-				<div className={"clearsInfoValue"}>X</div>
-				<div className={"clearsInfoValue"}>X</div>
+				<div className={"clearsInfoValueEmpty"}></div>
+				<div className={"clearsInfoValueEmpty"}></div>
+				<div className={"clearsInfoValueEmpty"}></div>
 
 				<div className={"clearsInfoKey"}>Mini Spin</div>
 				<div className={"clearsInfoValue"}>{stats?.miniSpinZero}</div>
