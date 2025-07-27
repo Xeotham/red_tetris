@@ -28,6 +28,7 @@ const joinMultiplayerRoom = async (socket, roomCode) => {
 	if (!room)
 		return exports.multiplayerRoomLst.push(new MultiplayerRoom.MultiplayerRoom(socket, true, roomCode));
 	room.addPlayer(socket);
+	dlog("Join room with code : " + room.getCode() + " for player : " + socket.id);
 }
 exports.joinMultiplayerRoom = joinMultiplayerRoom;
 

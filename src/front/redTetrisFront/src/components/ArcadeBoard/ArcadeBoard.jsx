@@ -1,4 +1,4 @@
-import "./Board.css";
+import "./ArcadeBoard.css";
 import Matrix from "../Matrix/Matrix.jsx";
 import {useEffect, useState} from "react";
 import {io} from "socket.io-client";
@@ -115,7 +115,7 @@ const   GameStats = ({gameInfo}) => {
 	)
 }
 
-const board = () => {
+const arcadeBoard = () => {
 
 	const [socket, setSocket] = useState(() => io(`http://${address}`));
 	const [abortController, setAbortController] = useState(new AbortController());
@@ -242,4 +242,4 @@ const board = () => {
 	);
 }
 
-export default board;
+export default arcadeBoard;

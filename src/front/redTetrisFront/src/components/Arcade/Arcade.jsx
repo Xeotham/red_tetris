@@ -1,5 +1,5 @@
 import  "./Arcade.css";
-import Board from "../ArcadeBoard/Board.jsx";
+import Board from "../ArcadeBoard/ArcadeBoard.jsx";
 
 const   arcade = () => {
 	return (

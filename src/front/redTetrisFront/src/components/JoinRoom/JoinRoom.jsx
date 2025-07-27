@@ -1,12 +1,17 @@
 import { useParams } from "react-router-dom";
 import TetrisButtons from "../TetrisButtons/TetrisButtons.jsx";
 import "./JoinRoom.css";
+import {useState} from "react";
+import {io} from "socket.io-client";
+import {address} from "../../main.jsx";
 
 const   JoinRoom = () => {
 	const   { roomId, username } = useParams();
 
-	const s = {nbPlayers: 0, isPrivate: true}; // Placeholder for the number of players, replace with actual state or props as needed.
-	const dis = false;
+	const   [s, setS] = useState({nbPlayers: 0, isPrivate: true}); // Placeholder for the number of players, replace with actual state or props as needed.
+	const   [dis, setDis] = useState(false);
+	const   [socket, setSocket] = useState(() => io(`http://${address}`));
+	const   [isOwner, setIsOwner] = useState(false);
 
 	if ((/^[A-Z]+$/.test(roomId)) === false || roomId.length !== 4) {
 		return (
@@ -20,6 +25,12 @@ const   JoinRoom = () => {
 			</>
 		);
 	}
+
+	socket.emit("joinMultiplayerRoom", roomId);
+	socket.on("isOwner", (isOwner) => {
+		const   newIsOwner = JSON.parse(isOwner);
+		setIsOwner(newIsOwner);
+	})
 
 	return (
 		<div id="room" className="tetrisWindowBkg">

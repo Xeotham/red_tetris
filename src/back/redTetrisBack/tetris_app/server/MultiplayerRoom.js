@@ -37,6 +37,7 @@ class MultiplayerRoom {
 			"seed": Date.now().toString(),
 		};
 		this.addPlayer(socket);
+		socket.emit("isOwner", JSON.stringify(true))
 	}
 
 	getIsInGame() { return this.isInGame; }
@@ -83,6 +84,7 @@ class MultiplayerRoom {
 		if (player.isOwner() && nonOwner !== undefined) {
 			nonOwner.setOwner(true);
 			nonOwner.getSocket().emit("MULTIPLAYER_JOIN_OWNER");
+			nonOwner.getSocket()?.emit("isOwner", JSON.stringify(true));
 		}
 		delete this.players[socket.id];
 		if (Object.values(this.players).length <= 1)
