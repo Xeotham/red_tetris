@@ -3,6 +3,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import TetrisButtons from "../TetrisButtons/TetrisButtons.jsx";
 import {useEffect, useState} from "react";
 import {getRandomUsername} from "../../utils.jsx";
+import {find} from "ramda";
 
 
 const   InvalidRoomId = ({roomId}) => {
@@ -32,6 +33,10 @@ const ChoseUsername = () => {
 		navigate(`/${roomId}/${username}`);
 	};
 
+	const findRoom = () => {
+		navigate("/find-room");
+	}
+
 	useEffect(() => {
 
 	}, []);
@@ -44,6 +49,7 @@ const ChoseUsername = () => {
 		);
 	}
 
+	// TODO : Redo the visuals
 	return (
 		<>
 			You are in room: {roomId}. <br />
@@ -55,6 +61,7 @@ const ChoseUsername = () => {
 				localStorage.setItem("formSubmitted", "true");
 				handleUsernameChange(inputValue);
 			}} id={"chooseUsernameForm"}>
+				<div style={{marginBottom: `5%`}}></div>
 				<input
 					className={"usernameInput"}
 					type="text"
@@ -63,7 +70,10 @@ const ChoseUsername = () => {
 					onChange={e => setInputValue(e.target.value)}
 					value={inputValue}
 				/>
+				<div style={{marginBottom: `5%`}}></div>
 				<input className={"submitButton"} type="submit" value="Submit"/>
+				<div style={{marginBottom: `5%`}}></div>
+				<div className={"findRoomButton"} onClick={findRoom}>Find a Room</div>
 			</form>
 		</>
 	);

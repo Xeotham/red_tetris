@@ -118,7 +118,7 @@ class 	TetrisGame {
 		this.isLevelling = true;
 		this.canRetry = true;
 		this.initialState = this.#clone();
-		console.log("Initial state beginning: ", this.initialState);
+		// console.log("Initial state beginning: ", this.initialState);
 	}
 
 	toJSON() {
@@ -766,8 +766,6 @@ class 	TetrisGame {
 		this.fallInterval = -1;
 		clearInterval(this.lockInterval);
 		this.lockInterval = -1;
-		const matrix = this.matrix;
-		console.log("Initial state: ", this.initialState);
 		Object.assign(this, this.initialState);
 		this.matrix.reset();
 		if (this.resetSeedOnRetry)

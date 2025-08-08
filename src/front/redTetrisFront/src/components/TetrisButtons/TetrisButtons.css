@@ -30,6 +30,7 @@
 	font-size: 2em;
 	font-family: 'play_pretend', 'Arial', sans-serif;
 	user-select: none;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .tetris-button:hover {

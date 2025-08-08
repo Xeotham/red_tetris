@@ -1,17 +1,126 @@
 import { useParams } from "react-router-dom";
 import TetrisButtons from "../TetrisButtons/TetrisButtons.jsx";
-import "./JoinRoom.css";
-import {useState} from "react";
-import {io} from "socket.io-client";
-import {address} from "../../main.jsx";
+import "./room.css";
+import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
+import { address } from "../../main.jsx";
 
-const   JoinRoom = () => {
+const abs = (value) => {
+	return value < 0 ? -value : value;
+}
+
+const clamp = (value, min, max) => {
+	return Math.max(min, Math.min(value, max));
+}
+
+const   Room = () => {
 	const   { roomId, username } = useParams();
 
-	const   [s, setS] = useState({nbPlayers: 0, isPrivate: true}); // Placeholder for the number of players, replace with actual state or props as needed.
-	const   [dis, setDis] = useState(false);
-	const   [socket, setSocket] = useState(() => io(`http://${address}`));
-	const   [isOwner, setIsOwner] = useState(false);
+	const   [s, setS] = useState({nbPlayers: 0, isPrivate: true, canRetry: true}); // Placeholder for the number of players, replace with actual state or props as needed.
+	const   [dis, setDis] = useState(true);
+	const   [form, setForm] = useState(null);
+	const	[socket, setSocket] = useState(null);
+
+	const saveMultiplayerRoomSettings = () => {
+		let values = {};
+		values["versus"] = (document.getElementById("is-versus"))?.checked;
+		values["0"] = parseInt((document.getElementById("lock-time")).value, 10);
+		values["1"] = parseInt((document.getElementById("spawn-ARE")).value, 10);
+		values["2"] = parseFloat((document.getElementById("soft-drop-amp")).value);
+		values["3"] = parseInt((document.getElementById("level")).value, 10);
+		const nbPlayers = s.nbPlayers || 0;
+		values["versus"] === true && nbPlayers > 2 ? values["versus"] = false : true;
+		isNaN(values["0"]) ? values["0"] = 500 : values["0"] = clamp(values["0"], -1, abs(values["0"]));
+		isNaN(values["1"]) ? values["1"] = 0 : values["1"] = clamp(values["1"], 0, abs(values["1"])); // Spawn ARE must be >= 0 and positive
+		isNaN(values["2"]) ? values["2"] = 1.5 : values["2"] = clamp(values["2"], 0.1, abs(values["2"])); // Soft drop amp must be > 0 && positive
+		isNaN(values["3"]) ? values["3"] = 4 : values["3"] = clamp(values["3"], 1, 15); // Level must be between 1 and 15
+
+		document.getElementById("is-versus").checked = values["versus"];
+		document.getElementById("lock-time").value = values["0"].toString();
+		document.getElementById("spawn-ARE").value = values["1"].toString();
+		document.getElementById("soft-drop-amp").value = values["2"].toString();
+		document.getElementById("level").value = values["3"].toString();
+
+		// console.log("private: ", (document.getElementById("is-private"))?.checked);
+
+		const newS = {
+			"isPrivate": (document.getElementById("is-private"))?.checked,
+			"isVersus": values["versus"],
+			"showShadowPiece": (document.getElementById("show-shadow"))?.checked,
+			"showBags": (document.getElementById("show-bags"))?.checked,
+			"holdAllowed": (document.getElementById("hold-allowed"))?.checked,
+			"showHold": (document.getElementById("show-hold"))?.checked,
+			"infiniteHold": (document.getElementById("infinite-hold"))?.checked,
+			"infiniteMovement": (document.getElementById("infinite-movement"))?.checked,
+			"lockTime": values["0"],
+			"spawnARE": values["1"],
+			"softDropAmp": values["2"],
+			"level": values["3"],
+			"isLevelling": (document.getElementById("is-leveling"))?.checked,
+			"seed": (document.getElementById("seed"))?.value || "error",
+			"resetSeedOnRetry": (document.getElementById("reset-seed-on-retry"))?.checked,
+			"canRetry": (document.getElementById("can-retry"))?.checked,
+			"nbPlayers": nbPlayers,
+
+		}
+		setS(newS);
+		if (!socket)
+			return ;
+		console.log("sending settings: ", newS);
+		socket.emit("multiplayerRoomCommand", "settings", {roomCode: roomId, settings: newS});
+
+	}
+	useEffect(() => {
+		const formElement = document.getElementById("roomSettingsForm");
+		setForm(formElement);
+		if (formElement) {
+			formElement.addEventListener("change", saveMultiplayerRoomSettings);
+			return () => {
+				formElement.removeEventListener("change", saveMultiplayerRoomSettings);
+			};
+		}
+	}, [saveMultiplayerRoomSettings]);
+
+	useEffect(() => {
+		const newSocket = io(`http://${address}`);
+		setSocket(newSocket);
+
+		newSocket.emit("joinMultiplayerRoom", roomId);
+
+		newSocket.on("MULTIPLAYER_OWNER", (isOwner) => {
+			const newIsOwner = JSON.parse(isOwner);
+			setDis(!newIsOwner);
+		});
+
+		newSocket.on("MULTIPLAYER_SETTINGS", (settings) => {
+			form?.removeEventListener("change", saveMultiplayerRoomSettings);
+			const newSettings = JSON.parse(settings);
+			setS(newSettings);
+			console.log("Settings received:", newSettings);
+			document.getElementById("is-private").checked = newSettings?.isPrivate;
+			document.getElementById("is-versus").checked = newSettings?.isVersus;
+			document.getElementById("show-shadow").checked = newSettings?.showShadowPiece;
+			document.getElementById("show-bags").checked = newSettings?.showBags;
+			document.getElementById("hold-allowed").checked = newSettings?.holdAllowed;
+			document.getElementById("show-hold").checked = newSettings?.showHold;
+			document.getElementById("infinite-hold").checked = newSettings?.infiniteHold;
+			document.getElementById("infinite-movement").checked = newSettings?.infiniteMovement;
+			document.getElementById("lock-time").value = newSettings?.lockTime || "500";
+			document.getElementById("spawn-ARE").value = newSettings?.spawnARE || "0";
+			document.getElementById("soft-drop-amp").value = newSettings?.softDropAmp
+				? newSettings?.softDropAmp.toString() : "1.5";
+			document.getElementById("level").value = newSettings?.level || "4";
+			document.getElementById("is-leveling").checked = newSettings?.isLevelling;
+			document.getElementById("seed").value = newSettings?.seed || "error";
+			document.getElementById("reset-seed-on-retry").checked = newSettings?.resetSeedOnRetry;
+			document.getElementById("can-retry").checked = newSettings?.canRetry;
+			form?.addEventListener("change", saveMultiplayerRoomSettings);
+		});
+
+		return () => {
+			newSocket.disconnect();
+		};
+	}, [roomId]);
 
 	if ((/^[A-Z]+$/.test(roomId)) === false || roomId.length !== 4) {
 		return (
@@ -25,12 +134,6 @@ const   JoinRoom = () => {
 			</>
 		);
 	}
-
-	socket.emit("joinMultiplayerRoom", roomId);
-	socket.on("isOwner", (isOwner) => {
-		const   newIsOwner = JSON.parse(isOwner);
-		setIsOwner(newIsOwner);
-	})
 
 	return (
 		<div id="room" className="tetrisWindowBkg">
@@ -83,7 +186,7 @@ const   JoinRoom = () => {
 
 					<div className="inSettingBox">
 						<label id="showShadow" className="labelSettings" htmlFor="show-shadow">Show shadow : </label>
-						<input type="checkbox" id="show-shadow" name="show-shadow" defaultChecked={s.showShadow}
+						<input type="checkbox" id="show-shadow" name="show-shadow" defaultChecked={s.showShadowPiece}
 							   disabled={dis}/>
 					</div>
 
@@ -113,9 +216,9 @@ const   JoinRoom = () => {
 					</div>
 
 					<div className="inSettingBox">
-						<label id="infiniteMovment" className="labelSettings" htmlFor="infinite-movment">Infinite movement
+						<label id="infiniteMovement" className="labelSettings" htmlFor="infinite-movement">Infinite movement
 							: </label>
-						<input type="checkbox" id="infinite-movment" name="infinite-movment" defaultChecked={s.infiniteMovment}
+						<input type="checkbox" id="infinite-movement" name="infinite-movement" defaultChecked={s.infiniteMovement}
 							   disabled={dis}/>
 					</div>
 				</div>
@@ -141,7 +244,7 @@ const   JoinRoom = () => {
 					</div>
 
 					<div className="inSettingBox">
-						<label id="level" className="labelSettings" htmlFor="level">Level : </label>
+						<label id="levelLabel" className="labelSettings" htmlFor="level">Level : </label>
 						<input type="number" id="level" name="level" style={{width: "25%"}}
 							   disabled={dis} defaultValue={s.level || "4"}/>
 					</div>
@@ -156,7 +259,7 @@ const   JoinRoom = () => {
 
 				<div id="roomSettingsSquare3" className="settingBox">
 					<div className="inSettingBox">
-						<label id="seed" className="labelSettings" htmlFor="seed">Seed : </label>
+						<label id="seedLabel" className="labelSettings" htmlFor="seed">Seed : </label>
 						<input type="text" id="seed" name="seed" style={{width: "50%"}}
 							   disabled={dis} defaultValue={s.seed || Date.now()}/>
 					</div>
@@ -179,5 +282,4 @@ const   JoinRoom = () => {
 		</div>
 	);
 }
-
-export default JoinRoom;
+export default Room;

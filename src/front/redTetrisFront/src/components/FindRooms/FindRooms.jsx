@@ -1,65 +1,62 @@
 import "./FindRooms.css";
 import ReturnHomeButton from "../ReturnHomeButton/ReturnHomeButton.jsx";
 import { useState, useRef, useEffect } from "react";
-import {getRandomUsername} from "../../utils.jsx";
-import {useNavigate} from "react-router-dom";
+import { getRandomUsername } from "../../utils.jsx";
+import { useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
+import { address } from "../../main.jsx";
 
 
 const   RoomList = () => {
+	const   navigate = useNavigate();
+	const [socket, setSocket] = useState(() => io(`http://${address}`));
+	const [rooms, setRooms] = useState(() => []);
+	const [page, setPage] = useState(() => 0);
+
+	useEffect(() => {
+		socket.emit("getMultiplayerRooms");
+		socket.on("GET_MULTIPLAYER_ROOMS", (rooms) => {
+			setRooms(JSON.parse(rooms));
+			socket.close();
+		});
+	})
+
+	const handlePageChange = (direction) => {
+		if (direction === "next") {
+			if ((page + 1) * 10 < rooms.length) {
+				setPage(page + 1);
+			}
+		} else if (direction === "prev") {
+			if (page > 0) {
+				setPage(page - 1);
+			}
+		}
+	}
+
+	const roomElements = [];
+	for (let i = 0; page * 10 + i < rooms.length && i < 10; i++) {
+		roomElements.push(
+			<div className={"room"} key={rooms[page * 10 + i].code || i} onClick={() => navigate(`/${rooms[page * 10 + i].code}`)}>
+				<div className={"roomName"}>{`Room ${page * 10 + i + 1}`}</div>
+				<div>{`code: ${rooms[page * 10 + i].code}`}</div>
+				<div className={"roomPlayers"}>{`${rooms[page * 10 + i].nbPlayers} players`}</div>
+			</div>
+		);
+		// TODO : Keep the +1 on the room?
+	}
+
 	return (
-		<div className={"roomList"}>
-			<div className={"room"}>
-				<div className={"roomName"}>Room 1</div>
-				<div>code: TEST</div>
-				<div className={"roomPlayers"}>2 players</div>
+		<div>
+
+			<div className={"nextPrevButtons"}>
+				<div className={"button"} onClick={() => handlePageChange("prev")}>Prev</div>
+				<div className={"button"} onClick={() => handlePageChange("next")}>Next</div>
 			</div>
-			<div className={"room"}>
-				<div className={"roomName"}>Room 2</div>
-				<div>code: HEYY</div>
-				<div className={"roomPlayers"}>1 players</div>
-			</div>
-			<div className={"room"}>
-				<div className={"roomName"}>Room 3</div>
-				<div>code: BRUH</div>
-				<div className={"roomPlayers"}>3 players</div>
-			</div>
-			<div className={"room"}>
-				<div className={"roomName"}>Room 4</div>
-				<div>code: BRUH</div>
-				<div className={"roomPlayers"}>3 players</div>
-			</div>
-			<div className={"room"}>
-				<div className={"roomName"}>Room 5</div>
-				<div>code: BRUH</div>
-				<div className={"roomPlayers"}>3 players</div>
-			</div>
-			<div className={"room"}>
-				<div className={"roomName"}>Room 6</div>
-				<div>code: BRUH</div>
-				<div className={"roomPlayers"}>3 players</div>
-			</div>
-			<div className={"room"}>
-				<div className={"roomName"}>Room 7</div>
-				<div>code: BRUH</div>
-				<div className={"roomPlayers"}>3 players</div>
-			</div>
-			<div className={"room"}>
-				<div className={"roomName"}>Room 8</div>
-				<div>code: BRUH</div>
-				<div className={"roomPlayers"}>3 players</div>
-			</div>
-			<div className={"room"}>
-				<div className={"roomName"}>Room 9</div>
-				<div>code: BRUH</div>
-				<div className={"roomPlayers"}>3 players</div>
-			</div>
-			<div className={"room"}>
-				<div className={"roomName"}>Room 10</div>
-				<div>code: BRUH</div>
-				<div className={"roomPlayers"}>3 players</div>
+			<div className={"roomList"}>
+				{roomElements}
 			</div>
 		</div>
-	)
+	);
 }
 
 const CreateRoom = ({ display, onClose }) => {

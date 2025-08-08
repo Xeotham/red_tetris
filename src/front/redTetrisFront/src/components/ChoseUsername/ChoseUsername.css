@@ -7,9 +7,37 @@
 	display: flex;
 	font-family: 'gameplay', 'Arial', sans-serif;
 	font-size: 16px;
-	margin: 10px 2px;
+	/*margin: 10px 2px;*/
+	margin-left: 30%;
+	border-radius: 15px;
 	cursor: pointer;
-	transform: translateX(50%);
+	transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.submitButton:hover {
+	background-color: #7a5bcf;
+	cursor: pointer;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.findRoomButton {
+	background-color: #654caf;
+	border: 1px solid #000000;
+	border-radius: 15px;
+	color: white;
+	padding: 5% 5%;
+	text-align: center;
+	display: flex;
+	font-family: 'gameplay', 'Arial', sans-serif;
+	font-size: 16px;
+	cursor: pointer;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.findRoomButton:hover {
+	background-color: #7a5bcf;
+	cursor: pointer;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .usernameInput {
@@ -17,6 +45,7 @@
 	padding: 8px;
 	font-size: 16px;
 	text-align: center;
+	border-radius: 15px;
 }
 
 .invalidRoomButton {

@@ -33,11 +33,11 @@ class MultiplayerRoom {
 			"level": 4,
 			"isLevelling": false,
 			"canRetry": true,
-			"resetSeedOnRetry": true,
 			"seed": Date.now().toString(),
+			"resetSeedOnRetry": true,
+			"nbPlayers": 1,
 		};
 		this.addPlayer(socket);
-		socket.emit("isOwner", JSON.stringify(true))
 	}
 
 	getIsInGame() { return this.isInGame; }
@@ -65,11 +65,12 @@ class MultiplayerRoom {
 		// console.log("sending MULTIPLAYER_JOIN 2");
 		if (Object.values(this.players).length <= 0) {
 			this.players[socket.id] = new Player(socket, true);
-			socket.emit("MULTIPLAYER_JOIN_OWNER");
+			socket.emit("MULTIPLAYER_OWNER", JSON.stringify(true))
 		}
 		else {
 			this.players[socket.id] = new Player(socket);
-			this.settings.canRetry = false;
+			if (Object.values(this.players).length === 2)
+				this.settings.canRetry = false;
 		}
 		this.sendSettingsToPlayers();
 	}
@@ -83,13 +84,16 @@ class MultiplayerRoom {
 		const nonOwner = Object.values(this.players).find((aPlayer => !aPlayer.isOwner()));
 		if (player.isOwner() && nonOwner !== undefined) {
 			nonOwner.setOwner(true);
-			nonOwner.getSocket().emit("MULTIPLAYER_JOIN_OWNER");
-			nonOwner.getSocket()?.emit("isOwner", JSON.stringify(true));
+			nonOwner.getSocket()?.emit("MULTIPLAYER_OWNER", JSON.stringify(true));
 		}
 		delete this.players[socket.id];
-		if (Object.values(this.players).length <= 1)
+		if (Object.values(this.players).length <= 1 && !this.settings.canRetry)
 			this.settings.canRetry = true;
 		this.sendSettingsToPlayers();
+	}
+
+	isPlayerInRoom(socketId) {
+		return !!this.players[socketId];
 	}
 
 	isEmpty() {
@@ -198,9 +202,8 @@ class MultiplayerRoom {
 	sendSettingsToPlayers() {
 		const playersArray = Object.values(this.players);
 		this.settings.nbPlayers = playersArray.length;
-		for (const player of playersArray) {
-			player.getSocket().emit("MULTIPLAYER_JOIN", JSON.stringify({ argument: "SETTINGS", value: this.settings }));
-		}
+		for (const player of playersArray)
+			player.getSocket().emit("MULTIPLAYER_SETTINGS", JSON.stringify(this.settings));
 	}
 }
 exports.MultiplayerRoom = MultiplayerRoom;

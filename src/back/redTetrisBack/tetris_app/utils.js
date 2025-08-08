@@ -6,7 +6,6 @@ exports.isUpperCase = exports.codeNameExists = exports.getTetrisRoom = exports.d
 const controllers = require("./socket/controllers");
 const { MultiplayerRoom } = require("./server/MultiplayerRoom");
 
-
 const getTetrisUser = (socketId) => {
 	if (controllers.arcadeGames[socketId])
 		return controllers.arcadeGames[socketId];
@@ -31,9 +30,13 @@ const deleteTetrisGame = (socketId) => {
 exports.deleteTetrisGame = deleteTetrisGame;
 
 
-const getTetrisRoom = (roomCode) => {
-	if (!roomCode)
+const getTetrisRoom = (roomCode, socket = null) => {
+	if (!roomCode && !socket)
 		return undefined;
+	if (!roomCode)
+		for (const room of controllers.multiplayerRoomLst)
+			if (room.isPlayerInRoom(socket.id))
+				return room;
 	return controllers.multiplayerRoomLst.find((room) => room.getCode() === roomCode);
 };
 exports.getTetrisRoom = getTetrisRoom;

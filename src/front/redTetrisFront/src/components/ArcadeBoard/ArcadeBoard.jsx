@@ -1,12 +1,12 @@
 import "./ArcadeBoard.css";
 import Matrix from "../Matrix/Matrix.jsx";
-import {useEffect, useState} from "react";
-import {io} from "socket.io-client";
-import {address} from "../../main.jsx";
-import {sfxPlayer} from "../../sfxHandler.jsx";
+import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
+import { address } from "../../main.jsx";
+import { sfxPlayer } from "../../sfxHandler.jsx";
 import Hold from "../Hold/Hold.jsx";
 import Bags from "../Bags/Bags.jsx";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const   EndDisplay = ({stats, display = false}) => {
 	const navigate = useNavigate();

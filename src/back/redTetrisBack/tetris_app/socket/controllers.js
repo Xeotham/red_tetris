@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.holdPiece = exports.forfeitGame = exports.retryGame = exports.tetrisArcade = exports.multiplayerRoomLst = exports.arcadeGames = void 0;
+exports.holdPiece = exports.forfeitGame = exports.retryGame = exports.tetrisArcade = exports.multiplayerRoomLst = exports.arcadeGames = exports.getMultiplayerRooms = void 0;
 
 const MultiplayerRoom = require("../server/MultiplayerRoom");
 const utils = require("../utils");
@@ -27,15 +27,26 @@ const joinMultiplayerRoom = async (socket, roomCode) => {
 	const room = utils.getTetrisRoom(roomCode);
 	if (!room)
 		return exports.multiplayerRoomLst.push(new MultiplayerRoom.MultiplayerRoom(socket, true, roomCode));
-	room.addPlayer(socket);
 	dlog("Join room with code : " + room.getCode() + " for player : " + socket.id);
+	room.addPlayer(socket);
 }
 exports.joinMultiplayerRoom = joinMultiplayerRoom;
 
+const multiplayerRoomCommand = async (socket, command, data) => {
+	const room = utils.getTetrisRoom(data.roomCode);
+	if (!room) {
+		dlog("Invalid tetris room im roomCommand : " + data.roomCode);
+		return ;
+	}
+	if (command === "settings") {
+		return room.addSettings(data.settings);
+	}
+}
+exports.multiplayerRoomCommand = multiplayerRoomCommand;
 
 const quitMultiplayerRoom = async (socket, roomCode) => {
 	utils.deleteTetrisGame(socket.id);
-	const room = utils.getTetrisRoom(roomCode);
+	const room = utils.getTetrisRoom(roomCode, socket);
 	if (room) {
 		dlog("Quit room with code : " + room.getCode() + " for player : " + socket.id);
 		room.removePlayer(socket);
@@ -142,3 +153,10 @@ const keyUp = async (key, socket) => {
 	}
 }
 exports.keyUp = keyUp;
+
+const getMultiplayerRooms = async (socket) => {
+	socket.emit("GET_MULTIPLAYER_ROOMS", JSON.stringify(exports.multiplayerRoomLst.map((room) => {
+		return ({code: room.code, nbPlayers: room.settings?.nbPlayers})
+	})));
+}
+exports.getMultiplayerRooms = getMultiplayerRooms;

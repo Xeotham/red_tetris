@@ -14,7 +14,7 @@ async function waitForFallInterval(game, timeout = 2000) {
 	while (game.fallInterval === -1) {
 		if (Date.now() - start > timeout)
 			throw new Error("Timeout waiting for fallInterval to be set");
-		await delay(1); // Use your existing delay utility
+		await delay(1);
 	}
 }
 
