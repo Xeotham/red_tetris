@@ -6,18 +6,17 @@ const MultiplayerRoom = require("../server/MultiplayerRoom");
 const utils = require("../utils");
 const { TetrisGame } = require("../server/Game/TetrisGame");
 const { Player } = require("../server/Player");
-const { deleteTetrisGame } = require("../utils");
 const { dlog } = require("../../server/server");
 
 exports.arcadeGames = {}; // { socketId: Player }
 exports.multiplayerRoomLst = []; // [MultiplayerRoom]
 
-const tetrisArcade = async (socket) => {
-	const tetrisGame = new TetrisGame(socket);
-	dlog("Arcade Game started for " + socket.id);
+const tetrisArcade = async (socket, settings = {}) => {
+	const tetrisGame = new TetrisGame(socket, settings);
 	exports.arcadeGames[socket.id] = new Player(socket, true);
 	exports.arcadeGames[socket.id].setGame(tetrisGame);
-	tetrisGame.gameLoop().then(() => utils.deleteTetrisGame(socket.id));
+	tetrisGame.gameLoop().then(() => { utils.deleteTetrisGame(socket.id) });
+	dlog("Arcade Game started for " + socket.id);
 	// TODO : Delete the player or close the socket? Send a message to the player?
 };
 exports.tetrisArcade = tetrisArcade;
@@ -45,7 +44,7 @@ const multiplayerRoomCommand = async (socket, command, data) => {
 exports.multiplayerRoomCommand = multiplayerRoomCommand;
 
 const quitMultiplayerRoom = async (socket, roomCode) => {
-	utils.deleteTetrisGame(socket.id);
+	await utils.deleteTetrisGame(socket.id);
 	const room = utils.getTetrisRoom(roomCode, socket);
 	if (room) {
 		dlog("Quit room with code : " + room.getCode() + " for player : " + socket.id);
@@ -129,7 +128,7 @@ const keyDown = async (key, socket) => {
 			user.game?.forfeit();
 			break ;
 		case user.keys.retry:
-			user.game?.retry();
+			await user.game?.retry();
 			break ;
 	}
 }

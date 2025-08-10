@@ -36,7 +36,7 @@ class Player {
 	setGame(game) { this.game = game; }
 
 	setupGame(settings) {
-		const game = new TetrisGame(this.socket, this.username);
+		const game = new TetrisGame(this.socket);
 		game.setSettings(settings);
 		this.game = game;
 	}

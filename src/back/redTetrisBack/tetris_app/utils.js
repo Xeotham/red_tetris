@@ -6,6 +6,20 @@ exports.isUpperCase = exports.codeNameExists = exports.getTetrisRoom = exports.d
 const controllers = require("./socket/controllers");
 const { MultiplayerRoom } = require("./server/MultiplayerRoom");
 
+const waitForFallInterval = async (game, timeout = 1800) => {
+	return new Promise((resolve) => {
+		if (!game)
+			return resolve();
+		const start = Date.now();
+		const interval = setInterval(() => {
+			if (game.fallInterval === -1 || Date.now() - start > timeout) {
+				clearInterval(interval);
+				resolve();
+			}
+		}, 10);
+	});
+}
+
 const getTetrisUser = (socketId) => {
 	if (controllers.arcadeGames[socketId])
 		return controllers.arcadeGames[socketId];
@@ -22,10 +36,13 @@ const getTetrisGame = (socketId) => {
 exports.getTetrisGame = getTetrisGame;
 
 
-const deleteTetrisGame = (socketId) => {
+const deleteTetrisGame = async (socketId) => {
 	exports.getTetrisGame(socketId)?.setOver(true);
-	if (controllers.arcadeGames[socketId])
+	await waitForFallInterval(exports.getTetrisGame(socketId));
+	if (controllers.arcadeGames[socketId]) {
+		delete controllers.arcadeGames[socketId].game;
 		delete controllers.arcadeGames[socketId];
+	}
 };
 exports.deleteTetrisGame = deleteTetrisGame;
 

@@ -19,9 +19,9 @@ const { dlog } = require("./../../../server/server");
 
 class 	TetrisGame {
 
-	constructor(socket, username = undefined) {
+	constructor(socket, settings = {}) {
 		this.player = socket;
-		this.username = username ? username : socket.id;
+		this.username = socket.id;
 		this.size = new Pos(tc.TETRIS_WIDTH, tc.TETRIS_HEIGHT);
 		this.matrix = new Matrix(this.size.add(0, tc.BUFFER_HEIGHT));
 		this.bags = [];
@@ -117,8 +117,8 @@ class 	TetrisGame {
 		this.softDropAmp = 1;
 		this.isLevelling = true;
 		this.canRetry = true;
+		this.setSettings(settings);
 		this.initialState = this.#clone();
-		// console.log("Initial state beginning: ", this.initialState);
 	}
 
 	toJSON() {
@@ -219,12 +219,12 @@ class 	TetrisGame {
 		if (!settings || this.fallInterval !== -1)
 			return;
 		Object.keys(settings).forEach((key) => {
-			// dlog("Setting " + key + " to " + settings[key]);
-			if (key in this && settings[key] !== undefined) {
+			if (key.toString() === "over")
+			dlog("Setting " + key + " to " + settings[key]);
+			if (key in this && settings[key] !== undefined)
 				this[key] = settings[key];
-			}
 		});
-		this.initialState = JSON.parse(JSON.stringify(this));
+		this.initialState = this.#clone();
 	}
 
 	#shuffleBag() {
@@ -247,7 +247,6 @@ class 	TetrisGame {
 			return dlog("Fall interval already set, not launching another one");
 		if (interval < 0)
 			return dlog("interval is negative, not launching");
-		// console.log("Setting fall interval to " + interval);
 		this.fallInterval = setInterval(() => this.#fallPiece(), interval);
 	}
 
@@ -713,6 +712,27 @@ class 	TetrisGame {
 			this.player.emit("GAME_FINISH");
 	}
 
+	async 	retry() {
+		if (this.over || !this.canRetry)
+			return ;
+		clearInterval(this.fallInterval);
+		this.fallInterval = -1;
+		clearInterval(this.lockInterval);
+		this.lockInterval = -1;
+		await Object.assign(this, this.initialState);
+		this.matrix.reset();
+		if (this.resetSeedOnRetry)
+			this.seed = Date.now().toString();
+		this.rng = seedRandom(this.seed);
+		this.bags = [this.#shuffleBag(), this.#shuffleBag()];
+		await this.spawnPiece();
+		this.#placeShadow();
+		this.trySetInterval();
+		this.hold = undefined;
+		this.beginningTime = Date.now();
+		this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
+	}
+
 	#getStats() {
 		return {
 			level: this.level,
@@ -757,27 +777,6 @@ class 	TetrisGame {
 	forfeit() {
 		this.over = true;
 		this.hasForfeit = true;
-	}
-
-	async retry() {
-		if (this.isOver() || !this.canRetry)
-			return ;
-		clearInterval(this.fallInterval);
-		this.fallInterval = -1;
-		clearInterval(this.lockInterval);
-		this.lockInterval = -1;
-		Object.assign(this, this.initialState);
-		this.matrix.reset();
-		if (this.resetSeedOnRetry)
-			this.seed = Date.now().toString();
-		this.rng = seedRandom(this.seed);
-		this.bags = [this.#shuffleBag(), this.#shuffleBag()];
-		await this.spawnPiece();
-		this.#placeShadow();
-		this.trySetInterval();
-		this.hold = undefined;
-		this.beginningTime = Date.now();
-		this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
 	}
 }
 exports.TetrisGame = TetrisGame;

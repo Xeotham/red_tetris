@@ -9,11 +9,11 @@ const tc = require("../tetris_app/server/Game/tetrisConstants");
 const expect = chai.expect;
 const should = chai.should();
 
-async function waitForFallInterval(game, timeout = 2000) {
+async function waitForFallInterval(game, timeout = 1800) {
 	const start = Date.now();
 	while (game.fallInterval === -1) {
 		if (Date.now() - start > timeout)
-			throw new Error("Timeout waiting for fallInterval to be set");
+			throw new Error("Timeout waiting for fallInterval to be set took too long");
 		await delay(1);
 	}
 }
@@ -23,7 +23,7 @@ describe('Controllers', () => {
 	let socket;
 
 	before((done) => {
-		socket = io(`http://${process.env.ADDR + ":" + process.env.BACK_PORT}`, { transports: ['websocket'] });
+		socket = io(`http://${process.env.ADDR + ":" + process.env.BACK_PORT}`);
 		socket.on('connect', done);
 	});
 
@@ -35,9 +35,10 @@ describe('Controllers', () => {
 
 	it('Should register a new arcade game', async () => {
 		await controllers.tetrisArcade(socket);
+		await waitForFallInterval(controllers.arcadeGames[socket.id].getGame());
 		expect(controllers.arcadeGames[socket.id]).to.not.be.undefined;
 		expect(controllers.arcadeGames[socket.id].getGame()).to.not.be.undefined;
-		controllers.arcadeGames[socket.id].getGame().setOver(true);
+		await deleteTetrisGame(socket.id);
 	});
 
 	it('Should Create or join a multiplayer room', async () => {
@@ -51,11 +52,12 @@ describe('Controllers', () => {
 		else
 			expect(room.getPlayers()[socket.id].isOwner()).to.equal(false);
 		expect(room.getCode()).to.equal("ABCD");
-		controllers.multiplayerRoomLst.splice(controllers.multiplayerRoomLst.indexOf(room), 1);
+		controllers.quitMultiplayerRoom(socket, "ABCD");
 	});
 
 	it('Should quit an arcade game or multiplayer room', async () => {
 		await controllers.tetrisArcade(socket);
+		await waitForFallInterval(controllers.arcadeGames[socket.id].getGame());
 		expect(controllers.arcadeGames[socket.id]).to.not.be.undefined;
 		await controllers.quitMultiplayerRoom(socket, undefined);
 		expect(controllers.arcadeGames[socket.id]).to.be.undefined;
@@ -69,16 +71,11 @@ describe('Controllers', () => {
 	});
 
 	it('Should react based on input', async () => {
-		// console.log("");
-		// console.log("this Websocket's ID is : " + socket.id);
-		await controllers.tetrisArcade(socket);
-		// console.log("game created");
-		// await delay(10);
+		await controllers.tetrisArcade(socket, {resetSeedOnRetry: false});
 		const user = controllers.arcadeGames[socket.id];
 		expect(user).to.not.be.undefined;
 		const game = user.getGame();
 		expect(game).to.not.be.undefined;
-		game.resetSeedOnRetry = false;
 		await waitForFallInterval(game);
 
 		await controllers.keyDown(user.keys.rotateClockwise, socket);
@@ -98,16 +95,9 @@ describe('Controllers', () => {
 		await controllers.keyUp(user.keys.moveLeft, socket);
 		await controllers.keyUp(user.keys.moveRight, socket);
 
-		await controllers.keyDown(user.keys.hardDrop, socket);
-		expect(game.dropType).to.equal("hard"); // Hard to test as it will quickly drop the piece and reset the dropType to "normal"
-		await controllers.keyDown(user.keys.softDrop, socket);
-		expect(game.dropType).to.equal("soft");
-		await controllers.keyUp(user.keys.softDrop, socket);
-		expect(game.dropType).to.equal("normal");
-
 		const actualPiece = game.currentPiece;
 		expect(game.hold).to.be.undefined;
- 		await controllers.keyDown(user.keys.hold, socket);
+		await controllers.keyDown(user.keys.hold, socket);
 		expect(game.hold).to.not.be.undefined;
 		expect(game.hold).to.equal(actualPiece);
 		expect(game.currentPiece).to.not.equal(actualPiece);
@@ -116,10 +106,18 @@ describe('Controllers', () => {
 		await waitForFallInterval(game);
 		expect(game.currentPiece.getName()).to.equal(actualPiece.name);
 
+		await controllers.keyDown(user.keys.hardDrop, socket);
+		expect(game.dropType).to.equal("hard"); // Hard to test as it will quickly drop the piece and reset the dropType to "normal"
+		await controllers.keyDown(user.keys.softDrop, socket);
+		expect(game.dropType).to.equal("soft");
+		await controllers.keyUp(user.keys.softDrop, socket);
+		expect(game.dropType).to.equal("normal");
+
 		await controllers.keyDown(user.keys.forfeit, socket);
 		expect(game.isOver()).to.be.true;
+		expect(game.getHasForfeit()).to.be.true;
 
-		deleteTetrisGame(socket.id);
+		// await deleteTetrisGame(socket.id);
 	});
 
 });

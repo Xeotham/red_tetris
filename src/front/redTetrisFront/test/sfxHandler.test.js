@@ -82,10 +82,10 @@ describe('SfxHandler', () => {
 		expect(logOutput).to.include("Unknown sound unknown");
 		logOutput = '';
 
-		expect(sfxPlayer("LEVEL", 1).src).to.equal("/src/assets/sfx/BejeweledSR/level1.ogg");
-		expect(sfxPlayer("LEVEL", 5).src).to.equal("/src/assets/sfx/BejeweledSR/level5.ogg");
-		expect(sfxPlayer("LEVEL", 10).src).to.equal("/src/assets/sfx/BejeweledSR/level10.ogg");
-		expect(sfxPlayer("LEVEL", 15).src).to.equal("/src/assets/sfx/BejeweledSR/level15.ogg");
+		expect(sfxPlayer("LEVEL", "1").src).to.equal("/src/assets/sfx/BejeweledSR/level1.ogg");
+		expect(sfxPlayer("LEVEL", "5").src).to.equal("/src/assets/sfx/BejeweledSR/level5.ogg");
+		expect(sfxPlayer("LEVEL", "10").src).to.equal("/src/assets/sfx/BejeweledSR/level10.ogg");
+		expect(sfxPlayer("LEVEL", "15").src).to.equal("/src/assets/sfx/BejeweledSR/level15.ogg");
 		expect(sfxPlayer("LEVEL", "up").src).to.equal("/src/assets/sfx/BejeweledSR/levelup.ogg");
 		expect(sfxPlayer("LEVEL", "unknown")).to.equal(undefined);
 		expect(logOutput).to.include("Unknown sound unknown");

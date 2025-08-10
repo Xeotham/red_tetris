@@ -61,13 +61,13 @@ describe('TetrisUtils', () => {
 		expect(getTetrisGame(clientSocket.id)).to.equal(undefined);
 	});
 
-	it('Should delete the game for a given Id', () => {
+	it('Should delete the game for a given Id', async () => {
 		const player = new Player(clientSocket, true);
 		const game = new TetrisGame(clientSocket);
 		player.setGame(game);
 		controllers.arcadeGames[clientSocket.id] = player;
 		expect(controllers.arcadeGames[clientSocket.id].getGame()).to.equal(game);
-		deleteTetrisGame(clientSocket.id);
+		await deleteTetrisGame(clientSocket.id);
 		expect(controllers.arcadeGames).to.not.have.property(clientSocket.id);
 	});
 

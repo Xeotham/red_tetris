@@ -103,10 +103,6 @@ describe('MultiplayerRoom', () => {
 	});
 
 	it('Should add a player to the room', () => {
-		// clientSocket.once('MULTIPLAYER_JOIN', (data) => {
-		// 	console.log("In MULTIPLAYER_JOIN");
-		// 	expect(JSON.parse(data).argument).to.equal("TEST");
-		// });
 		const room = new MultiplayerRoom(clientSocket, true, "TEST");
 		expect(room.getPlayers()).to.have.property(clientSocket.id);
 		room.addPlayer(clientSocket);

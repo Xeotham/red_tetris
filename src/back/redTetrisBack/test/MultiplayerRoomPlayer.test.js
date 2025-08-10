@@ -69,7 +69,7 @@ describe('Player', () => {
 			isLevelling: false,
 			canRetry: false
 		};
-		const normalGame = new TetrisGame(clientSocket, player.getUsername());
+		const normalGame = new TetrisGame(clientSocket);
 		for (const key in settings)
 			expect(normalGame[key]).to.not.equal(settings[key]);
 		player.setupGame(settings);
