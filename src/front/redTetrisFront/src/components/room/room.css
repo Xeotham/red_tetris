@@ -47,6 +47,7 @@
     border-radius: 100px;
     cursor: pointer;
     text-shadow: #1a1a1a 1px 1px 1px;
+    /*color: #1c1a1c;*/
     text-align: center;
     font-family: 'play_pretend', 'Arial', sans-serif;
     font-size: 2vmin;
@@ -59,10 +60,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
     color: rgb(231, 170, 44);
     margin-left: 10%;
     margin-top: -10%;
     font-size: 2.5vmin;
+    user-select: none;
 }
 
 .playButton {
@@ -91,11 +94,13 @@
     height: 100%;
     background-color: #e7aa2c;
     text-shadow: #1a1a1a 1px 1px 1px;
+    text-align: center;
     cursor: pointer;
     border-radius: 100px;
     white-space: normal;
     font-size: 1.5vmin;
     word-wrap: break-word;
+    user-select: none; /* Standard syntax */
 }
 
 .participantsText {
@@ -120,6 +125,7 @@
     justify-content: center;
     color: rgb(231, 170, 44);
     font-size: 2vmin;
+    user-select: none;
 }
 
 .roomSettingsForm {
@@ -132,6 +138,7 @@
     align-items: stretch;
     justify-content: flex-start;
     gap: 5%;
+    user-select: none;
 }
 
 .settingBox {
@@ -166,5 +173,5 @@
     align-items: center;
     justify-content: center;
     color: rgb(231, 170, 44);
-    font-size: 2vmin;
+    font-size: 1.8vmin;
 }

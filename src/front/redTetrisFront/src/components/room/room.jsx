@@ -4,6 +4,7 @@ import "./room.css";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { address } from "../../main.jsx";
+import { useNavigate } from "react-router-dom";
 
 const abs = (value) => {
 	return value < 0 ? -value : value;
@@ -15,6 +16,7 @@ const clamp = (value, min, max) => {
 
 const   Room = () => {
 	const   { roomId, username } = useParams();
+	const navigate = useNavigate();
 
 	const   [s, setS] = useState({nbPlayers: 0, isPrivate: true, canRetry: true}); // Placeholder for the number of players, replace with actual state or props as needed.
 	const   [dis, setDis] = useState(true);
@@ -66,7 +68,7 @@ const   Room = () => {
 		setS(newS);
 		if (!socket)
 			return ;
-		console.log("sending settings: ", newS);
+		// console.log("sending settings: ", newS);
 		socket.emit("multiplayerRoomCommand", "settings", {roomCode: roomId, settings: newS});
 
 	}
@@ -96,7 +98,7 @@ const   Room = () => {
 			form?.removeEventListener("change", saveMultiplayerRoomSettings);
 			const newSettings = JSON.parse(settings);
 			setS(newSettings);
-			console.log("Settings received:", newSettings);
+			// console.log("Settings received:", newSettings);
 			document.getElementById("is-private").checked = newSettings?.isPrivate;
 			document.getElementById("is-versus").checked = newSettings?.isVersus;
 			document.getElementById("show-shadow").checked = newSettings?.showShadowPiece;
@@ -122,6 +124,32 @@ const   Room = () => {
 		};
 	}, [roomId]);
 
+	useEffect(() => {
+		const backButton = document.getElementById("BackButton");
+		if (backButton) {
+			backButton.addEventListener("click", () => navigate("/find-room") );
+			return () => backButton.removeEventListener("click", () => navigate("/find-room") );
+		}
+	});
+
+	useEffect(() => {
+		const clipboardCopy = document.getElementById("clipboardCopy");
+		if (clipboardCopy) { // FIXME : missing ip
+			clipboardCopy.addEventListener("click", () =>
+				navigator.clipboard.writeText("http://" + "localhost" + ":" + import.meta.env.VITE_FRONT_PORT + "/" + roomId) );
+			return () => clipboardCopy.removeEventListener("click", () =>
+				navigator.clipboard.writeText("http://" + "localhost" + ":" + import.meta.env.VITE_FRONT_PORT + "/" + roomId) );
+		}
+	});
+
+	// useEffect(() => {
+	// 	const startButton = document.getElementById("playButton");
+	// 	if (startButton) {
+	// 		startButton.addEventListener("click", () => console.log("Start button clicked") );
+	// 		return () => startButton.removeEventListener("click", () => console.log("Start button clicked") );
+	// 	}
+	// });
+
 	if ((/^[A-Z]+$/.test(roomId)) === false || roomId.length !== 4) {
 		return (
 			<>
@@ -135,6 +163,11 @@ const   Room = () => {
 		);
 	}
 
+	// TODO : implement the start game logic
+	const startGame = () => {
+		console.log("Start button clicked");
+	}
+
 	return (
 		<div id="room" className="tetrisWindowBkg">
 			<div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "6%" }}>
@@ -146,12 +179,11 @@ const   Room = () => {
 
 			<div id="startBox" style={{width: "100%", height: "6%"}}>
 				<div style={{display: "flex", alignItems: "left", width: "100%", height: "100%"}}>
-					<button className="playButton" onClick={() => {
-					}}>Start</button>
+					<button className="playButton" id="playButton" onClick={startGame}>Start</button>
 					{/* TODO : change, this is not aligned correctly when resizing*/}
-					<div className="copyCodeBox">
-						<div style={{fontSize: "1.2em"}}>{roomId}</div>
-						<div id="clipboardCopy" style={{
+					<div id="clipboardCopy" className="copyCodeBox">
+						<div style={{fontSize: "1.2em", marginTop: "2.25%"}}>{roomId}</div>
+						<div style={{
 							fontSize: ".8em", textDecorationLine: "underline",
 							textUnderlineOffset: "35%"
 						}}>Copy code</div>
@@ -163,9 +195,11 @@ const   Room = () => {
 			<div style={{marginBottom: "3%"}}></div>
 
 			<div id="roomSettingsTitle" style={{width: "100%", height: "4%"}}>
-				<div style={{width: "100%", height: "33%", fontSize: "2vmin", color: "rgb(231, 170, 44)"}}>~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
+				<div style={{width: "100%", height: "33%", fontSize: "2vmin", color: "rgb(231, 170, 44)",
+				userSelect: "none"}}>~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
 				<div className="settingsTitle">Room settings</div>
-				<div style={{width: "100%", height: "33%", fontSize: "2vmin", color: "rgb(231, 170, 44)"}}>~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
+				<div style={{width: "100%", height: "33%", fontSize: "2vmin", color: "rgb(231, 170, 44)",
+				userSelect: "none"}}>~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
 			</div>
 
 			<div style={{marginBottom: "3%"}}></div>
@@ -226,26 +260,26 @@ const   Room = () => {
 				<div id="roomSettingsSquare2" className="settingBox">
 					<div className="inSettingBox">
 						<label id="lockTime" className="labelSettings" htmlFor="lock-time">Lock time : </label>
-						<input type="number" id="lock-time" name="lock-time" style={{width: "25%"}}
+						<input type="number" id="lock-time" name="lock-time" style={{width: "25%", borderRadius: "10px"}}
 							   disabled={dis} defaultValue={s.lockTime || "500"}/>
 					</div>
 
 					<div className="inSettingBox">
 						<label id="spawnARE" className="labelSettings" htmlFor="spawn-ARE">Spawn ARE : </label>
-						<input type="number" id="spawn-ARE" name="spawn-ARE" style={{width: "25%"}}
+						<input type="number" id="spawn-ARE" name="spawn-ARE" style={{width: "25%", borderRadius: "10px"}}
 							   disabled={dis} defaultValue={s.spawnARE || "0"}/>
 					</div>
 
 					<div className="inSettingBox">
 						<label id="softDropAmp" className="labelSettings" htmlFor="soft-drop-amp">SoftDrop amplifier
 							: </label>
-						<input type="number" id="soft-drop-amp" name="soft-drop-amp" style={{width: "25%"}}
+						<input type="number" id="soft-drop-amp" name="soft-drop-amp" style={{width: "25%", borderRadius: "10px"}}
 							   disabled={dis} defaultValue={s.softDropAmp || "1.5"}/>
 					</div>
 
 					<div className="inSettingBox">
 						<label id="levelLabel" className="labelSettings" htmlFor="level">Level : </label>
-						<input type="number" id="level" name="level" style={{width: "25%"}}
+						<input type="number" id="level" name="level" style={{width: "25%", borderRadius: "10px"}}
 							   disabled={dis} defaultValue={s.level || "4"}/>
 					</div>
 
@@ -260,7 +294,7 @@ const   Room = () => {
 				<div id="roomSettingsSquare3" className="settingBox">
 					<div className="inSettingBox">
 						<label id="seedLabel" className="labelSettings" htmlFor="seed">Seed : </label>
-						<input type="text" id="seed" name="seed" style={{width: "50%"}}
+						<input type="text" id="seed" name="seed" style={{width: "50%", borderRadius: "10px"}}
 							   disabled={dis} defaultValue={s.seed || Date.now()}/>
 					</div>
 					<div className="inSettingBox">
