@@ -143,6 +143,10 @@ class 	TetrisGame {
 	}
 
 	#clone() {
+		console.log("Cloning game state");
+		if (this.fallInterval !== -1)
+			return this.initialState;
+		console.log("Cloning game state (out of game)");
 		return ({
 			currentPiece: this.currentPiece,
 			shadowPiece: this.shadowPiece,
@@ -719,10 +723,11 @@ class 	TetrisGame {
 		this.fallInterval = -1;
 		clearInterval(this.lockInterval);
 		this.lockInterval = -1;
-		await Object.assign(this, this.initialState);
-		this.matrix.reset();
+		await Object.assign(this, JSON.parse(JSON.stringify(this.initialState)));
 		if (this.resetSeedOnRetry)
 			this.seed = Date.now().toString();
+		this.size = new Pos(tc.TETRIS_WIDTH, tc.TETRIS_HEIGHT);
+		this.matrix = new Matrix(this.size.add(0, tc.BUFFER_HEIGHT));
 		this.rng = seedRandom(this.seed);
 		this.bags = [this.#shuffleBag(), this.#shuffleBag()];
 		await this.spawnPiece();

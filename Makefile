@@ -58,11 +58,6 @@ logs:
 	@ docker logs front
 	@ echo "$(ORANGE)Back:$(BASE_COLOR)"
 	@ docker logs back
-# 	@ docker logs wordpress > wordpress.log
-# 	@ docker logs adminer > adminer.log
-# 	@ docker logs ftp > ftp.log
-# 	@ docker logs portainer 2> portainer.log
-# 	@ docker logs redis > redis.log 2>redis.log
 	@ echo "$(DARK_GREEN)Logs created!$(BASE_COLOR)"
 
 rm_logs:
