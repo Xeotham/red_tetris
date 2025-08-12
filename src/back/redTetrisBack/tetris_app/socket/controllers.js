@@ -21,6 +21,16 @@ const tetrisArcade = async (socket, settings = {}) => {
 };
 exports.tetrisArcade = tetrisArcade;
 
+const joinMultiplayerVersus = async (socket) => {
+	for (const room of exports.multiplayerRoomLst)
+		if (room.getIsVersus() && !room.getIsInGame() && Object.values(room.getPlayers()).length <= 1)
+			return room.addPlayer(socket);
+	dlog("No multiplayer versus room available, creating a new one for " + socket.id);
+	const newRoom = new MultiplayerRoom.MultiplayerRoom(socket, false);
+	exports.multiplayerRoomLst.push(newRoom);
+	socket.emit("JOIN_MULTIPLAYER_VERSUS", JSON.stringify(newRoom.getCode()));
+}
+exports.joinMultiplayerVersus = joinMultiplayerVersus;
 
 const joinMultiplayerRoom = async (socket, roomCode) => {
 	const room = utils.getTetrisRoom(roomCode);
@@ -154,8 +164,13 @@ const keyUp = async (key, socket) => {
 exports.keyUp = keyUp;
 
 const getMultiplayerRooms = async (socket) => {
-	socket.emit("GET_MULTIPLAYER_ROOMS", JSON.stringify(exports.multiplayerRoomLst.map((room) => {
-		return ({code: room.code, nbPlayers: room.settings?.nbPlayers})
-	})));
+	const rooms = [];
+
+	for (const room of exports.multiplayerRoomLst) {
+		if (room.getIsVersus() || room.isPrivate())
+			continue ;
+		rooms.push({code: room.code, nbPlayers: room.settings?.nbPlayers});
+	}
+	socket.emit("GET_MULTIPLAYER_ROOMS", JSON.stringify(rooms));
 }
 exports.getMultiplayerRooms = getMultiplayerRooms;

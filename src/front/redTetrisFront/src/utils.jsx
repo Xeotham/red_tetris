@@ -1,3 +1,5 @@
+import { clamp } from "ramda";
+
 export const   getTexture = (type) => {
 	switch (type) {
 		case "I":       return '/src/assets/textures/minimalist/I.png';
@@ -21,5 +23,5 @@ export const   getTexture = (type) => {
 export const getRandomUsername = (ad_seed, no_seed) => {
 	const adjectives = ["Quick", "Brave", "Clever", "Swift", "Bold"];
 	const nouns = ["Fox", "Lion", "Eagle", "Tiger", "Wolf"];
-	return adjectives[Math.floor(ad_seed * adjectives.length)] + nouns[Math.floor(no_seed * nouns.length)];
+	return adjectives[Math.floor(clamp(0, 1, ad_seed) * adjectives.length)] + nouns[Math.floor(clamp(0, 1, no_seed) * nouns.length)];
 };

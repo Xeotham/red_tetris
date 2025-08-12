@@ -143,10 +143,8 @@ class 	TetrisGame {
 	}
 
 	#clone() {
-		console.log("Cloning game state");
 		if (this.fallInterval !== -1)
 			return this.initialState;
-		console.log("Cloning game state (out of game)");
 		return ({
 			currentPiece: this.currentPiece,
 			shadowPiece: this.shadowPiece,

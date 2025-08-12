@@ -9,6 +9,7 @@ async function tetrisRoutes(socket) {
     socket.on("arcadeStart", () => controllers.tetrisArcade(socket));
     socket.on("keydown", (key) => controllers.keyDown(key, socket));
     socket.on("keyup", (key) => controllers.keyUp(key, socket));
+    socket.on("joinMultiplayerVersus", (roomCode) => controllers.joinMultiplayerVersus(socket, roomCode));
     socket.on("joinMultiplayerRoom", (roomCode) => controllers.joinMultiplayerRoom(socket, roomCode));
     socket.on("multiplayerRoomCommand", (command, data) => controllers.multiplayerRoomCommand(socket, command, data));
     socket.on("quitMultiplayerRoom", (roomCode) => controllers.quitMultiplayerRoom(socket, roomCode));
