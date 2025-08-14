@@ -13,6 +13,7 @@
 	border-radius: 5px;
 	cursor: pointer;
 	transition: background-color 0.5s ease, box-shadow 0.5s ease;
+	user-select: none;
 }
 
 .button:hover {
@@ -38,6 +39,7 @@
 	left: 50%;
 	transition: background-color 0.3s ease, box-shadow 0.3s ease;
 	clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+	user-select: none;
 }
 
 .room:hover {
@@ -56,6 +58,7 @@
 	width: 100%;
 	clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
 	transition: background-color 0.3s ease, box-shadow 0.3s ease;
+	user-select: none;
 }
 
 .createRoomButton:hover {

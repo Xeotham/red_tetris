@@ -14,29 +14,41 @@ const   RoomList = () => {
 	const [page, setPage] = useState(() => 0);
 
 	useEffect(() => {
-		socket.emit("getMultiplayerRooms");
-		socket.on("GET_MULTIPLAYER_ROOMS", (rooms) => {
-			setRooms(JSON.parse(rooms));
+		fetchRooms();
+		// Clean up socket listeners on unmount
+		return () => {
+			socket.off("GET_MULTIPLAYER_ROOMS");
 			socket.close();
+		};
+	}, [socket]);
+
+
+	const fetchRooms = () => {
+		socket.emit("getMultiplayerRooms");
+		socket.once("GET_MULTIPLAYER_ROOMS", (rooms) => {
+			setRooms(JSON.parse(rooms));
+			setPage(0);
 		});
-	})
+	};
 
 	const handlePageChange = (direction) => {
-		if (direction === "next") {
-			if ((page + 1) * 10 < rooms.length) {
+		if (direction === "refresh")
+			fetchRooms();
+		else if (direction === "next")
+			if ((page + 1) * 10 < rooms.length)
 				setPage(page + 1);
-			}
-		} else if (direction === "prev") {
-			if (page > 0) {
+		else if (direction === "prev")
+			if (page > 0)
 				setPage(page - 1);
-			}
-		}
-	}
+	};
 
 	const roomElements = [];
 	for (let i = 0; page * 10 + i < rooms.length && i < 10; i++) {
 		roomElements.push(
-			<div className={"room"} key={rooms[page * 10 + i].code || i} onClick={() => navigate(`/${rooms[page * 10 + i].code}`)}>
+			<div className={"room"} key={rooms[page * 10 + i].code || i} onClick={() => {
+				// socket.close();
+				navigate(`/${rooms[page * 10 + i].code}`)}
+			}>
 				<div className={"roomName"}>{`Room ${page * 10 + i + 1}`}</div>
 				<div>{`code: ${rooms[page * 10 + i].code}`}</div>
 				<div className={"roomPlayers"}>{`${rooms[page * 10 + i].nbPlayers} players`}</div>
@@ -47,7 +59,7 @@ const   RoomList = () => {
 
 	return (
 		<div>
-
+			<div className={"button"} onClick={() => handlePageChange("refresh")}>Refresh</div>
 			<div className={"nextPrevButtons"}>
 				<div className={"button"} onClick={() => handlePageChange("prev")}>Prev</div>
 				<div className={"button"} onClick={() => handlePageChange("next")}>Next</div>
