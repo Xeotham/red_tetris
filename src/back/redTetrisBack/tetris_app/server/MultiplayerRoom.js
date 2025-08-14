@@ -27,6 +27,7 @@ class MultiplayerRoom {
 			"showHold": true,
 			"infiniteHold": false,
 			"infiniteMovement": false,
+			"rotationSystem": "SRS",
 			"lockTime": 500,
 			"spawnARE": 0,
 			"softDropAmp": 1.5,

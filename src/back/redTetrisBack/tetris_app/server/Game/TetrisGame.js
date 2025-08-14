@@ -239,7 +239,7 @@ class 	TetrisGame {
 			new O(this.rotationType),
 			new I(this.rotationType)
 		];
-		return pieces.sort(() => this.rng() - 0.5); // TODO : Use a seeded shuffle algorithm
+		return pieces.sort(() => this.rng() - 0.5);
 	}
 
 	trySetInterval(interval = this.fallSpeed) {

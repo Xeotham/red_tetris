@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import TetrisButtons from "../TetrisButtons/TetrisButtons.jsx";
 import "./room.css";
-import { useEffect, useState } from "react";
+import {useCallback, useEffect, useState} from "react";
 import { io } from "socket.io-client";
 import { address } from "../../main.jsx";
 import { useNavigate } from "react-router-dom";
@@ -14,16 +14,141 @@ const clamp = (value, min, max) => {
 	return Math.max(min, Math.min(value, max));
 }
 
-const   Room = () => {
-	const   { roomId, username } = useParams();
+const square1 = (dis, s) => {
+	return (
+		<div id="roomSettingsSquare1" className="settingBox">
+			<div className="inSettingBox">
+				<label id="isPrivate" className="labelSettings" htmlFor="is-private">Is private : </label>
+				<input type="checkbox" id="is-private" name="is-private" defaultChecked={s.isPrivate} disabled={dis}/>
+			</div>
+
+			<div className="inSettingBox">
+				<label id="isVersus" className="labelSettings" htmlFor="is-versus">Is versus : </label>
+				<input type="checkbox" id="is-versus" name="is-versus" defaultChecked={s.isVersus} disabled={dis}/>
+			</div>
+
+			<div className="inSettingBox">
+				<label id="showShadow" className="labelSettings" htmlFor="show-shadow">Show shadow : </label>
+				<input type="checkbox" id="show-shadow" name="show-shadow" defaultChecked={s.showShadowPiece}
+					   disabled={dis}/>
+			</div>
+
+			<div className="inSettingBox">
+				<label id="showBags" className="labelSettings" htmlFor="show-bags">Show bags : </label>
+				<input type="checkbox" id="show-bags" name="show-bags" defaultChecked={s.showBags} disabled={dis}/>
+			</div>
+
+			<div className="inSettingBox">
+				<label id="holdAllowed" className="labelSettings" htmlFor="hold-allowed">Hold allowed : </label>
+				<input type="checkbox" id="hold-allowed" name="hold-allowed" defaultChecked={s.holdAllowed}
+					   disabled={dis}/>
+			</div>
+
+			<div className="inSettingBox">
+				<label id="showHold" className="labelSettings" htmlFor="show-hold">Show hold : </label>
+				<input type="checkbox" id="show-hold" name="show-hold" defaultChecked={s.showHold} disabled={dis}/>
+			</div>
+
+			<div className="inSettingBox">
+				<label id="infiniteHold" className="labelSettings" htmlFor="infinite-hold">Infinite hold
+					: </label>
+				<input type="checkbox" id="infinite-hold" name="infinite-hold" defaultChecked={s.infiniteHold}
+					   disabled={dis}/>
+			</div>
+
+			<div className="inSettingBox">
+				<label id="infiniteMovement" className="labelSettings" htmlFor="infinite-movement">Infinite movement
+					: </label>
+				<input type="checkbox" id="infinite-movement" name="infinite-movement"
+					   defaultChecked={s.infiniteMovement} disabled={dis}/>
+			</div>
+		</div>
+	);
+}
+
+const square2 = (dis, s) => {
+	return (
+		<div id="roomSettingsSquare2" className="settingBox">
+			<div className="inSettingBox">
+				<label className="labelSettings" htmlFor="rotationSelect">Rotation : </label>
+				<select name="rotationSelect" id="rotationSelect" disabled={dis}
+						style={{width: "45%", borderRadius: "10px"}}>
+					<option value="SRS">SRS</option>
+					<option value="SRS-X">SRS-X</option>
+					<option value="original">Original</option>
+				</select>
+			</div>
+
+			<div className="inSettingBox">
+				<label id="lockTime" className="labelSettings" htmlFor="lock-time">Lock time : </label>
+				<input type="number" id="lock-time" name="lock-time" style={{width: "25%", borderRadius: "10px"}}
+					   disabled={dis} defaultValue={s.lockTime || "500"}/>
+			</div>
+
+			<div className="inSettingBox">
+				<label id="spawnARE" className="labelSettings" htmlFor="spawn-ARE">Spawn ARE : </label>
+				<input type="number" id="spawn-ARE" name="spawn-ARE" style={{width: "25%", borderRadius: "10px"}}
+					   disabled={dis} defaultValue={s.spawnARE || "0"}/>
+			</div>
+
+			<div className="inSettingBox">
+				<label id="softDropAmp" className="labelSettings" htmlFor="soft-drop-amp">SoftDrop amplifier
+					: </label>
+				<input type="number" id="soft-drop-amp" name="soft-drop-amp"
+					   style={{width: "25%", borderRadius: "10px"}}
+					   disabled={dis} defaultValue={s.softDropAmp || "1.5"}/>
+			</div>
+
+			<div className="inSettingBox">
+				<label id="levelLabel" className="labelSettings" htmlFor="level">Level : </label>
+				<input type="number" id="level" name="level" style={{width: "25%", borderRadius: "10px"}}
+					   disabled={dis} defaultValue={s.level || "4"}/>
+			</div>
+
+			<div className="inSettingBox">
+				<label id="isLevelling" className="labelSettings" htmlFor="is-leveling">Is leveling : </label>
+				<input type="checkbox" id="is-leveling" name="is-leveling"
+					   defaultChecked={s.isLevelling} disabled={dis}/>
+			</div>
+
+		</div>
+	);
+}
+
+const square3 = (dis, s) => {
+	return (
+		<div id="roomSettingsSquare3" className="settingBox">
+			<div className="inSettingBox">
+				<label id="seedLabel" className="labelSettings" htmlFor="seed">Seed : </label>
+				<input type="text" id="seed" name="seed" style={{width: "50%", borderRadius: "10px"}}
+					   disabled={dis} defaultValue={s.seed || Date.now()}/>
+			</div>
+			<div className="inSettingBox">
+				<label id="resetSeedOnRetry" className="labelSettings" htmlFor="reset-seed-on-retry">
+					Reset seed on retry : </label>
+				<input type="checkbox" id="reset-seed-on-retry" name="reset-seed-on-retry"
+					   defaultChecked={s.resetSeedOnRetry} disabled={dis}/>
+			</div>
+			<div className="inSettingBox">
+				<label id="canRetry" className="labelSettings" htmlFor="can-retry">Can retry : </label>
+				<input type="checkbox" id="can-retry" name="can-retry"
+					   defaultChecked={s.canRetry}
+					   disabled={dis}/>
+			</div>
+		</div>
+	);
+}
+
+const Room = () => {
+	const {roomId, username} = useParams();
 	const navigate = useNavigate();
 
-	const   [s, setS] = useState({nbPlayers: 0, isPrivate: true, canRetry: true}); // Placeholder for the number of players, replace with actual state or props as needed.
-	const   [dis, setDis] = useState(true);
-	const   [form, setForm] = useState(null);
-	const	[socket, setSocket] = useState(null);
+	const [s, setS] = useState({nbPlayers: 0, isPrivate: true, canRetry: true}); // Placeholder for the number of players, replace with actual state or props as needed.
+	const [dis, setDis] = useState(true);
+	const [form, setForm] = useState(null);
+	const [socket, setSocket] = useState(null);
 
-	const saveMultiplayerRoomSettings = () => {
+	const saveMultiplayerRoomSettings = useCallback(() => {
 		let values = {};
 		values["versus"] = (document.getElementById("is-versus"))?.checked;
 		values["0"] = parseInt((document.getElementById("lock-time")).value, 10);
@@ -54,6 +179,7 @@ const   Room = () => {
 			"showHold": (document.getElementById("show-hold"))?.checked,
 			"infiniteHold": (document.getElementById("infinite-hold"))?.checked,
 			"infiniteMovement": (document.getElementById("infinite-movement"))?.checked,
+			"rotationSystem": (document.getElementById("rotationSelect"))?.value,
 			"lockTime": values["0"],
 			"spawnARE": values["1"],
 			"softDropAmp": values["2"],
@@ -71,7 +197,9 @@ const   Room = () => {
 		// console.log("sending settings: ", newS);
 		socket.emit("multiplayerRoomCommand", "settings", {roomCode: roomId, settings: newS});
 
-	}
+	});
+
+	// useEffect to handle the form submission and save settings
 	useEffect(() => {
 		const formElement = document.getElementById("roomSettingsForm");
 		setForm(formElement);
@@ -82,6 +210,29 @@ const   Room = () => {
 			};
 		}
 	}, [saveMultiplayerRoomSettings]);
+
+	useEffect(() => {
+		const backButton = document.getElementById("BackButton");
+		if (backButton) {
+			backButton.addEventListener("click", () => navigate("/find-room") );
+			return () => backButton.removeEventListener("click", () => navigate("/find-room") );
+		}
+	});
+
+	useEffect(() => {
+		const clipboardCopy = document.getElementById("clipboardCopy");
+		if (clipboardCopy) { // FIXME : missing ip
+			clipboardCopy.addEventListener("click", () =>
+				navigator.clipboard.writeText("http://" + "localhost" + ":" + import.meta.env.VITE_FRONT_PORT + "/" + roomId) );
+			return () => clipboardCopy.removeEventListener("click", () =>
+				navigator.clipboard.writeText("http://" + "localhost" + ":" + import.meta.env.VITE_FRONT_PORT + "/" + roomId) );
+		}
+	});
+
+	// TODO : implement the start game logic
+	const startGame = () => {
+		console.log("Start button clicked");
+	}
 
 	useEffect(() => {
 		const newSocket = io(`http://${address}`);
@@ -108,6 +259,7 @@ const   Room = () => {
 			document.getElementById("infinite-hold").checked = newSettings?.infiniteHold;
 			document.getElementById("infinite-movement").checked = newSettings?.infiniteMovement;
 			document.getElementById("lock-time").value = newSettings?.lockTime || "500";
+			document.getElementById("rotationSelect").value = newSettings?.rotationSystem || "SRS";
 			document.getElementById("spawn-ARE").value = newSettings?.spawnARE || "0";
 			document.getElementById("soft-drop-amp").value = newSettings?.softDropAmp
 				? newSettings?.softDropAmp.toString() : "1.5";
@@ -124,32 +276,6 @@ const   Room = () => {
 		};
 	}, [roomId]);
 
-	useEffect(() => {
-		const backButton = document.getElementById("BackButton");
-		if (backButton) {
-			backButton.addEventListener("click", () => navigate("/find-room") );
-			return () => backButton.removeEventListener("click", () => navigate("/find-room") );
-		}
-	});
-
-	useEffect(() => {
-		const clipboardCopy = document.getElementById("clipboardCopy");
-		if (clipboardCopy) { // FIXME : missing ip
-			clipboardCopy.addEventListener("click", () =>
-				navigator.clipboard.writeText("http://" + "localhost" + ":" + import.meta.env.VITE_FRONT_PORT + "/" + roomId) );
-			return () => clipboardCopy.removeEventListener("click", () =>
-				navigator.clipboard.writeText("http://" + "localhost" + ":" + import.meta.env.VITE_FRONT_PORT + "/" + roomId) );
-		}
-	});
-
-	// useEffect(() => {
-	// 	const startButton = document.getElementById("playButton");
-	// 	if (startButton) {
-	// 		startButton.addEventListener("click", () => console.log("Start button clicked") );
-	// 		return () => startButton.removeEventListener("click", () => console.log("Start button clicked") );
-	// 	}
-	// });
-
 	if ((/^[A-Z]+$/.test(roomId)) === false || roomId.length !== 4) {
 		return (
 			<>
@@ -161,11 +287,6 @@ const   Room = () => {
 				</div>
 			</>
 		);
-	}
-
-	// TODO : implement the start game logic
-	const startGame = () => {
-		console.log("Start button clicked");
 	}
 
 	return (
@@ -205,112 +326,9 @@ const   Room = () => {
 			<div style={{marginBottom: "3%"}}></div>
 
 			<form id="roomSettingsForm" className="roomSettingsForm">
-				<div id="roomSettingsSquare1" className="settingBox">
-					<div className="inSettingBox">
-						<label id="isPrivate" className="labelSettings" htmlFor="is-private">Is private : </label>
-						<input type="checkbox" id="is-private" name="is-private" defaultChecked={s.isPrivate}
-							   disabled={dis}/>
-					</div>
-
-					<div className="inSettingBox">
-						<label id="isVersus" className="labelSettings" htmlFor="is-versus">Is versus : </label>
-						<input type="checkbox" id="is-versus" name="is-versus" defaultChecked={s.isVersus}
-							   disabled={dis}/>
-					</div>
-
-					<div className="inSettingBox">
-						<label id="showShadow" className="labelSettings" htmlFor="show-shadow">Show shadow : </label>
-						<input type="checkbox" id="show-shadow" name="show-shadow" defaultChecked={s.showShadowPiece}
-							   disabled={dis}/>
-					</div>
-
-					<div className="inSettingBox">
-						<label id="showBags" className="labelSettings" htmlFor="show-bags">Show bags : </label>
-						<input type="checkbox" id="show-bags" name="show-bags" defaultChecked={s.showBags}
-							   disabled={dis}/>
-					</div>
-
-					<div className="inSettingBox">
-						<label id="holdAllowed" className="labelSettings" htmlFor="hold-allowed">Hold allowed : </label>
-						<input type="checkbox" id="hold-allowed" name="hold-allowed" defaultChecked={s.holdAllowed}
-							   disabled={dis}/>
-					</div>
-
-					<div className="inSettingBox">
-						<label id="showHold" className="labelSettings" htmlFor="show-hold">Show hold : </label>
-						<input type="checkbox" id="show-hold" name="show-hold" defaultChecked={s.showHold}
-							   disabled={dis}/>
-					</div>
-
-					<div className="inSettingBox">
-						<label id="infiniteHold" className="labelSettings" htmlFor="infinite-hold">Infinite hold
-							: </label>
-						<input type="checkbox" id="infinite-hold" name="infinite-hold" defaultChecked={s.infiniteHold}
-							   disabled={dis}/>
-					</div>
-
-					<div className="inSettingBox">
-						<label id="infiniteMovement" className="labelSettings" htmlFor="infinite-movement">Infinite movement
-							: </label>
-						<input type="checkbox" id="infinite-movement" name="infinite-movement" defaultChecked={s.infiniteMovement}
-							   disabled={dis}/>
-					</div>
-				</div>
-
-				<div id="roomSettingsSquare2" className="settingBox">
-					<div className="inSettingBox">
-						<label id="lockTime" className="labelSettings" htmlFor="lock-time">Lock time : </label>
-						<input type="number" id="lock-time" name="lock-time" style={{width: "25%", borderRadius: "10px"}}
-							   disabled={dis} defaultValue={s.lockTime || "500"}/>
-					</div>
-
-					<div className="inSettingBox">
-						<label id="spawnARE" className="labelSettings" htmlFor="spawn-ARE">Spawn ARE : </label>
-						<input type="number" id="spawn-ARE" name="spawn-ARE" style={{width: "25%", borderRadius: "10px"}}
-							   disabled={dis} defaultValue={s.spawnARE || "0"}/>
-					</div>
-
-					<div className="inSettingBox">
-						<label id="softDropAmp" className="labelSettings" htmlFor="soft-drop-amp">SoftDrop amplifier
-							: </label>
-						<input type="number" id="soft-drop-amp" name="soft-drop-amp" style={{width: "25%", borderRadius: "10px"}}
-							   disabled={dis} defaultValue={s.softDropAmp || "1.5"}/>
-					</div>
-
-					<div className="inSettingBox">
-						<label id="levelLabel" className="labelSettings" htmlFor="level">Level : </label>
-						<input type="number" id="level" name="level" style={{width: "25%", borderRadius: "10px"}}
-							   disabled={dis} defaultValue={s.level || "4"}/>
-					</div>
-
-					<div className="inSettingBox">
-						<label id="isLevelling" className="labelSettings" htmlFor="is-leveling">Is leveling : </label>
-						<input type="checkbox" id="is-leveling" name="is-leveling"
-							   defaultChecked={s.isLevelling} disabled={dis}/>
-					</div>
-
-				</div>
-
-				<div id="roomSettingsSquare3" className="settingBox">
-					<div className="inSettingBox">
-						<label id="seedLabel" className="labelSettings" htmlFor="seed">Seed : </label>
-						<input type="text" id="seed" name="seed" style={{width: "50%", borderRadius: "10px"}}
-							   disabled={dis} defaultValue={s.seed || Date.now()}/>
-					</div>
-					<div className="inSettingBox">
-						<label id="resetSeedOnRetry" className="labelSettings" htmlFor="reset-seed-on-retry">
-							Reset seed on retry : </label>
-						<input type="checkbox" id="reset-seed-on-retry" name="reset-seed-on-retry"
-							   defaultChecked={s.resetSeedOnRetry} disabled={dis}/>
-					</div>
-					<div className="inSettingBox">
-						<label id="canRetry" className="labelSettings" htmlFor="can-retry">Can retry : </label>
-						<input type="checkbox" id="can-retry" name="can-retry"
-							   defaultChecked={s.canRetry}
-							   disabled={dis}/>
-					</div>
-
-				</div>
+				{square1(dis, s)}
+				{square2(dis, s)}
+				{square3(dis, s)}
 			</form>
 
 		</div>

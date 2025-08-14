@@ -2,7 +2,7 @@ import  "./Home.css"
 import TetrisButtons from "../TetrisButtons/TetrisButtons.jsx";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import {address} from "../../main.jsx";
+import { address } from "../../main.jsx";
 
 const   Home = () => {
 	const   navigate = useNavigate();
