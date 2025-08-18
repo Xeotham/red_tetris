@@ -37,6 +37,7 @@ exports.getTetrisGame = getTetrisGame;
 
 
 const deleteTetrisGame = async (socketId) => {
+	// console.log("Quitting game for socketId: " + socketId);
 	exports.getTetrisGame(socketId)?.setOver(true);
 	await waitForFallInterval(exports.getTetrisGame(socketId));
 	if (controllers.arcadeGames[socketId]) {

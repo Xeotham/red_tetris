@@ -708,8 +708,7 @@ class 	TetrisGame {
 		this.player.emit("EFFECT", JSON.stringify({ type: "BOARD", value: "gameover" }));
 		this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
 		this.player.emit("STATS", JSON.stringify({ stats: this.#getStats() }));
-		if (!this.isInRoom)
-			this.player.emit("GAME_FINISH");
+		this.player.emit("GAME_FINISH");
 	}
 
 	async 	retry() {
