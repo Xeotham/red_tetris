@@ -16,7 +16,7 @@ class MultiplayerRoom {
 			this.code = codeName;
 		else
 			this.code = this.#generateInviteCode();
-		dlog("The code of the new room is " + this.code);
+		dlog("The code of the new Room is " + this.code);
 		this.playersRemaining = 0;
 		this.settings = {
 			"isPrivate": true,
@@ -60,7 +60,7 @@ class MultiplayerRoom {
 	addPlayer(socket) {
 		if (this.players[socket.id]) {
 			socket.emit("MULTIPLAYER_LEAVE");
-			return dlog("Player " + socket.id + " already exists in room " + this.code);
+			return dlog("Player " + socket.id + " already exists in Room " + this.code);
 		}
 		// console.log("sending MULTIPLAYER_JOIN to " + socket.id + " with code " + this.code);
 		socket.emit("MULTIPLAYER_JOIN", JSON.stringify({ argument: this.code }));
@@ -157,7 +157,7 @@ class MultiplayerRoom {
 
 		const endOfGame = (player) => {
 			const playerArrayEnd = Object.values(this.players);
-			dlog("End of game for player " + player.getUsername() + " is at place " + this.playersRemaining + " in room " + this.code);
+			dlog("End of game for player " + player.getUsername() + " is at place " + this.playersRemaining + " in Room " + this.code);
 			player.getGame().place = this.playersRemaining;
 			player.getSocket().emit("MULTIPLAYER_FINISH", JSON.stringify({ argument: this.playersRemaining }));
 			--this.playersRemaining;

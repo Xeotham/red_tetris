@@ -1,7 +1,7 @@
 import  './App.css'
 import { Route, Routes } from "react-router-dom";
 import ChooseUsername from "../ChooseUsername/ChooseUsername.jsx";
-import Room from "../room/room.jsx";
+import Room from "../Room/Room.jsx";
 import Home from "../Home/Home.jsx";
 import FindRooms from "../FindRooms/FindRooms.jsx";
 import Arcade from "../Arcade/Arcade.jsx";

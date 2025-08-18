@@ -71,7 +71,7 @@ describe('TetrisUtils', () => {
 		expect(controllers.arcadeGames).to.not.have.property(clientSocket.id);
 	});
 
-	it('Should return the room with a given code', () => {
+	it('Should return the Room with a given code', () => {
 		const room = new MultiplayerRoom(clientSocket, true, "TEST");
 		expect(getTetrisRoom("nonExistentCode")).to.be.undefined;
 		expect(getTetrisRoom("TEST")).to.be.undefined;

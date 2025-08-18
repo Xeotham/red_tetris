@@ -1,11 +1,12 @@
 import { useParams } from "react-router-dom";
 import TetrisButtons from "../TetrisButtons/TetrisButtons.jsx";
-import "./room.css";
+import "./Room.css";
 import {useCallback, useEffect, useState} from "react";
 import { io } from "socket.io-client";
 import { address } from "../../main.jsx";
 import { useNavigate } from "react-router-dom";
 import {clamp} from "ramda";
+import {useSocket} from "../../hooks/socket/useSocket.jsx";
 
 const abs = (value) => {
 	return value < 0 ? -value : value;
@@ -149,15 +150,14 @@ const Square2 = ({dis, s}) => {
 	);
 }
 
-const Room = () => {
-	const {roomId, username} = useParams();
+const   SettingsScreen = ({roomId, username}) => {
 	const navigate = useNavigate();
 
 	const [s, setS] = useState({nbPlayers: 0, isPrivate: true}); // Placeholder for the number of players, replace with actual state or props as needed.
 	const [invalidName, setInvalidName] = useState(true);
 	const [dis, setDis] = useState(true);
 	const [form, setForm] = useState(null);
-	const [socket, setSocket] = useState(null);
+	const socket = useSocket();
 
 	const saveMultiplayerRoomSettings = useCallback(() => {
 		const v = {
@@ -237,17 +237,14 @@ const Room = () => {
 	}
 
 	useEffect(() => {
-		const newSocket = io(`http://${address}`);
-		setSocket(newSocket);
+		socket.emit("joinMultiplayerRoom", roomId);
 
-		newSocket.emit("joinMultiplayerRoom", roomId);
-
-		newSocket.on("MULTIPLAYER_OWNER", (isOwner) => {
+		socket.on("MULTIPLAYER_OWNER", (isOwner) => {
 			const newIsOwner = JSON.parse(isOwner);
 			setDis(!newIsOwner);
 		});
 
-		newSocket.on("MULTIPLAYER_SETTINGS", (settings) => {
+		socket.on("MULTIPLAYER_SETTINGS", (settings) => {
 			form?.removeEventListener("change", saveMultiplayerRoomSettings);
 			const newSettings = JSON.parse(settings);
 			setS(newSettings);
@@ -277,7 +274,7 @@ const Room = () => {
 		});
 
 		return () => {
-			newSocket.disconnect();
+			socket.disconnect();
 		};
 	}, [roomId]);
 
@@ -296,7 +293,7 @@ const Room = () => {
 
 	return (
 		<div id="room" className="tetrisWindowBkg">
-			<div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "6%" }}>
+			<div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "6%"}}>
 				<button id="BackButton" className="backButton">Back</button>
 				<div className="playerText">Player : {username}</div>
 			</div>
@@ -312,7 +309,8 @@ const Room = () => {
 						<div style={{
 							fontSize: ".8em", textDecorationLine: "underline",
 							textUnderlineOffset: "35%"
-						}}>Copy code</div>
+						}}>Copy code
+						</div>
 					</div>
 				</div>
 				<div className="participantsText">Players : {s.nbPlayers}</div>
@@ -321,11 +319,17 @@ const Room = () => {
 			<div style={{marginBottom: "3%"}}></div>
 
 			<div id="roomSettingsTitle" style={{width: "100%", height: "4%"}}>
-				<div style={{width: "100%", height: "33%", fontSize: "2vmin", color: "rgb(231, 170, 44)",
-				userSelect: "none"}}>~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
+				<div style={{
+					width: "100%", height: "33%", fontSize: "2vmin", color: "rgb(231, 170, 44)",
+					userSelect: "none"
+				}}>~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				</div>
 				<div className="settingsTitle">Room settings</div>
-				<div style={{width: "100%", height: "33%", fontSize: "2vmin", color: "rgb(231, 170, 44)",
-				userSelect: "none"}}>~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
+				<div style={{
+					width: "100%", height: "33%", fontSize: "2vmin", color: "rgb(231, 170, 44)",
+					userSelect: "none"
+				}}>~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				</div>
 			</div>
 
 			<div style={{marginBottom: "3%"}}></div>
@@ -335,7 +339,21 @@ const Room = () => {
 				<Square2 dis={dis} s={s}/>
 				<Square3 dis={dis} s={s}/>
 			</form>
+		</div>
+	)
+}
 
+const Room = () => {
+	const {roomId, username} = useParams();
+
+	return (
+		<div>
+			<div id={"settingsContainer"}>
+				<SettingsScreen roomId={roomId} username={username} />
+			</div>
+			<div id={"boardContainer"}>
+
+			</div>
 		</div>
 	);
 }

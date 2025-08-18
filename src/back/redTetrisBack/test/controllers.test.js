@@ -41,7 +41,7 @@ describe('Controllers', () => {
 		await deleteTetrisGame(socket.id);
 	});
 
-	it('Should Create or join a multiplayer room', async () => {
+	it('Should Create or join a multiplayer Room', async () => {
 		const roomExisted = !!getTetrisRoom(socket);
 		await controllers.joinMultiplayerRoom(socket, "ABCD");
 		const room = getTetrisRoom("ABCD");
@@ -55,7 +55,7 @@ describe('Controllers', () => {
 		controllers.quitMultiplayerRoom(socket, "ABCD");
 	});
 
-	it('Should quit an arcade game or multiplayer room', async () => {
+	it('Should quit an arcade game or multiplayer Room', async () => {
 		await controllers.tetrisArcade(socket);
 		await waitForFallInterval(controllers.arcadeGames[socket.id].getGame());
 		expect(controllers.arcadeGames[socket.id]).to.not.be.undefined;

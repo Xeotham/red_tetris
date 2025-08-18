@@ -67,7 +67,7 @@ const   idlePage = () => {
 	document.getElementById("arcade")?.addEventListener("click", () => tetrisSoloPage());
 	document.getElementById("matchmaking")?.addEventListener("click", () => tetrisVersusPage());
 	document.getElementById("get-multiplayer-rooms")?.addEventListener("click", () => { gameListPage(); });
-	document.getElementById("create-room")?.addEventListener("click", () => tetrisCreateRoomPage());
+	document.getElementById("create-Room")?.addEventListener("click", () => tetrisCreateRoomPage());
 	document.getElementById("setting")?.addEventListener("click", () => page.show("/settings"));
 
 }
