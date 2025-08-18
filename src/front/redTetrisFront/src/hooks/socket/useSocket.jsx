@@ -6,7 +6,7 @@ const SocketContext = createContext(null);
 
 export const SocketProvider = ({ children }) => {
 	const [socket, setSocket] = useState(() => io(`http://${address}`, {}));
-	console.log(socket);
+	// console.log(socket);
 	return (
 		<SocketContext.Provider value={socket}>
 			{children}
