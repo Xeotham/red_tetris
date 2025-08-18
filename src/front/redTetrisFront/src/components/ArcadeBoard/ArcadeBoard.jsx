@@ -119,7 +119,7 @@ const   GameStats = ({gameInfo}) => {
 const ArcadeBoard = () => {
 
 	const socket = useSocket();
-	console.log(socket);
+	// console.log(socket);
 	const [abortController, setAbortController] = useState(new AbortController());
 	const [game, setGame] = useState({
 		matrix: null,
@@ -197,7 +197,6 @@ const ArcadeBoard = () => {
 		socket.on("GAME_START", (data) => {
 			const new_data = JSON.parse(data);
 			setGame(new_data.game);
-			// console.log(game);
 		});
 
 		socket.on("GAME", (data) => {
@@ -210,9 +209,7 @@ const ArcadeBoard = () => {
 			const new_data = JSON.parse(data);
 			const sfx = sfxPlayer(new_data.type, new_data.value);
 
-			// console.log(sfx);
 			sfx?.play();
-
 		});
 
 		socket.on("STATS", (data) => {
@@ -220,6 +217,7 @@ const ArcadeBoard = () => {
 
 			setStats(new_data.stats);
 			setDisplayStats(true);
+			abortController.abort();
 		})
 
 		gameControllers(abortController);
