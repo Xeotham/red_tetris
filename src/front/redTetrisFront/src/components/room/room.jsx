@@ -5,16 +5,13 @@ import {useCallback, useEffect, useState} from "react";
 import { io } from "socket.io-client";
 import { address } from "../../main.jsx";
 import { useNavigate } from "react-router-dom";
+import {clamp} from "ramda";
 
 const abs = (value) => {
 	return value < 0 ? -value : value;
 }
 
-const clamp = (value, min, max) => {
-	return Math.max(min, Math.min(value, max));
-}
-
-const square1 = (dis, s) => {
+const Square1 = ({dis, s}) => {
 	return (
 		<div id="roomSettingsSquare1" className="settingBox">
 			<div className="inSettingBox">
@@ -66,15 +63,15 @@ const square1 = (dis, s) => {
 	);
 }
 
-const square2 = (dis, s) => {
+const Square2 = ({dis, s}) => {
 	return (
 		<div id="roomSettingsSquare2" className="settingBox">
 			<div className="inSettingBox">
 				<label className="labelSettings" htmlFor="rotationSelect">Rotation : </label>
 				<select name="rotationSelect" id="rotationSelect" disabled={dis}
 						style={{width: "45%", borderRadius: "10px"}}>
-					<option value="SRS">SRS</option>
 					<option value="SRS-X">SRS-X</option>
+					<option value="SRS">SRS</option>
 					<option value="original">Original</option>
 				</select>
 			</div>
@@ -82,7 +79,7 @@ const square2 = (dis, s) => {
 			<div className="inSettingBox">
 				<label id="lockTime" className="labelSettings" htmlFor="lock-time">Lock time : </label>
 				<input type="number" id="lock-time" name="lock-time" style={{width: "25%", borderRadius: "10px"}}
-					   disabled={dis} defaultValue={s.lockTime || "500"}/>
+					   disabled={dis} min={-1}/>
 			</div>
 
 			<div className="inSettingBox">
@@ -115,7 +112,7 @@ const square2 = (dis, s) => {
 	);
 }
 
-const square3 = (dis, s) => {
+const Square3 = ({dis, s}) => {
 	return (
 		<div id="roomSettingsSquare3" className="settingBox">
 			<div className="inSettingBox">
@@ -143,36 +140,28 @@ const Room = () => {
 	const {roomId, username} = useParams();
 	const navigate = useNavigate();
 
-	const [s, setS] = useState({nbPlayers: 0, isPrivate: true, canRetry: true}); // Placeholder for the number of players, replace with actual state or props as needed.
+	const [s, setS] = useState({nbPlayers: 0, isPrivate: true}); // Placeholder for the number of players, replace with actual state or props as needed.
 	const [dis, setDis] = useState(true);
 	const [form, setForm] = useState(null);
 	const [socket, setSocket] = useState(null);
 
 	const saveMultiplayerRoomSettings = useCallback(() => {
-		let values = {};
-		values["versus"] = (document.getElementById("is-versus"))?.checked;
-		values["0"] = parseInt((document.getElementById("lock-time")).value, 10);
-		values["1"] = parseInt((document.getElementById("spawn-ARE")).value, 10);
-		values["2"] = parseFloat((document.getElementById("soft-drop-amp")).value);
-		values["3"] = parseInt((document.getElementById("level")).value, 10);
-		const nbPlayers = s.nbPlayers || 0;
-		values["versus"] === true && nbPlayers > 2 ? values["versus"] = false : true;
-		isNaN(values["0"]) ? values["0"] = 500 : values["0"] = clamp(values["0"], -1, abs(values["0"]));
-		isNaN(values["1"]) ? values["1"] = 0 : values["1"] = clamp(values["1"], 0, abs(values["1"])); // Spawn ARE must be >= 0 and positive
-		isNaN(values["2"]) ? values["2"] = 1.5 : values["2"] = clamp(values["2"], 0.1, abs(values["2"])); // Soft drop amp must be > 0 && positive
-		isNaN(values["3"]) ? values["3"] = 4 : values["3"] = clamp(values["3"], 1, 15); // Level must be between 1 and 15
+		const v = {
+			"0": parseInt((document.getElementById("lock-time")).value, 10),
+			"1": parseInt((document.getElementById("spawn-ARE")).value, 10),
+			"2": parseFloat((document.getElementById("soft-drop-amp")).value),
+			"3": parseInt((document.getElementById("level")).value, 10),
+		};
 
-		document.getElementById("is-versus").checked = values["versus"];
-		document.getElementById("lock-time").value = values["0"].toString();
-		document.getElementById("spawn-ARE").value = values["1"].toString();
-		document.getElementById("soft-drop-amp").value = values["2"].toString();
-		document.getElementById("level").value = values["3"].toString();
+		// console.log("isNan(",v["0"],"):", isNaN(v["0"]));
+		// console.log("clamping lockTime:", clamp(-1, abs(v["0"]), v["0"]));
+		const res = isNaN(v["0"]) ? 500 : clamp(-1, abs(v["0"]), v["0"]);
+		// console.log("result:", res);
 
-		// console.log("private: ", (document.getElementById("is-private"))?.checked);
 
 		const newS = {
 			"isPrivate": (document.getElementById("is-private"))?.checked,
-			"isVersus": values["versus"],
+			"isVersus": s.nbPlayers > 2 ? false : (document.getElementById("is-versus"))?.checked,
 			"showShadowPiece": (document.getElementById("show-shadow"))?.checked,
 			"showBags": (document.getElementById("show-bags"))?.checked,
 			"holdAllowed": (document.getElementById("hold-allowed"))?.checked,
@@ -180,22 +169,26 @@ const Room = () => {
 			"infiniteHold": (document.getElementById("infinite-hold"))?.checked,
 			"infiniteMovement": (document.getElementById("infinite-movement"))?.checked,
 			"rotationSystem": (document.getElementById("rotationSelect"))?.value,
-			"lockTime": values["0"],
-			"spawnARE": values["1"],
-			"softDropAmp": values["2"],
-			"level": values["3"],
+			"lockTime": res,
+			// Spawn ARE must be >= 0 and positive,
+			"spawnARE": isNaN(v["1"]) ? 0 : clamp(0, abs(v["1"]), v["1"]),
+			// Soft drop amp must be > 0 && positive
+			"softDropAmp": isNaN(v["2"]) ? 1.5 : clamp(0.1, abs(v["2"]), v["2"]),
+			"level": isNaN(v["3"]) ? 4 : clamp(1, 15, v["3"]),
 			"isLevelling": (document.getElementById("is-leveling"))?.checked,
 			"seed": (document.getElementById("seed"))?.value || "error",
 			"resetSeedOnRetry": (document.getElementById("reset-seed-on-retry"))?.checked,
 			"canRetry": (document.getElementById("can-retry"))?.checked,
-			"nbPlayers": nbPlayers,
-
+			"nbPlayers": s.nbPlayers,
 		}
 		setS(newS);
-		if (!socket)
-			return ;
+		document.getElementById("is-versus").checked = newS["versus"];
+		document.getElementById("lock-time").value = newS["lockTime"].toString();
+		document.getElementById("spawn-ARE").value = newS["spawnARE"].toString();
+		document.getElementById("soft-drop-amp").value = newS["softDropAmp"].toString();
+		document.getElementById("level").value = newS["level"].toString();
 		// console.log("sending settings: ", newS);
-		socket.emit("multiplayerRoomCommand", "settings", {roomCode: roomId, settings: newS});
+		socket?.emit("multiplayerRoomCommand", "settings", {roomCode: roomId, settings: newS});
 
 	});
 
@@ -258,8 +251,8 @@ const Room = () => {
 			document.getElementById("show-hold").checked = newSettings?.showHold;
 			document.getElementById("infinite-hold").checked = newSettings?.infiniteHold;
 			document.getElementById("infinite-movement").checked = newSettings?.infiniteMovement;
-			document.getElementById("lock-time").value = newSettings?.lockTime || "500";
-			document.getElementById("rotationSelect").value = newSettings?.rotationSystem || "SRS";
+			document.getElementById("lock-time").value = newSettings?.lockTime;
+			document.getElementById("rotationSelect").value = newSettings?.rotationSystem || "SRS-X";
 			document.getElementById("spawn-ARE").value = newSettings?.spawnARE || "0";
 			document.getElementById("soft-drop-amp").value = newSettings?.softDropAmp
 				? newSettings?.softDropAmp.toString() : "1.5";
@@ -326,9 +319,9 @@ const Room = () => {
 			<div style={{marginBottom: "3%"}}></div>
 
 			<form id="roomSettingsForm" className="roomSettingsForm">
-				{square1(dis, s)}
-				{square2(dis, s)}
-				{square3(dis, s)}
+				<Square1 dis={dis} s={s}/>
+				<Square2 dis={dis} s={s}/>
+				<Square3 dis={dis} s={s}/>
 			</form>
 
 		</div>
