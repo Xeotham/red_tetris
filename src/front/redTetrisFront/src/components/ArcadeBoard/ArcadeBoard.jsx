@@ -218,6 +218,10 @@ const ArcadeBoard = () => {
 			setStats(new_data.stats);
 			setDisplayStats(true);
 			abortController.abort();
+			socket.off("GAME_START");
+			socket.off("GAME");
+			socket.off("EFFECT");
+			socket.off("STATS");
 		})
 
 		gameControllers(abortController);

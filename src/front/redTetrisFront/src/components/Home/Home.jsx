@@ -8,7 +8,7 @@ const   Home = () => {
 	const   navigate = useNavigate();
 
 	const   arcadeOnClick = () => {
-		console.log("arcadeOnClick");
+		// console.log("arcadeOnClick");
 		navigate("/arcade-board");
 	}
 
