@@ -3,13 +3,13 @@ import ReturnHomeButton from "../ReturnHomeButton/ReturnHomeButton.jsx";
 import { useState, useRef, useEffect } from "react";
 import { getRandomUsername } from "../../utils.jsx";
 import { useNavigate } from "react-router-dom";
-import { io } from "socket.io-client";
-import { address } from "../../main.jsx";
+import {useSocket} from "../../hooks/socket/useSocket.jsx";
 
 
 const   RoomList = () => {
 	const   navigate = useNavigate();
-	const [socket, setSocket] = useState(() => io(`http://${address}`));
+	const socket = useSocket()
+	console.log(socket);
 	const [rooms, setRooms] = useState(() => []);
 	const [page, setPage] = useState(() => 0);
 
@@ -18,7 +18,6 @@ const   RoomList = () => {
 		// Clean up socket listeners on unmount
 		return () => {
 			socket.off("GET_MULTIPLAYER_ROOMS");
-			socket.close();
 		};
 	}, [socket]);
 
@@ -26,6 +25,7 @@ const   RoomList = () => {
 	const fetchRooms = () => {
 		socket.emit("getMultiplayerRooms");
 		socket.once("GET_MULTIPLAYER_ROOMS", (rooms) => {
+			console.log(rooms);
 			setRooms(JSON.parse(rooms));
 			setPage(0);
 		});
