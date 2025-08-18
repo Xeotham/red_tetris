@@ -34,6 +34,7 @@ class MultiplayerRoom {
 			"level": 4,
 			"isLevelling": false,
 			"canRetry": true,
+			"music": "bgm1.mp3",
 			"seed": Date.now().toString(),
 			"resetSeedOnRetry": true,
 			"nbPlayers": 1,

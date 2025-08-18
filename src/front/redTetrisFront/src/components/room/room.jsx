@@ -112,9 +112,22 @@ const Square2 = ({dis, s}) => {
 	);
 }
 
-const Square3 = ({dis, s}) => {
+	const Square3 = ({dis, s}) => {
 	return (
 		<div id="roomSettingsSquare3" className="settingBox">
+			<div className="inSettingBox">
+				<label className="labelSettings" htmlFor="musicSelect">Music : </label>
+				<select name="musicSelect" id="musicSelect" disabled={dis}
+						style={{width: "70%", borderRadius: "10px"}}>
+					<option value="bgm1.mp3">Tetoris</option>
+					<option value="bgm2.mp3">Disturbing the peace</option>
+					<option value="bgm3.mp3">Jump up, Super Star!</option>
+					<option value="bgm4.mp3">Submerciful</option>
+					<option value="bgm5.mp3">chirpsichord</option>
+					<option value="">No Music</option>
+				</select>
+			</div>
+
 			<div className="inSettingBox">
 				<label id="seedLabel" className="labelSettings" htmlFor="seed">Seed : </label>
 				<input type="text" id="seed" name="seed" style={{width: "50%", borderRadius: "10px"}}
@@ -141,6 +154,7 @@ const Room = () => {
 	const navigate = useNavigate();
 
 	const [s, setS] = useState({nbPlayers: 0, isPrivate: true}); // Placeholder for the number of players, replace with actual state or props as needed.
+	const [invalidName, setInvalidName] = useState(true);
 	const [dis, setDis] = useState(true);
 	const [form, setForm] = useState(null);
 	const [socket, setSocket] = useState(null);
@@ -153,11 +167,7 @@ const Room = () => {
 			"3": parseInt((document.getElementById("level")).value, 10),
 		};
 
-		// console.log("isNan(",v["0"],"):", isNaN(v["0"]));
-		// console.log("clamping lockTime:", clamp(-1, abs(v["0"]), v["0"]));
-		const res = isNaN(v["0"]) ? 500 : clamp(-1, abs(v["0"]), v["0"]);
-		// console.log("result:", res);
-
+		console.log("musicSelectValue:", (document.getElementById("musicSelect"))?.value);
 
 		const newS = {
 			"isPrivate": (document.getElementById("is-private"))?.checked,
@@ -169,13 +179,12 @@ const Room = () => {
 			"infiniteHold": (document.getElementById("infinite-hold"))?.checked,
 			"infiniteMovement": (document.getElementById("infinite-movement"))?.checked,
 			"rotationSystem": (document.getElementById("rotationSelect"))?.value,
-			"lockTime": res,
-			// Spawn ARE must be >= 0 and positive,
-			"spawnARE": isNaN(v["1"]) ? 0 : clamp(0, abs(v["1"]), v["1"]),
-			// Soft drop amp must be > 0 && positive
-			"softDropAmp": isNaN(v["2"]) ? 1.5 : clamp(0.1, abs(v["2"]), v["2"]),
+			"lockTime": isNaN(v["0"]) ? 500 : clamp(-1, abs(v["0"]), v["0"]), // Lock time must be >= -1
+			"spawnARE": isNaN(v["1"]) ? 0 : clamp(0, abs(v["1"]), v["1"]), // Spawn ARE must be >= 0
+			"softDropAmp": isNaN(v["2"]) ? 1.5 : clamp(0.1, abs(v["2"]), v["2"]), // Soft drop amp must be > 0
 			"level": isNaN(v["3"]) ? 4 : clamp(1, 15, v["3"]),
 			"isLevelling": (document.getElementById("is-leveling"))?.checked,
+			"music": (document.getElementById("musicSelect"))?.value,
 			"seed": (document.getElementById("seed"))?.value || "error",
 			"resetSeedOnRetry": (document.getElementById("reset-seed-on-retry"))?.checked,
 			"canRetry": (document.getElementById("can-retry"))?.checked,
@@ -242,7 +251,9 @@ const Room = () => {
 			form?.removeEventListener("change", saveMultiplayerRoomSettings);
 			const newSettings = JSON.parse(settings);
 			setS(newSettings);
-			// console.log("Settings received:", newSettings);
+			if (!newSettings)
+				return ;
+			console.log("Settings received:", newSettings);
 			document.getElementById("is-private").checked = newSettings?.isPrivate;
 			document.getElementById("is-versus").checked = newSettings?.isVersus;
 			document.getElementById("show-shadow").checked = newSettings?.showShadowPiece;
@@ -258,6 +269,7 @@ const Room = () => {
 				? newSettings?.softDropAmp.toString() : "1.5";
 			document.getElementById("level").value = newSettings?.level || "4";
 			document.getElementById("is-leveling").checked = newSettings?.isLevelling;
+			document.getElementById("musicSelect").value = newSettings?.music || "bgm1.mp3";
 			document.getElementById("seed").value = newSettings?.seed || "error";
 			document.getElementById("reset-seed-on-retry").checked = newSettings?.resetSeedOnRetry;
 			document.getElementById("can-retry").checked = newSettings?.canRetry;

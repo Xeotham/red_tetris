@@ -1,9 +1,8 @@
-import "./ChoseUsername.css";
+import "./ChooseUsername.css";
 import {useNavigate, useParams} from "react-router-dom";
 import TetrisButtons from "../TetrisButtons/TetrisButtons.jsx";
-import {useEffect, useState} from "react";
-import {getRandomUsername} from "../../utils.jsx";
-import {find} from "ramda";
+import { useEffect, useState } from "react";
+import { getRandomUsername } from "../../utils.jsx";
 
 
 const   InvalidRoomId = ({roomId}) => {
@@ -22,10 +21,12 @@ const   InvalidRoomId = ({roomId}) => {
 	)
 }
 
-const ChoseUsername = () => {
+const ChooseUsername = () => {
 	const   { roomId } = useParams();
 	const   [inputValue, setInputValue] = useState(getRandomUsername(Math.random(), Math.random()));
 	const   navigate = useNavigate();
+
+	console.log("Choose UserName");
 
 	const handleUsernameChange = (inputUsername) => {
 		// Allow alphanumeric and underscores, max 20 characters
@@ -79,4 +80,4 @@ const ChoseUsername = () => {
 	);
 };
 
-export default ChoseUsername;
+export default ChooseUsername;
