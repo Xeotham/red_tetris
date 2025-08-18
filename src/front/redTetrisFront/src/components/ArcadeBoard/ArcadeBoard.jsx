@@ -7,6 +7,7 @@ import { sfxPlayer } from "../../sfxHandler.jsx";
 import Hold from "../Hold/Hold.jsx";
 import Bags from "../Bags/Bags.jsx";
 import { useNavigate } from "react-router-dom";
+import {useSocket} from "../../hooks/socket/useSocket.jsx";
 
 const   EndDisplay = ({stats, display = false}) => {
 	const navigate = useNavigate();
@@ -115,9 +116,10 @@ const   GameStats = ({gameInfo}) => {
 	)
 }
 
-const arcadeBoard = () => {
+const ArcadeBoard = () => {
 
-	const [socket, setSocket] = useState(() => io(`http://${address}`));
+	const socket = useSocket();
+	console.log(socket);
 	const [abortController, setAbortController] = useState(new AbortController());
 	const [game, setGame] = useState({
 		matrix: null,
@@ -242,4 +244,4 @@ const arcadeBoard = () => {
 	);
 }
 
-export default arcadeBoard;
+export default ArcadeBoard;

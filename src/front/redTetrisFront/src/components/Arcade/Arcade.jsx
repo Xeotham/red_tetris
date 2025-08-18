@@ -1,5 +1,5 @@
 import  "./Arcade.css";
-import Board from "../ArcadeBoard/ArcadeBoard.jsx";
+import ArcadeBoard from "../ArcadeBoard/ArcadeBoard.jsx";
 
 const   arcade = () => {
 	return (
@@ -7,7 +7,7 @@ const   arcade = () => {
 			{/*<div className={"title"}>ARCADE BOARD</div>*/}
 			{/*<div className={"arcadeBoardContent"}>*/}
 			{/*	<p>Welcome to the Arcade Board!</p>*/}
-				<Board />
+				<ArcadeBoard />
 			{/*</div>*/}
 		</div>
 	);
