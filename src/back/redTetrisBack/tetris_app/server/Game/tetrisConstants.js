@@ -127,11 +127,11 @@ const GARBAGE_CALCULUS = (clear, combo, B2B, table) => {
 	if (clear === "Perfect Clear")
 		return 10;
 	// remove the "Z-" / "L-" / "J-" / "S-" / "I-" / "Mini T-", not "T-Spin"
-	if ((clear.includes("Mini") && !clear.includes("T-")) || clear.includes("Mini T-"))
+	if (clear.includes("Mini"))
 		clear = clear.substring(0, clear.indexOf("Spin") - 2) + clear.substring(clear.indexOf("Spin"));
 	if (!table[clear])
 		return 0;
-	return table[clear][utils.clamp(combo, 0, table[clear].length - 1)] + (0, exports.B2B_EXTRA_GARBAGE)(B2B);
+	return table[clear][utils.clamp(combo, 0, table[clear].length - 1)] + exports.B2B_EXTRA_GARBAGE(B2B);
 };
 exports.GARBAGE_CALCULUS = GARBAGE_CALCULUS;
 

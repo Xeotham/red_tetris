@@ -574,10 +574,8 @@ class 	TetrisGame {
 	}
 
 	async changeFallSpeed(type) {
-		// console.log("over: " + this.over + ", type: " + type + ", dropType: " + this.dropType + ", fallInterval: " + this.fallInterval);
 		if (this.over || type === this.dropType || this.fallInterval === -1)
 			return;
-		// console.log("So drop type in game is : " + type);
 		if (type !== "normal") {
 			++this.nbMoves;
 			++this.keysPressed;

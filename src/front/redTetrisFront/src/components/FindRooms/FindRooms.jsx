@@ -42,20 +42,20 @@ const   RoomList = () => {
 				setPage(page - 1);
 	};
 
-	const roomElements = [];
-	for (let i = 0; page * 10 + i < rooms.length && i < 10; i++) {
-		roomElements.push(
-			<div className={"room"} key={rooms[page * 10 + i].code || i} onClick={() => {
-				// socket.close();
-				navigate(`/${rooms[page * 10 + i].code}`)}
-			}>
+	const getRooms = (roomsEl, rooms, page, i) => {
+		if (page * 10 + i >= rooms.length || i >= 10)
+			return roomsEl;
+		// concat returns a new array and does not mutate the original array
+		return getRooms(roomsEl.concat([
+			<div className={"room"} key={rooms[page * 10 + i].code || i} onClick={() =>
+				navigate(`/${rooms[page * 10 + i].code}`)}>
 				<div className={"roomName"}>{`Room ${page * 10 + i + 1}`}</div>
 				<div>{`code: ${rooms[page * 10 + i].code}`}</div>
 				<div className={"roomPlayers"}>{`${rooms[page * 10 + i].nbPlayers} players`}</div>
 			</div>
-		);
-		// TODO : Keep the +1 on the room?
+		]), rooms, page, i + 1);
 	}
+	const roomElements = getRooms([], rooms, page, 0);
 
 	return (
 		<div>
