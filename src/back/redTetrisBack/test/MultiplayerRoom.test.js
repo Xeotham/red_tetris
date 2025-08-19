@@ -24,13 +24,13 @@ describe('MultiplayerRoom', () => {
 		if (clientSocket.connected) clientSocket.disconnect();
 	});
 
-	it('Should return if the room is in game', () => {
+	it('Should return if the Room is in game', () => {
 		const room = new MultiplayerRoom(clientSocket, true, undefined);
 		expect(room.getIsInGame()).to.be.false;
 		room.startGames();
 		expect(room.getIsInGame()).to.be.true;
 		room.players[clientSocket.id].getGame().setOver(true);
-		// clientSocket.once('GAME_FINISH', () => { expect(room.getIsInGame()).to.be.false; });
+		// clientSocket.once('GAME_FINISH', () => { expect(Room.getIsInGame()).to.be.false; });
 	});
 
 	it('Should return the list of players', () => {
@@ -43,21 +43,21 @@ describe('MultiplayerRoom', () => {
 		expect(Object.values(room.getPlayers())).to.be.empty;
 	});
 
-	it('Should return if the room is private', () => {
+	it('Should return if the Room is private', () => {
 		const room = new MultiplayerRoom(clientSocket, true, "TEST");
 		expect(room.isPrivate()).to.be.true;
 		room.addSetting("isPrivate", false);
 		expect(room.isPrivate()).to.be.false;
 	});
 
-	it('Should return if the room is versus', () => {
+	it('Should return if the Room is versus', () => {
 		const room = new MultiplayerRoom(clientSocket, true, "TEST");
 		expect(room.getIsVersus()).to.be.false;
 		room.addSetting("isVersus", true);
 		expect(room.getIsVersus()).to.be.true;
 	});
 
-	it('Should change and return the room code', () => {
+	it('Should change and return the Room code', () => {
 		const room = new MultiplayerRoom(clientSocket, true, "TEST");
 		expect(room.getCode()).to.equal("TEST");
 		room.changeCode();
@@ -102,7 +102,7 @@ describe('MultiplayerRoom', () => {
 		expect(room.settings.test).to.deep.equal({ value: "test" });
 	});
 
-	it('Should add a player to the room', () => {
+	it('Should add a player to the Room', () => {
 		const room = new MultiplayerRoom(clientSocket, true, "TEST");
 		expect(room.getPlayers()).to.have.property(clientSocket.id);
 		room.addPlayer(clientSocket);
@@ -117,7 +117,7 @@ describe('MultiplayerRoom', () => {
 		expect(room.getPlayers()["testSocket"]?.isOwner()).to.be.false;
 	});
 
-	it('Should remove a player from the room', () => {
+	it('Should remove a player from the Room', () => {
 		const room = new MultiplayerRoom(clientSocket, true, "TEST");
 		room.addPlayer(clientSocket);
 		room.addPlayer({ id: "testSocket", emit: () => {} });
@@ -137,7 +137,7 @@ describe('MultiplayerRoom', () => {
 		expect(room.getPlayers()).to.not.have.property("testSocket");
 	});
 
-	it('Should return if the room is empty', () => {
+	it('Should return if the Room is empty', () => {
 		const room = new MultiplayerRoom(clientSocket, true, "TEST");
 		expect(room.isEmpty()).to.be.false;
 		room.addPlayer(clientSocket);

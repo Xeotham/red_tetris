@@ -26,7 +26,6 @@ class Player {
 		this.keys.hold = "shift";
 		this.keys.forfeit = "escape";
 		this.keys.retry = "r";
-
 	}
 	getSocket() { return this.socket; }
 	getUsername() { return this.username; }
@@ -39,6 +38,15 @@ class Player {
 		const game = new TetrisGame(this.socket);
 		game.setSettings(settings);
 		this.game = game;
+		console.log("New game created for player " + this.socket.id);
+	}
+
+	toJSON() {
+		return ({
+			username: this.username,
+			owner: this.owner,
+			game: this.game ? this.game.toJSON() : undefined,
+		});
 	}
 }
 exports.Player = Player;

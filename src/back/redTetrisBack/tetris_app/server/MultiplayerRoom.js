@@ -5,6 +5,7 @@ exports.MultiplayerRoom = void 0;
 const utils = require("../utils");
 const { Player } = require("./Player");
 const { dlog } = require("./../../server/server");
+const controllers = require("../socket/controllers");
 
 
 class MultiplayerRoom {
@@ -16,7 +17,7 @@ class MultiplayerRoom {
 			this.code = codeName;
 		else
 			this.code = this.#generateInviteCode();
-		dlog("The code of the new room is " + this.code);
+		dlog("The code of the new Room is " + this.code);
 		this.playersRemaining = 0;
 		this.settings = {
 			"isPrivate": true,
@@ -60,7 +61,7 @@ class MultiplayerRoom {
 	addPlayer(socket) {
 		if (this.players[socket.id]) {
 			socket.emit("MULTIPLAYER_LEAVE");
-			return dlog("Player " + socket.id + " already exists in room " + this.code);
+			return dlog("Player " + socket.id + " already exists in Room " + this.code);
 		}
 		// console.log("sending MULTIPLAYER_JOIN to " + socket.id + " with code " + this.code);
 		socket.emit("MULTIPLAYER_JOIN", JSON.stringify({ argument: this.code }));
@@ -121,7 +122,7 @@ class MultiplayerRoom {
 
 	async startGames() {
 		if (this.isInGame)
-			return ;
+			return;
 
 		return new Promise((resolve) => {
 		const playersArray = Object.values(this.players);
@@ -148,7 +149,7 @@ class MultiplayerRoom {
 						++lost;
 						continue ;
 					}
-					games.push(players[j]);
+					games.push(players[j].toJSON());
 				}
 				players[i].getSocket().emit("MULTIPLAYER_OPPONENTS_GAMES", JSON.stringify({ argument: games }));
 			}
@@ -157,9 +158,12 @@ class MultiplayerRoom {
 
 		const endOfGame = (player) => {
 			const playerArrayEnd = Object.values(this.players);
-			dlog("End of game for player " + player.getUsername() + " is at place " + this.playersRemaining + " in room " + this.code);
+			dlog("End of game for player " + player.getUsername() + " is at place " + this.playersRemaining + " in Room " + this.code);
 			player.getGame().place = this.playersRemaining;
 			player.getSocket().emit("MULTIPLAYER_FINISH", JSON.stringify({ argument: this.playersRemaining }));
+			controllers.keyUp(player.keys.moveLeft, player.getSocket());
+			controllers.keyUp(player.keys.moveRight, player.getSocket());
+			controllers.keyUp(player.keys.softDrop, player.getSocket());
 			--this.playersRemaining;
 			if (player.getGame()?.getHasForfeit())
 				this.removePlayer(player.getUsername());

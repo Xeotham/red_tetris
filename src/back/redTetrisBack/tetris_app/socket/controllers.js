@@ -25,7 +25,7 @@ const joinMultiplayerVersus = async (socket) => {
 	for (const room of exports.multiplayerRoomLst)
 		if (room.getIsVersus() && !room.getIsInGame() && Object.values(room.getPlayers()).length <= 1)
 			return room.addPlayer(socket);
-	dlog("No multiplayer versus room available, creating a new one for " + socket.id);
+	dlog("No multiplayer versus Room available, creating a new one for " + socket.id);
 	const newRoom = new MultiplayerRoom.MultiplayerRoom(socket, false);
 	exports.multiplayerRoomLst.push(newRoom);
 	socket.emit("JOIN_MULTIPLAYER_VERSUS", JSON.stringify(newRoom.getCode()));
@@ -36,7 +36,7 @@ const joinMultiplayerRoom = async (socket, roomCode) => {
 	const room = utils.getTetrisRoom(roomCode);
 	if (!room)
 		return exports.multiplayerRoomLst.push(new MultiplayerRoom.MultiplayerRoom(socket, true, roomCode));
-	dlog("Join room with code : " + room.getCode() + " for player : " + socket.id);
+	dlog("Join Room with code : " + room.getCode() + " for player : " + socket.id);
 	room.addPlayer(socket);
 }
 exports.joinMultiplayerRoom = joinMultiplayerRoom;
@@ -44,11 +44,19 @@ exports.joinMultiplayerRoom = joinMultiplayerRoom;
 const multiplayerRoomCommand = async (socket, command, data) => {
 	const room = utils.getTetrisRoom(data.roomCode);
 	if (!room) {
-		dlog("Invalid tetris room im roomCommand : " + data.roomCode);
+		dlog("Invalid tetris Room im roomCommand : " + data.roomCode);
 		return ;
 	}
 	if (command === "settings") {
 		return room.addSettings(data.settings);
+	}
+	else if (command === "start") {
+		if (room.getIsInGame()) {
+			dlog("Room " + room.getCode() + " is already in game, cannot start again.");
+			return ;
+		}
+		room.startGames();
+		dlog("Room " + room.getCode() + " started games for players : " + Object.keys(room.getPlayers()));
 	}
 }
 exports.multiplayerRoomCommand = multiplayerRoomCommand;
@@ -57,7 +65,7 @@ const quitMultiplayerRoom = async (socket, roomCode) => {
 	await utils.deleteTetrisGame(socket.id);
 	const room = utils.getTetrisRoom(roomCode, socket);
 	if (room) {
-		dlog("Quit room with code : " + room.getCode() + " for player : " + socket.id);
+		dlog("Quit Room with code : " + room.getCode() + " for player : " + socket.id);
 		room.removePlayer(socket);
 		if (room.isEmpty())
 			exports.multiplayerRoomLst.splice(exports.multiplayerRoomLst.indexOf(room), 1);
@@ -85,7 +93,7 @@ const   movePiece = (direction, user, keyType) => {
 
 	if (keyType === "keyUp") {
 		arg.firstMove = true;
-		arg.timeout.clear();
+		arg.timeout?.clear();
 		if (opposite.timeout != null)
 			opposite.timeout.resume();
 		return ;

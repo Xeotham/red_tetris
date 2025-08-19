@@ -82,7 +82,7 @@ const socketClose = async (type: string) => {
 		tetrisGameInformation.setGame(null);
 		tetrisGameInformation.setRoomOwner(false);
 		if (tetrisGameInformation.getRoomCode() !== "")
-			console.log("Leaving room : " + tetrisGameInformation.getRoomCode());
+			console.log("Leaving Room : " + tetrisGameInformation.getRoomCode());
 		tetrisGameInformation.setRoomCode("");
 		tetrisGameInformation.resetSettings();
 		loadTetrisPage("idle");
@@ -114,7 +114,7 @@ const socketInit = (socket: WebSocket) => {
 export const resetSocket = (leaveType: string = "game") => {
 
 	if ((leaveType === "game" && tetrisGameInformation.getRoomCode() === "") ||
-		leaveType === "room") {
+		leaveType === "Room") {
 		// console.log("Closing socket");
 		tetrisGameInformation.getSocket()?.close();
 		tetrisGameInformation.setSocket(null);
@@ -170,7 +170,7 @@ export const joinRoom = (roomCode: string) => {
 
 export const startRoom = () => {
 	if (!tetrisGameInformation.getRoomOwner())
-		return console.log("You are not the owner of the room");
+		return console.log("You are not the owner of the Room");
 	postToApi(`http://${address}/api/tetris/roomCommand`, { argument: "start", gameId: 0, roomCode: tetrisGameInformation.getRoomCode() }).catch();
 }
 
@@ -320,13 +320,13 @@ const   messageHandler = (event: MessageEvent)=> {
 			else {
 				// console.log("MULTIPLAYER_JOIN");
 				tetrisGameInformation.setRoomCode(res.argument as string);
-				console.log("Joining room: " + res.argument);
+				console.log("Joining Room: " + res.argument);
 			}
 			loadTetrisPage("multiplayer-room", {rooms:[{roomCode: tetrisGameInformation.getRoomCode()}]});
 			return ;
 		case 'MULTIPLAYER_LEAVE':
 			// console.log("MULTIPLAYER_LEAVE");
-			resetSocket("room");
+			resetSocket("Room");
 			return ;
 		case 'INFO':
 			console.log("INFO: " + res.argument);
