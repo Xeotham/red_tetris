@@ -7,7 +7,7 @@ import { sfxPlayer } from "../../sfxHandler.jsx";
 import Hold from "../Hold/Hold.jsx";
 import Bags from "../Bags/Bags.jsx";
 import { useNavigate } from "react-router-dom";
-import {useSocket} from "../../hooks/socket/useSocket.jsx";
+import { useSocket } from "../../hooks/socket/useSocket.jsx";
 
 const   EndDisplay = ({stats, display = false}) => {
 	const navigate = useNavigate();

@@ -26,8 +26,6 @@ const ChooseUsername = () => {
 	const   [inputValue, setInputValue] = useState(getRandomUsername(Math.random(), Math.random()));
 	const   navigate = useNavigate();
 
-	console.log("Choose UserName");
-
 	const handleUsernameChange = (inputUsername) => {
 		// Allow alphanumeric and underscores, max 20 characters
 		const   username = !(/^[A-Za-z0-9_]{1,20}$/.test(inputUsername)) ? getRandomUsername(Math.random(), Math.random()) : inputUsername;

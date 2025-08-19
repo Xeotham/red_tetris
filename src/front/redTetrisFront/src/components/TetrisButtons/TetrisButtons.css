@@ -21,7 +21,7 @@
 	padding: 1%;
 	margin: 1%;
 	background-color: #654caf;
-	border-radius: 100px;
+	border-radius: 25px;
 	cursor: pointer;
 	width: 80%;
 	height: 100%;
@@ -30,11 +30,13 @@
 	font-size: 2em;
 	font-family: 'play_pretend', 'Arial', sans-serif;
 	user-select: none;
-	transition: background-color 0.3s ease, box-shadow 0.3s ease;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease-in-out, width 0.3s ease-in-out;
 }
 
 .tetris-button:hover {
-	box-shadow: 2px 2px 0 #000000, 2px -2px 10px #000000, -2px 2px 10px #000;
-	width: 82%;
-	background-color: #4411a3;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease-in-out, width 0.3s ease-in-out;
+	box-shadow: 3px 3px 0 #000000, 3px -3px 10px #000000, -3px 3px 10px #000;
+	width: 95%;
+	background-color: #7762b0;
+	border-radius: 250px;
 }

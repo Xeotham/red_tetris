@@ -12,11 +12,13 @@
 	padding: 10px 20px;
 	border-radius: 5px;
 	cursor: pointer;
-	transition: background-color 0.5s ease, box-shadow 0.5s ease;
 	user-select: none;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease-in-out, width 0.3s ease-in-out;
 }
 
 .button:hover {
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease-in-out, width 0.3s ease-in-out;
+	border-radius: 8px;
 	background-color: #7a5bcf;
 	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
@@ -37,14 +39,17 @@
 	padding: 10px 50px;
 	width: 100%;
 	left: 50%;
-	transition: background-color 0.3s ease, box-shadow 0.3s ease;
-	clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+	/*clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);*/
 	user-select: none;
+	clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, width 0.3s ease-in-out;
 }
 
 .room:hover {
 	background-color: #7a5bcf;
 	cursor: pointer;
+	width: 110%;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, width 0.3s ease-in-out;
 }
 
 .createRoomButton {
@@ -57,14 +62,16 @@
 	border-radius: 5px;
 	width: 100%;
 	clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
-	transition: background-color 0.3s ease, box-shadow 0.3s ease;
 	user-select: none;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, width 0.3s ease-in-out;
 }
 
 .createRoomButton:hover {
 	background-color: #7a5bcf;
 	cursor: pointer;
 	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	width: 110%;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, width 0.3s ease-in-out;
 }
 
 .findRooms {
