@@ -121,7 +121,7 @@ class MultiplayerRoom {
 
 	async startGames() {
 		if (this.isInGame)
-			return ;
+			return;
 
 		return new Promise((resolve) => {
 		const playersArray = Object.values(this.players);

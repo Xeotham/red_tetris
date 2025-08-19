@@ -50,6 +50,14 @@ const multiplayerRoomCommand = async (socket, command, data) => {
 	if (command === "settings") {
 		return room.addSettings(data.settings);
 	}
+	else if (command === "start") {
+		if (room.getIsInGame()) {
+			dlog("Room " + room.getCode() + " is already in game, cannot start again.");
+			return ;
+		}
+		room.startGames();
+		dlog("Room " + room.getCode() + " started games for players : " + Object.keys(room.getPlayers()));
+	}
 }
 exports.multiplayerRoomCommand = multiplayerRoomCommand;
 

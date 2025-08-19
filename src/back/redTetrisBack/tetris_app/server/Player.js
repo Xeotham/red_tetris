@@ -39,6 +39,7 @@ class Player {
 		const game = new TetrisGame(this.socket);
 		game.setSettings(settings);
 		this.game = game;
+		console.log("New game created for player " + this.socket.id);
 	}
 }
 exports.Player = Player;

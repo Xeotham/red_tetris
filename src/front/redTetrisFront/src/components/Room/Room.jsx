@@ -7,6 +7,7 @@ import { address } from "../../main.jsx";
 import { useNavigate } from "react-router-dom";
 import {clamp} from "ramda";
 import {useSocket} from "../../hooks/socket/useSocket.jsx";
+import RoomBoard from "../RoomBoard/RoomBoard.jsx";
 
 const abs = (value) => {
 	return value < 0 ? -value : value;
@@ -150,12 +151,12 @@ const Square2 = ({dis, s}) => {
 	);
 }
 
-const   SettingsScreen = ({roomId, username}) => {
+const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, abortController}) => {
 	const navigate = useNavigate();
 
 	const [s, setS] = useState({nbPlayers: 0, isPrivate: true}); // Placeholder for the number of players, replace with actual state or props as needed.
 	const [invalidName, setInvalidName] = useState(true);
-	const [dis, setDis] = useState(true);
+	const [isOwner, setIsOwner] = useState(false);
 	const [form, setForm] = useState(null);
 	const socket = useSocket();
 
@@ -216,7 +217,10 @@ const   SettingsScreen = ({roomId, username}) => {
 	useEffect(() => {
 		const backButton = document.getElementById("BackButton");
 		if (backButton) {
-			backButton.addEventListener("click", () => navigate("/find-room") );
+			backButton.addEventListener("click", () => {
+				abortController.abort();
+				navigate("/find-room")
+			} );
 			return () => backButton.removeEventListener("click", () => navigate("/find-room") );
 		}
 	});
@@ -232,16 +236,23 @@ const   SettingsScreen = ({roomId, username}) => {
 	});
 
 	// TODO : implement the start game logic
-	const startGame = () => {
+	const startGame = (isOwner) => {
+		if (!isOwner)
+			return ;
+
+		socket.emit("multiplayerRoomCommand", "start", {roomCode: roomId});
+		console.log("Setting Container: ", settingsContainer);
+		settingsContainer.style.display = "none";
+		boardContainer.style.display = "block";
 		console.log("Start button clicked");
 	}
 
 	useEffect(() => {
 		socket.emit("joinMultiplayerRoom", roomId);
 
-		socket.on("MULTIPLAYER_OWNER", (isOwner) => {
-			const newIsOwner = JSON.parse(isOwner);
-			setDis(!newIsOwner);
+		socket.on("MULTIPLAYER_OWNER", (isRoomOwner) => {
+			const newIsOwner = JSON.parse(isRoomOwner);
+			setIsOwner(newIsOwner);
 		});
 
 		socket.on("MULTIPLAYER_SETTINGS", (settings) => {
@@ -250,7 +261,6 @@ const   SettingsScreen = ({roomId, username}) => {
 			setS(newSettings);
 			if (!newSettings)
 				return ;
-			console.log("Settings received:", newSettings);
 			document.getElementById("is-private").checked = newSettings?.isPrivate;
 			document.getElementById("is-versus").checked = newSettings?.isVersus;
 			document.getElementById("show-shadow").checked = newSettings?.showShadowPiece;
@@ -274,7 +284,7 @@ const   SettingsScreen = ({roomId, username}) => {
 		});
 
 		return () => {
-			socket.disconnect();
+			// socket.disconnect();
 		};
 	}, [roomId]);
 
@@ -302,7 +312,7 @@ const   SettingsScreen = ({roomId, username}) => {
 
 			<div id="startBox" style={{width: "100%", height: "6%"}}>
 				<div style={{display: "flex", alignItems: "left", width: "100%", height: "100%"}}>
-					<button className="playButton" id="playButton" onClick={startGame}>Start</button>
+					<button className="playButton" id="playButton" onClick={() => startGame(isOwner)}>Start</button>
 					{/* TODO : change, this is not aligned correctly when resizing*/}
 					<div id="clipboardCopy" className="copyCodeBox">
 						<div style={{fontSize: "1.2em", marginTop: "2.25%"}}>{roomId}</div>
@@ -335,24 +345,32 @@ const   SettingsScreen = ({roomId, username}) => {
 			<div style={{marginBottom: "3%"}}></div>
 
 			<form id="roomSettingsForm" className="roomSettingsForm">
-				<Square1 dis={dis} s={s}/>
-				<Square2 dis={dis} s={s}/>
-				<Square3 dis={dis} s={s}/>
+				<Square1 dis={!isOwner} s={s}/>
+				<Square2 dis={!isOwner} s={s}/>
+				<Square3 dis={!isOwner} s={s}/>
 			</form>
 		</div>
 	)
 }
 
 const Room = () => {
-	const {roomId, username} = useParams();
+	const   {roomId, username} = useParams();
+	const   [settingsContainer, setSettingContainer] = useState(null);
+	const   [boardContainer, setBoardContainer] = useState(null);
+	const   [abortController, setAbortController] = useState(new AbortController());
+
+	useEffect(() => {
+		setSettingContainer(document.getElementById("settingsContainer"));
+		setBoardContainer(document.getElementById("boardContainer"));
+	})
 
 	return (
 		<div>
-			<div id={"settingsContainer"}>
-				<SettingsScreen roomId={roomId} username={username} />
+			<div id={"settingsContainer"} style={{display: "block"}}>
+				<SettingsScreen roomId={roomId} username={username} settingsContainer={settingsContainer} boardContainer={boardContainer} abortController={abortController} />
 			</div>
-			<div id={"boardContainer"}>
-
+			<div id={"boardContainer"} style={{display: "none"}}>
+				<RoomBoard settingsContainer={settingsContainer} boardContainer={boardContainer} abortController={abortController} />
 			</div>
 		</div>
 	);

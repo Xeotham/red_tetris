@@ -9,9 +9,7 @@ import Bags from "../Bags/Bags.jsx";
 import { useNavigate } from "react-router-dom";
 import {useSocket} from "../../hooks/socket/useSocket.jsx";
 
-const   EndDisplay = ({stats, display = false}) => {
-	const navigate = useNavigate();
-
+const   EndDisplay = ({stats, display = false, settingsContainer, boardContainer}) => {
 	if (!stats) {
 		return <div className={"statsDisplay"}></div>;
 	}
@@ -87,7 +85,12 @@ const   EndDisplay = ({stats, display = false}) => {
 				<div className={"clearsInfoValue"}>{stats?.miniSpinTriple}</div>
 				<div className={"clearsInfoValue"}>{stats?.miniSpinQuad}</div>
 			</div>
-			<div className={"backHomeButton"} onClick={ () => navigate("/")} > Go Back Home </div>
+			<div className={"backHomeButton"} onClick={ () => {
+				boardContainer.style.display = "none";
+				settingsContainer.style.display = "block";
+				document.getElementsByClassName("statsDisplay")[0].style.display = "none";
+
+			}} > Go Back </div>
 		</div>
 	);
 }
@@ -116,10 +119,9 @@ const   GameStats = ({gameInfo}) => {
 	)
 }
 
-const RoomBoard = () => {
+const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 
 	const socket = useSocket();
-	const [abortController, setAbortController] = useState(new AbortController());
 	const [game, setGame] = useState({
 		matrix: null,
 		bags: null,
@@ -190,12 +192,11 @@ const RoomBoard = () => {
 	}
 
 	useEffect(() => {
-
-		socket.emit("arcadeStart");
-
 		socket.on("GAME_START", (data) => {
-			const new_data = JSON.parse(data);
+			const   new_data = JSON.parse(data);
 			setGame(new_data.game);
+			setDisplayStats(false);
+			console.log("Game started for player: " + socket.id);
 		});
 
 		socket.on("GAME", (data) => {
@@ -216,11 +217,11 @@ const RoomBoard = () => {
 
 			setStats(new_data.stats);
 			setDisplayStats(true);
-			abortController.abort();
-			socket.off("GAME_START");
-			socket.off("GAME");
-			socket.off("EFFECT");
-			socket.off("STATS");
+			// abortController.abort();
+			// socket.off("GAME_START");
+			// socket.off("GAME");
+			// socket.off("EFFECT");
+			// socket.off("STATS");
 		})
 
 		gameControllers(abortController);
@@ -240,7 +241,7 @@ const RoomBoard = () => {
 			</div>
 			<GameStats gameInfo={game} />
 			<ScoreDisplay score={game.score} />
-			<EndDisplay stats={stats} display={displayStats}/>
+			<EndDisplay stats={stats} display={displayStats} settingsContainer={settingsContainer} boardContainer={boardContainer} />
 		</div>
 	);
 }
