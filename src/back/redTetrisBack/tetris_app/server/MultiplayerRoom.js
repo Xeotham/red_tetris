@@ -5,6 +5,7 @@ exports.MultiplayerRoom = void 0;
 const utils = require("../utils");
 const { Player } = require("./Player");
 const { dlog } = require("./../../server/server");
+const controllers = require("../socket/controllers");
 
 
 class MultiplayerRoom {
@@ -148,7 +149,7 @@ class MultiplayerRoom {
 						++lost;
 						continue ;
 					}
-					games.push(players[j]);
+					games.push(players[j].toJSON());
 				}
 				players[i].getSocket().emit("MULTIPLAYER_OPPONENTS_GAMES", JSON.stringify({ argument: games }));
 			}
@@ -160,6 +161,9 @@ class MultiplayerRoom {
 			dlog("End of game for player " + player.getUsername() + " is at place " + this.playersRemaining + " in Room " + this.code);
 			player.getGame().place = this.playersRemaining;
 			player.getSocket().emit("MULTIPLAYER_FINISH", JSON.stringify({ argument: this.playersRemaining }));
+			controllers.keyUp(player.keys.moveLeft, player.getSocket());
+			controllers.keyUp(player.keys.moveRight, player.getSocket());
+			controllers.keyUp(player.keys.softDrop, player.getSocket());
 			--this.playersRemaining;
 			if (player.getGame()?.getHasForfeit())
 				this.removePlayer(player.getUsername());

@@ -196,6 +196,8 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 			const   new_data = JSON.parse(data);
 			setGame(new_data.game);
 			setDisplayStats(false);
+			settingsContainer.style.display = "none";
+			boardContainer.style.display = "block";
 			console.log("Game started for player: " + socket.id);
 		});
 

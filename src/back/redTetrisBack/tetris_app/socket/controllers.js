@@ -93,7 +93,7 @@ const   movePiece = (direction, user, keyType) => {
 
 	if (keyType === "keyUp") {
 		arg.firstMove = true;
-		arg.timeout.clear();
+		arg.timeout?.clear();
 		if (opposite.timeout != null)
 			opposite.timeout.resume();
 		return ;

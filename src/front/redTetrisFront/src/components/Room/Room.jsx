@@ -241,10 +241,6 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 			return ;
 
 		socket.emit("multiplayerRoomCommand", "start", {roomCode: roomId});
-		console.log("Setting Container: ", settingsContainer);
-		settingsContainer.style.display = "none";
-		boardContainer.style.display = "block";
-		console.log("Start button clicked");
 	}
 
 	useEffect(() => {
@@ -362,15 +358,29 @@ const Room = () => {
 	useEffect(() => {
 		setSettingContainer(document.getElementById("settingsContainer"));
 		setBoardContainer(document.getElementById("boardContainer"));
+		console.log("Container: ", settingsContainer, boardContainer);
 	})
 
 	return (
 		<div>
 			<div id={"settingsContainer"} style={{display: "block"}}>
-				<SettingsScreen roomId={roomId} username={username} settingsContainer={settingsContainer} boardContainer={boardContainer} abortController={abortController} />
+				{settingsContainer && boardContainer && (
+					<SettingsScreen
+						roomId={roomId}
+						username={username}
+						settingsContainer={settingsContainer}
+						boardContainer={boardContainer}
+						abortController={abortController}
+					/>
+				)}
 			</div>
 			<div id={"boardContainer"} style={{display: "none"}}>
-				<RoomBoard settingsContainer={settingsContainer} boardContainer={boardContainer} abortController={abortController} />
+				{settingsContainer && boardContainer && (
+					<RoomBoard
+						settingsContainer={settingsContainer}
+						boardContainer={boardContainer}
+			            abortController={abortController}/>
+				)}
 			</div>
 		</div>
 	);
