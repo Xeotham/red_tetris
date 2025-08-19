@@ -358,7 +358,6 @@ const Room = () => {
 	useEffect(() => {
 		setSettingContainer(document.getElementById("settingsContainer"));
 		setBoardContainer(document.getElementById("boardContainer"));
-		console.log("Container: ", settingsContainer, boardContainer);
 	})
 
 	return (
@@ -374,7 +373,7 @@ const Room = () => {
 					/>
 				)}
 			</div>
-			<div id={"boardContainer"} style={{display: "none"}}>
+			<div id={"boardContainer"} className={"boardContainer"} style={{display: "none"}}>
 				{settingsContainer && boardContainer && (
 					<RoomBoard
 						settingsContainer={settingsContainer}

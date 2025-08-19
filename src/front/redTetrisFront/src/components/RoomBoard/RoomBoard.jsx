@@ -1,13 +1,11 @@
 import "./RoomBoard.css";
 import Matrix from "../Matrix/Matrix.jsx";
-import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
-import { address } from "../../main.jsx";
+import {useEffect, useRef, useState} from "react";
 import { sfxPlayer } from "../../sfxHandler.jsx";
 import Hold from "../Hold/Hold.jsx";
 import Bags from "../Bags/Bags.jsx";
-import { useNavigate } from "react-router-dom";
 import {useSocket} from "../../hooks/socket/useSocket.jsx";
+import matrix from "../Matrix/Matrix.jsx";
 
 const   EndDisplay = ({stats, display = false, settingsContainer, boardContainer}) => {
 	if (!stats) {
@@ -119,6 +117,46 @@ const   GameStats = ({gameInfo}) => {
 	)
 }
 
+// const   OpponentMatrix = ({matrix, id, index}) => {
+// 	const   containerRef = useRef();
+// 	const   [dimensions, setDimensions] = useState({ width: 320, height: 640 });
+//
+// 	useEffect(() => {
+// 		if (!containerRef.current) return;
+//
+// 		const observer = new ResizeObserver((entries) => {
+// 			const { width } = entries[0].contentRect;
+// 			// Calculate height based on width (e.g., 1:2 aspect ratio)
+// 			const height = width * 2;
+// 			setDimensions({ width, height });
+// 		});
+//
+// 		observer.observe(containerRef.current);
+//
+// 		return () => observer.disconnect();
+// 	}, []);
+//
+// 	console.log(`Container resized: ${dimensions.width}px x ${dimensions.height}px`);
+//
+//
+// 	return (
+// 		<div className={"opponentChildContainer"} key={index}>
+// 			<Matrix matrix={matrix} id={id} width={dimensions.width} height={dimensions.height} />
+// 		</div>
+// 	)
+// }
+
+const OpponentBoard = ({opponents}) => {
+
+	return (
+		<div className={"opponentParentContainer"}>
+			{opponents.map((opponent, index) => (
+				<div className={"opponentChildContainer"} key={index}>
+				</div>))}
+		</div>
+	)
+}
+
 const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 
 	const socket = useSocket();
@@ -137,7 +175,7 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 		piecesPlaced: null,
 		piecesPerSecond: null
 	});
-	const [stats, setStats] = useState({
+	const   [stats, setStats] = useState({
 		attacksReceived: 0,
 		attacksReceivedPerMinute: 0,
 		attacksSent: 0,
@@ -174,7 +212,9 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 		tspinTriple: 0,
 		tspinZero: 0,
 	});
-	const [displayStats, setDisplayStats] = useState(false);
+	const   [displayStats, setDisplayStats] = useState(false);
+	const   [leftOpponents, setLeftOpponents] = useState([]);
+	const   [rightOpponents, setRightOpponents] = useState([]);
 
 	const gameControllers = async (abortController) => {
 		const signal = abortController.signal;
@@ -226,24 +266,47 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 			// socket.off("STATS");
 		})
 
+		socket.on("MULTIPLAYER_OPPONENTS_GAMES", (data) => {
+			const   gameList = JSON.parse(data).argument;
+			const   left = [];
+			const   right = [];
+			for (let i = 0; i < gameList.length; ++i) {
+				if (i % 2 === 1)
+					left.push(gameList[i]);
+				else
+					right.push(gameList[i]);
+			}
+			setLeftOpponents(left);
+			// setRightOpponents(right);
+			setRightOpponents(gameList);
+		})
+
 		gameControllers(abortController);
 	}, []);
 
 	// console.log(game);
 	return (
-		<div className={"board"}>
-			<div className={"boardHold"}>
-				<Hold holdPiece={{hold: game.hold, canSwap: game.canSwap}}/>
+		<div className={"roomBoard"}>
+			<div className={"opponentBoard"}>
+				<OpponentBoard opponents={[]}/>
 			</div>
-			<div className={"boardMatrix"}>
-				<Matrix matrix={game.matrix} width={320} height={640}/>
+			<div className={"userBoard"}>
+				<div className={"boardHold"}>
+					<Hold holdPiece={{hold: game.hold, canSwap: game.canSwap}}/>
+				</div>
+				<div className={"boardMatrix"}>
+					<Matrix matrix={game.matrix} width={320} height={640}/>
+				</div>
+				<div className={"boardBag"}>
+					<Bags bags={game.bags}/>
+				</div>
+				<GameStats gameInfo={game} />
+				<ScoreDisplay score={game.score} />
+				<EndDisplay stats={stats} display={displayStats} settingsContainer={settingsContainer} boardContainer={boardContainer} />
 			</div>
-			<div className={"boardBag"}>
-				<Bags bags={game.bags}/>
+			<div className={"opponentBoard"}>
+				<OpponentBoard opponents={rightOpponents}/>
 			</div>
-			<GameStats gameInfo={game} />
-			<ScoreDisplay score={game.score} />
-			<EndDisplay stats={stats} display={displayStats} settingsContainer={settingsContainer} boardContainer={boardContainer} />
 		</div>
 	);
 }

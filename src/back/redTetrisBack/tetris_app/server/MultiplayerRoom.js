@@ -154,7 +154,7 @@ class MultiplayerRoom {
 				players[i].getSocket().emit("MULTIPLAYER_OPPONENTS_GAMES", JSON.stringify({ argument: games }));
 			}
 		};
-		const interval = setInterval(sendOpponentsGames, 1000 / 10);
+		const interval = setInterval(sendOpponentsGames, 1000);
 
 		const endOfGame = (player) => {
 			const playerArrayEnd = Object.values(this.players);
