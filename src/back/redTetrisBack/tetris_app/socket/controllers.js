@@ -175,7 +175,8 @@ const getMultiplayerRooms = async (socket) => {
 	const rooms = [];
 
 	for (const room of exports.multiplayerRoomLst) {
-		if (room.getIsVersus() || room.isPrivate())
+		// TODO : Should see games that are playing?
+		if (room.getIsVersus() || room.isPrivate() || room.getIsInGame())
 			continue ;
 		rooms.push({code: room.code, nbPlayers: room.settings?.nbPlayers});
 	}
