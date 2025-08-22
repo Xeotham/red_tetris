@@ -2,14 +2,14 @@ import "./FindRooms.css";
 import ReturnHomeButton from "../ReturnHomeButton/ReturnHomeButton.jsx";
 import { useState, useRef, useEffect } from "react";
 import { getRandomUsername } from "../../utils.jsx";
-import { useNavigate } from "react-router-dom";
+import {useNavigate, useSubmit} from "react-router-dom";
 import {useSocket} from "../../hooks/socket/useSocket.jsx";
 
 
 const   RoomList = () => {
 	const   navigate = useNavigate();
 	const socket = useSocket()
-	console.log(socket);
+	// console.log(socket);
 	const [rooms, setRooms] = useState(() => []);
 	const [page, setPage] = useState(() => 0);
 
@@ -25,7 +25,7 @@ const   RoomList = () => {
 	const fetchRooms = () => {
 		socket.emit("getMultiplayerRooms");
 		socket.once("GET_MULTIPLAYER_ROOMS", (rooms) => {
-			console.log(rooms);
+			// console.log(rooms);
 			setRooms(JSON.parse(rooms));
 			setPage(0);
 		});
@@ -34,12 +34,12 @@ const   RoomList = () => {
 	const handlePageChange = (direction) => {
 		if (direction === "refresh")
 			fetchRooms();
-		else if (direction === "next")
+		if (direction === "next")
 			if ((page + 1) * 10 < rooms.length)
 				setPage(page + 1);
-		else if (direction === "prev")
-			if (page > 0)
-				setPage(page - 1);
+		if (direction === "prev")
+				if (page > 0)
+					setPage(page - 1);
 	};
 
 	const getRooms = (roomsEl, rooms, page, i) => {
@@ -59,10 +59,12 @@ const   RoomList = () => {
 
 	return (
 		<div>
-			<div className={"button"} onClick={() => handlePageChange("refresh")}>Refresh</div>
-			<div className={"nextPrevButtons"}>
-				<div className={"button"} onClick={() => handlePageChange("prev")}>Prev</div>
-				<div className={"button"} onClick={() => handlePageChange("next")}>Next</div>
+			<div className={"buttonsDiv"}>
+				<div className={"button"} onClick={() => handlePageChange("refresh")}>Refresh</div>
+				<div className={"nextPrevButtons"}>
+					<div className={"button"} onClick={() => handlePageChange("prev")}>Prev</div>
+					<div className={"button"} onClick={() => handlePageChange("next")}>Next</div>
+				</div>
 			</div>
 			<div className={"roomList"}>
 				{roomElements}
@@ -100,7 +102,7 @@ const CreateRoom = ({ display, onClose }) => {
 
 	return (
 	<div className={"createRoom"} ref={createRoomRef} style={{ display: display ? "flex" : "none" }} >
-		<div className={"title"} style={{ marginTop: "20px" }}>
+		<div className={"title"}>
 	        Create Room
 		</div>
 		<form className={"createRoomForm"} onSubmit={(event) => {
@@ -115,18 +117,17 @@ const CreateRoom = ({ display, onClose }) => {
 			<span className={"createRoomError"} style={{ color: "red", display: error !== "" ? "block" : "none", margin: "10px" }}>
 				{error}
 			</span>
-			<input className={"createRoomInput"} type="text" placeholder="Room Code" maxLength={4} minLength={4}
+			<input className={"createRoomInput"} type="text" placeholder="Room Code" minLength={4} maxLength={4}
 				onInput={(e) => (e.target.value = e.target.value.toUpperCase())}
 				onChange={e => setRoomId(e.target.value)}
 			/>
 			<input
 				className={"createRoomInput"}
 				type="text"
-				style={{marginTop: "10px", padding: "8px", fontSize: "16px"}}
 				onChange={e => setUsernameValue(e.target.value)}
 				value={usernameValue}
 			/>
-			<input type={"submit"}/>
+			<input type={"submit"} className={"submitButton"}/>
 		</form>
 	</div>
 	);
@@ -140,15 +141,10 @@ const FindRooms = () => {
 			<div className={"title"}>FIND ROOMS</div>
 			<ReturnHomeButton/>
 			<RoomList/>
-			<CreateRoom display={showCreateRoom} onClose={() => setShowCreateRoom(false)} />
-      <div
-        className={"createRoomButton"}
-        onClick={() => setShowCreateRoom(true)}
-      >
-        Create Room
-      </div>
-    </div>
-  );
+			<div className={"createRoomButton"} onClick={() => setShowCreateRoom(true)}>Create Room</div>
+			<CreateRoom display={showCreateRoom} onClose={() => setShowCreateRoom(false)}/>
+		</div>
+	);
 };
 
 export default FindRooms;

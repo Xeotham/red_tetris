@@ -5,33 +5,18 @@
 /*    padding: 0;*/
 /*}*/
 
-.full {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    padding: 0;
-}
-
 .tetrisWindowBkg {
-    /*width: 100%;*/
-    /*height: 100%;*/
+    position: absolute;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /*margin: 0;*/
-    padding: 0;
     background-color: #9860ec;
-    /*margin-top: 3%;*/
-    margin-left: -8%;
     width: 80vw;
     height: 90vh;
-    /*justify-content: center;*/
-    /*align-items: center;*/
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     border-radius: 20px;
     box-shadow: 0 0 0 #000000, 0 0 10px #000000, 20px 20px 10px #000
 }

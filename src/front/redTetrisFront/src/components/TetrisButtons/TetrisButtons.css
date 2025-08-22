@@ -27,7 +27,7 @@
 	height: 100%;
 	max-width: 1000px;
 	text-shadow: #1a1a1a 1px 1px 1px;
-	font-size: 2em;
+	font-size: 4vmin;
 	font-family: 'play_pretend', 'Arial', sans-serif;
 	user-select: none;
 	transition: background-color 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease-in-out, width 0.3s ease-in-out;

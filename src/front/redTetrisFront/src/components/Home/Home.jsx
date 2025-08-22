@@ -30,6 +30,7 @@ const   Home = () => {
 
 	return (
 		<div>
+			<div style={{marginTop: "15%"}}></div>
 			<div className={"title"}>PURPLE TETRIS</div>
 			<div className={"menu"}>
 				<TetrisButtons id={"arcade"} onClick={arcadeOnClick}>
