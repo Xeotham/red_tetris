@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Player = void 0;
 
 const { TetrisGame } = require("./Game/TetrisGame");
+const {clearInterval} = require("node:timers");
 
 
 class Player {
@@ -11,6 +12,10 @@ class Player {
 		this.username = username;
 		this.owner = owner;
 		this.game = undefined;
+		this.sending = undefined;
+		this.receiving = undefined;
+		this.spec = false;
+		this.watchInterval = -1;
 
 		this.moveLeft = { timeout: null, firstMove: true };
 		this.moveRight = { timeout: null, firstMove: true };
@@ -35,11 +40,25 @@ class Player {
 	setGame(game) { this.game = game; }
 
 	setupGame(settings) {
-		const game = new TetrisGame(this.socket);
-		game.setSettings(settings);
-		this.game = game;
+		this.game = new TetrisGame(this.socket, this.username);
+		this.game.setSettings(settings);
+		this.receiving = undefined;
+		this.sending = undefined;
 		this.socket.emit("MUSIC", JSON.stringify({ type: "BEGIN", argument: settings.music }));
-		console.log("New game created for player " + this.socket.id);
+		// dog("New game created for player " + this.socket.id);
+	}
+
+	startInterval(toWatch) {
+		clearInterval(this.watchInterval);
+		this.watchInterval = setInterval(() => {
+			if (!toWatch.getGame()) {
+				clearInterval(this.watchInterval);
+				this.watchInterval = -1;
+				return ;
+			}
+			this.getSocket().emit("GAME", JSON.stringify({game: toWatch.getGame()?.toJSON()}));
+		}, 1000 / 55); // 60 times per second
+
 	}
 
 	toJSON() {

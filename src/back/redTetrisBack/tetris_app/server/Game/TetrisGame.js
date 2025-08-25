@@ -19,9 +19,9 @@ const { dlog } = require("./../../../server/server");
 
 class 	TetrisGame {
 
-	constructor(socket, settings = {}) {
+	constructor(socket, username = "nameless", settings = {}) {
 		this.player = socket;
-		this.username = socket.id;
+		this.username = username;
 		this.size = new Pos(tc.TETRIS_WIDTH, tc.TETRIS_HEIGHT);
 		this.matrix = new Matrix(this.size.add(0, tc.BUFFER_HEIGHT));
 		this.bags = [];
@@ -126,6 +126,7 @@ class 	TetrisGame {
 		this.showBags ? jsonBags = this.bags.map((bag) => bag.map((piece) => piece.toJSON())) :
 			jsonBags = undefined;
 		return {
+			username: this.username,
 			matrix: this.matrix.toJSON(),
 			bags: jsonBags,
 			hold: this.showHold ? this.hold?.toJSON() : undefined,

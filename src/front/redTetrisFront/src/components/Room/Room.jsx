@@ -126,7 +126,7 @@ const Square2 = ({dis, s}) => {
 					<option value="bgm3">Jump up, Super Star!</option>
 					<option value="bgm4">Submerciful</option>
 					<option value="bgm5">chirpsichord</option>
-					<option value="">No Music</option>
+					<option value="none">No Music</option>
 				</select>
 			</div>
 

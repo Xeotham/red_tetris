@@ -7,6 +7,7 @@ const { Player } = require("./Player");
 const { dlog } = require("./../../server/server");
 const controllers = require("../socket/controllers");
 const { mod } = require("./Game/utils");
+const {clearInterval} = require("node:timers");
 
 
 class MultiplayerRoom {
@@ -66,9 +67,7 @@ class MultiplayerRoom {
 			socket.emit("MULTIPLAYER_LEAVE");
 			return dlog("Player " + socket.id + " already exists in Room " + this.code);
 		}
-		// console.log("sending MULTIPLAYER_JOIN to " + socket.id + " with code " + this.code);
 		socket.emit("MULTIPLAYER_JOIN", JSON.stringify({ argument: this.code }));
-		// console.log("sending MULTIPLAYER_JOIN 2");
 		if (Object.values(this.players).length <= 0) {
 			this.players[socket.id] = new Player(socket, username, true);
 			socket.emit("MULTIPLAYER_OWNER", JSON.stringify(true))
@@ -78,8 +77,12 @@ class MultiplayerRoom {
 			if (Object.values(this.players).length === 2)
 				this.settings.canRetry = false;
 		}
-		if (this.isInGame)
+		if (this.isInGame) {
 			this.opponentsOrder.push(this.players[socket.id]);
+			this.#setSpecGame(this.players[socket.id]);
+			this.#assignOpponents();
+			socket.emit("MULTIPLAYER_SPEC_JOIN");
+		}
 		this.sendSettingsToPlayers();
 	}
 
@@ -151,19 +154,10 @@ class MultiplayerRoom {
 			if (this.noLoserList.length <= 1)
 				return ;
 			for (let i = 0; i < this.opponentsOrder.length; ++i) {
-				let player = this.opponentsOrder[i];
-				if (player.getGame() === undefined || player.getGame()?.isOver()) {
-					for (let j = 1; j < this.opponentsOrder.length; ++j) {
-						const newPlayer = this.opponentsOrder[(i + j) % this.opponentsOrder.length];
-						if (!newPlayer?.getGame()?.isOver()) {
-							player = newPlayer;
-							break ;
-						}
-					}
-				}
-				let games = [this.noLoserList[mod(this.noLoserList.indexOf(player) - 1, this.noLoserList.length)]];
+				const player = this.opponentsOrder[i];
+				let games = [player.receiving];
 				if (this.noLoserList.length > 2)
-					games.push(this.noLoserList[mod(this.noLoserList.indexOf(player) + 1, this.noLoserList.length)]);
+					games.push(player.sending);
 				player.getSocket().emit("MULTIPLAYER_OPPONENTS_GAMES", JSON.stringify({ argument: games }));
 			}
 		};
@@ -172,6 +166,7 @@ class MultiplayerRoom {
 		const endOfGame = (player) => {
 			const playerArrayEnd = Object.values(this.players);
 			dlog("End of game for player " + player.getUsername() + " is at place " + this.playersRemaining + " in Room " + this.code);
+			this.#setSpecGame(player);
 			player.getGame().place = this.playersRemaining;
 			player.getSocket().emit("MULTIPLAYER_FINISH", JSON.stringify({ argument: this.playersRemaining }));
 			controllers.keyUp(player.keys.moveLeft, player.getSocket());
@@ -189,10 +184,18 @@ class MultiplayerRoom {
 			playerArrayEnd.forEach((player) => {
 				player.getSocket().emit("GAME_FINISH");
 				player.getSocket().emit("MUSIC", JSON.stringify({ type: "END" }));
-				if (!player.getGame()?.getHasForfeit())
+				if (!!player.getGame()?.getHasForfeit())
 					player.getSocket().emit("MULTIPLAYER_JOIN", JSON.stringify({ argument: this.code }));
+				if (player.spec) {
+					player.spec = false;
+					clearInterval(player.watchInterval);
+					player.watchInterval = -1;
+					if (!player.getGame())
+						player.getSocket().emit("MULTIPLAYER_SPEC_LEAVE");
+				}
 				player.setGame(undefined);
 			});
+			this.settings.seed = Date.now().toString();
 			this.sendSettingsToPlayers();
 			clearInterval(interval);
 			resolve();
@@ -201,12 +204,25 @@ class MultiplayerRoom {
 	}
 
 	#assignOpponents() {
-		this.noLoserList = this.opponentsOrder.filter(player => !player.getGame()?.isOver() && player.getGame() !== undefined);
+		this.noLoserList = this.opponentsOrder.filter(player => player.getGame() && !player.getGame()?.isOver());
 		if (this.noLoserList.length <= 1)
 			return ;
-		for (let i = 0; i < this.noLoserList.length; ++i) {
-			this.noLoserList[i].getGame()?.setOpponent(
-				this.noLoserList[(i + 1) % this.noLoserList.length].getGame());
+		for (let i = 0; i < this.opponentsOrder.length; ++i) {
+			let player = this.opponentsOrder[i];
+			let newPlayer = undefined;
+			if (!player.getGame() || player.getGame()?.isOver()) {
+				for (let j = 1; j < this.opponentsOrder.length; ++j) {
+					newPlayer = this.opponentsOrder[mod(i + j, this.opponentsOrder.length)];
+					if (newPlayer?.getGame() && !newPlayer.getGame()?.isOver())
+						break ;
+					newPlayer = undefined;
+				}
+			}
+			const pos = this.noLoserList.indexOf(newPlayer || player);
+			player.receiving = this.noLoserList[mod(pos - 1, this.noLoserList.length)];
+			player.sending = this.noLoserList[mod(pos + 1,this.noLoserList.length)];
+			// dlog("Player " + player.getUsername() + " is sending to " + player.sending.getUsername() + " and receiving from " + player.receiving.getUsername());
+			player.getGame()?.setOpponent(player.sending?.getGame());
 		}
 	}
 
@@ -215,6 +231,18 @@ class MultiplayerRoom {
 		this.settings.nbPlayers = playersArray.length;
 		for (const player of playersArray)
 			player.getSocket().emit("MULTIPLAYER_SETTINGS", JSON.stringify(this.settings));
+	}
+
+	#setSpecGame(player) {
+		player.spec = true;
+		const pos = this.opponentsOrder.indexOf(player);
+		for (let i = 1; i < this.opponentsOrder.length - 1; ++i) {
+			const newPlayer = this.opponentsOrder[mod(i + pos, this.opponentsOrder.length)];
+			if (!newPlayer.getGame() || newPlayer.getGame().isOver())
+				continue ;
+			player.startInterval(newPlayer);
+			break ;
+		}
 	}
 }
 exports.MultiplayerRoom = MultiplayerRoom;

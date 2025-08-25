@@ -230,6 +230,18 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController, username
 			boardContainer.style.display = "block";
 		});
 
+		socket.on("MULTIPLAYER_SPEC_JOIN", () => {
+			settingsContainer.style.display = "none";
+			boardContainer.style.display = "block";
+			setDisplayStats(false);
+		});
+
+		socket.on("MULTIPLAYER_SPEC_LEAVE", () => {
+			settingsContainer.style.display = "block";
+			boardContainer.style.display = "none";
+			setDisplayStats(false);
+		});
+
 		socket.on("GAME", (data) => {
 			const new_data = JSON.parse(data);
 			setGame(new_data.game);
@@ -302,7 +314,7 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController, username
 					<Hold holdPiece={{hold: game.hold, canSwap: game.canSwap}}/>
 				</div>
 				<div className={"boardMatrix"}>
-					<Matrix matrix={game.matrix} width={320} height={640} username={username}/>
+					<Matrix matrix={game.matrix} width={320} height={640} username={game.username}/>
 				</div>
 				<div className={"boardBag"}>
 					<Bags bags={game.bags}/>

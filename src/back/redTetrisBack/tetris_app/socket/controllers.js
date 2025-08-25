@@ -12,12 +12,11 @@ exports.arcadeGames = {}; // { socketId: Player }
 exports.multiplayerRoomLst = []; // [MultiplayerRoom]
 
 const tetrisArcade = async (socket, settings = {}) => {
-	const tetrisGame = new TetrisGame(socket, settings);
+	const tetrisGame = new TetrisGame(socket, "Player", settings);
 	exports.arcadeGames[socket.id] = new Player(socket, "Player", true);
 	exports.arcadeGames[socket.id].setGame(tetrisGame);
 	tetrisGame.gameLoop().then(() => { utils.deleteTetrisGame(socket.id) });
 	dlog("Arcade Game started for " + socket.id);
-	// TODO : Delete the player or close the socket? Send a message to the player?
 };
 exports.tetrisArcade = tetrisArcade;
 
@@ -56,7 +55,7 @@ const multiplayerRoomCommand = async (socket, command, data) => {
 			return ;
 		}
 		room.startGames();
-		dlog("Room " + room.getCode() + " started games for players : " + Object.keys(room.getPlayers()));
+		dlog("Room " + room.getCode() + " started games for players : " + Object.values(room.getPlayers()).map(p => p.username).join(", "));
 	}
 }
 exports.multiplayerRoomCommand = multiplayerRoomCommand;
