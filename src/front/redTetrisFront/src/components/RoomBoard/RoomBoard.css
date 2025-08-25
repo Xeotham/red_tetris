@@ -48,34 +48,20 @@
 .opponentBoard {
 	width: 100%;
 	height: 100%;
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
 	align-items: center;
-	position: relative;
 	background-color: rgb(184, 30, 30);
 }
 
 .opponentParentContainer {
-	display: flex;          /* Enables Flexbox */
-	flex-wrap: wrap;        /* Allows items to wrap to the next line */
-	gap: 10px;              /* Adds space between items */
-	padding: 10px;
-	background: #f0f0f0;
-	width: 100%;
-	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	padding: 0 30px;
 }
 
 .opponentChildContainer {
-	flex: 1 1 200px;        /* Flex-grow, flex-shrink, flex-basis */
-	min-width: 0;           /* Prevents overflow */
-	background: #511695;
-	padding: 10px;
-	box-sizing: border-box;
-	aspect-ratio: 0.5;
-	max-width: 100%;
-	max-height: 100%;
-	overflow: hidden;
 }
 
 /* Styles for the stats display of the end screen */

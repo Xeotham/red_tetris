@@ -5,7 +5,6 @@ import { sfxPlayer } from "../../sfxHandler.jsx";
 import Hold from "../Hold/Hold.jsx";
 import Bags from "../Bags/Bags.jsx";
 import {useSocket} from "../../hooks/socket/useSocket.jsx";
-import matrix from "../Matrix/Matrix.jsx";
 
 const   EndDisplay = ({stats, display = false, settingsContainer, boardContainer}) => {
 	if (!stats) {
@@ -117,50 +116,28 @@ const   GameStats = ({gameInfo}) => {
 	)
 }
 
-// const   OpponentMatrix = ({matrix, id, index}) => {
-// 	const   containerRef = useRef();
-// 	const   [dimensions, setDimensions] = useState({ width: 320, height: 640 });
-//
-// 	useEffect(() => {
-// 		if (!containerRef.current) return;
-//
-// 		const observer = new ResizeObserver((entries) => {
-// 			const { width } = entries[0].contentRect;
-// 			// Calculate height based on width (e.g., 1:2 aspect ratio)
-// 			const height = width * 2;
-// 			setDimensions({ width, height });
-// 		});
-//
-// 		observer.observe(containerRef.current);
-//
-// 		return () => observer.disconnect();
-// 	}, []);
-//
-// 	console.log(`Container resized: ${dimensions.width}px x ${dimensions.height}px`);
-//
-//
-// 	return (
-// 		<div className={"opponentChildContainer"} key={index}>
-// 			<Matrix matrix={matrix} id={id} width={dimensions.width} height={dimensions.height} />
-// 		</div>
-// 	)
-// }
 
-const OpponentBoard = ({opponents}) => {
+const OpponentBoard = ({ opponent, id }) => {
+	const parentRef = useRef();
+
+	if (!opponent || !opponent.matrix) {
+		return (<></>)
+
+	}
 
 	return (
-		<div className={"opponentParentContainer"}>
-			{opponents.map((opponent, index) => (
-				<div className={"opponentChildContainer"} key={index}>
-				</div>))}
+		<div className="opponentParentContainer" ref={parentRef} id={id}>
+				<div className="opponentChildContainer">
+					<Matrix matrix={opponent.matrix} />
+				</div>
 		</div>
-	)
-}
+	);
+};
 
 const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 
-	const socket = useSocket();
-	const [game, setGame] = useState({
+	const   socket = useSocket();
+	const   [game, setGame] = useState({
 		matrix: null,
 		bags: null,
 		hold: null,
@@ -213,14 +190,19 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 		tspinZero: 0,
 	});
 	const   [displayStats, setDisplayStats] = useState(false);
-	const   [leftOpponents, setLeftOpponents] = useState([]);
-	const   [rightOpponents, setRightOpponents] = useState([]);
+	const   [leftOpponents, setLeftOpponents] = useState({
+		matrix: null,
+	});
+	const   [rightOpponents, setRightOpponents] = useState({
+		matrix: null,
+	});
 
 	const gameControllers = async (abortController) => {
 		const signal = abortController.signal;
 		const keydownHandler = async (event) => {
-			if (!event.repeat)
-				socket.emit("keydown", event.key)
+			if (!event.repeat) {
+				socket.emit("keydown", event.key);
+			}
 		};
 		const keyupHandler = async (event) => {
 			if (!event.repeat)
@@ -251,6 +233,7 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 			const new_data = JSON.parse(data);
 			const sfx = sfxPlayer(new_data.type, new_data.value);
 
+
 			sfx?.play();
 		});
 
@@ -268,27 +251,24 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 
 		socket.on("MULTIPLAYER_OPPONENTS_GAMES", (data) => {
 			const   gameList = JSON.parse(data).argument;
-			const   left = [];
-			const   right = [];
-			for (let i = 0; i < gameList.length; ++i) {
-				if (i % 2 === 1)
-					left.push(gameList[i]);
-				else
-					right.push(gameList[i]);
-			}
-			setLeftOpponents(left);
-			// setRightOpponents(right);
-			setRightOpponents(gameList);
+
+			// setGameList(gameList);
+
+			setLeftOpponents({ matrix: gameList[0]?.game.matrix });
+			setRightOpponents({ matrix: gameList[1]?.game.matrix });
 		})
 
 		gameControllers(abortController);
+		return () => {
+			abortController.abort();
+		};
 	}, []);
 
 	// console.log(game);
 	return (
 		<div className={"roomBoard"}>
 			<div className={"opponentBoard"}>
-				<OpponentBoard opponents={[]}/>
+				<OpponentBoard opponent={leftOpponents} id={"leftOpponents"}/>
 			</div>
 			<div className={"userBoard"}>
 				<div className={"boardHold"}>
@@ -305,7 +285,7 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 				<EndDisplay stats={stats} display={displayStats} settingsContainer={settingsContainer} boardContainer={boardContainer} />
 			</div>
 			<div className={"opponentBoard"}>
-				<OpponentBoard opponents={rightOpponents}/>
+				<OpponentBoard opponent={rightOpponents} id={"rightOpponents"}/>
 			</div>
 		</div>
 	);

@@ -652,8 +652,10 @@ class 	TetrisGame {
 
 	async swap() {
 		// console.log("holdAllowed: " + this.holdAllowed + ", canSwap: " + this.canSwap + ", over: " + this.over + ", fallInterval: " + this.fallInterval);
-		if (!this.holdAllowed || !this.canSwap || this.over || this.fallInterval === -1)
-			return ;
+		// dlog("Swapping piece");
+		if (!this.holdAllowed || !this.canSwap || this.over || this.fallInterval === -1) {
+			return;
+		}
 		this.player.emit("EFFECT", JSON.stringify({ type: "USER_EFFECT", value: "hold" }));
 		++this.keysPressed;
 		++this.holds;
