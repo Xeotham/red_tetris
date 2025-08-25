@@ -6,6 +6,7 @@ const utils = require("../utils");
 const { Player } = require("./Player");
 const { dlog } = require("./../../server/server");
 const controllers = require("../socket/controllers");
+const { mod } = require("./Game/utils");
 
 
 class MultiplayerRoom {
@@ -37,7 +38,7 @@ class MultiplayerRoom {
 			"level": 4,
 			"isLevelling": false,
 			"canRetry": true,
-			"music": "bgm1.mp3",
+			"music": "bgm1",
 			"seed": Date.now().toString(),
 			"resetSeedOnRetry": true,
 			"nbPlayers": 1,
@@ -77,6 +78,8 @@ class MultiplayerRoom {
 			if (Object.values(this.players).length === 2)
 				this.settings.canRetry = false;
 		}
+		if (this.isInGame)
+			this.opponentsOrder.push(this.players[socket.id]);
 		this.sendSettingsToPlayers();
 	}
 
@@ -91,6 +94,8 @@ class MultiplayerRoom {
 			nonOwner.setOwner(true);
 			nonOwner.getSocket()?.emit("MULTIPLAYER_OWNER", JSON.stringify(true));
 		}
+		if (this.isInGame)
+			this.opponentsOrder.slice(this.opponentsOrder.indexOf(player), 1);
 		delete this.players[socket.id];
 		if (Object.values(this.players).length <= 1 && !this.settings.canRetry)
 			this.settings.canRetry = true;
@@ -133,7 +138,8 @@ class MultiplayerRoom {
 		this.settings.isInRoom = true;
 
 		// this.opponentsOrder = playersArray.filter(player => !player.getGame()?.isOver() && player.getGame() !== undefined);
-		this.opponentsOrder = playersArray.concat([]).sort(() => Math.random() - 0.5); // Deep copy of the array (not the players)
+		// Deep copy of the array (not the players)
+		this.opponentsOrder = playersArray.concat([]).sort(() => Math.random() - 0.5);
 
 		for (const player of playersArray)
 			player.setupGame(this.settings);
@@ -142,6 +148,8 @@ class MultiplayerRoom {
 			player.getGame()?.gameLoop().then(() => endOfGame(player));
 
 		const sendOpponentsGames = () => {
+			if (this.noLoserList.length <= 1)
+				return ;
 			for (let i = 0; i < this.opponentsOrder.length; ++i) {
 				let player = this.opponentsOrder[i];
 				if (player.getGame() === undefined || player.getGame()?.isOver()) {
@@ -153,10 +161,9 @@ class MultiplayerRoom {
 						}
 					}
 				}
-				const games = [
-					this.noLoserList[(this.noLoserList.indexOf(player) - 1) % this.noLoserList.length],
-					this.noLoserList[(this.noLoserList.indexOf(player) + 1) % this.noLoserList.length]
-				];
+				let games = [this.noLoserList[mod(this.noLoserList.indexOf(player) - 1, this.noLoserList.length)]];
+				if (this.noLoserList.length > 2)
+					games.push(this.noLoserList[mod(this.noLoserList.indexOf(player) + 1, this.noLoserList.length)]);
 				player.getSocket().emit("MULTIPLAYER_OPPONENTS_GAMES", JSON.stringify({ argument: games }));
 			}
 		};
@@ -181,7 +188,7 @@ class MultiplayerRoom {
 			this.isInGame = false;
 			playerArrayEnd.forEach((player) => {
 				player.getSocket().emit("GAME_FINISH");
-				player.getSocket().emit("music", JSON.stringify({ type: "end" }));
+				player.getSocket().emit("MUSIC", JSON.stringify({ type: "END" }));
 				if (!player.getGame()?.getHasForfeit())
 					player.getSocket().emit("MULTIPLAYER_JOIN", JSON.stringify({ argument: this.code }));
 				player.setGame(undefined);

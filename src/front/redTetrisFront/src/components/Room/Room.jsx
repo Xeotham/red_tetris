@@ -121,11 +121,11 @@ const Square2 = ({dis, s}) => {
 				<label className="labelSettings" htmlFor="musicSelect">Music : </label>
 				<select name="musicSelect" id="musicSelect" disabled={dis}
 						style={{width: "70%", borderRadius: "10px"}}>
-					<option value="bgm1.mp3">Tetoris</option>
-					<option value="bgm2.mp3">Disturbing the peace</option>
-					<option value="bgm3.mp3">Jump up, Super Star!</option>
-					<option value="bgm4.mp3">Submerciful</option>
-					<option value="bgm5.mp3">chirpsichord</option>
+					<option value="bgm1">Tetoris</option>
+					<option value="bgm2">Disturbing the peace</option>
+					<option value="bgm3">Jump up, Super Star!</option>
+					<option value="bgm4">Submerciful</option>
+					<option value="bgm5">chirpsichord</option>
 					<option value="">No Music</option>
 				</select>
 			</div>
@@ -267,13 +267,13 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 			document.getElementById("infinite-hold").checked = newSettings?.infiniteHold;
 			document.getElementById("infinite-movement").checked = newSettings?.infiniteMovement;
 			document.getElementById("lock-time").value = newSettings?.lockTime;
-			document.getElementById("rotationSelect").value = newSettings?.rotationSystem || "SRS-X";
+			document.getElementById("rotationSelect").value = newSettings?.rotationSystem || "SRSX";
 			document.getElementById("spawn-ARE").value = newSettings?.spawnARE || "0";
 			document.getElementById("soft-drop-amp").value = newSettings?.softDropAmp
 				? newSettings?.softDropAmp.toString() : "1.5";
 			document.getElementById("level").value = newSettings?.level || "4";
 			document.getElementById("is-leveling").checked = newSettings?.isLevelling;
-			document.getElementById("musicSelect").value = newSettings?.music || "bgm1.mp3";
+			document.getElementById("musicSelect").value = newSettings?.music || "bgm1";
 			document.getElementById("seed").value = newSettings?.seed || "error";
 			document.getElementById("reset-seed-on-retry").checked = newSettings?.resetSeedOnRetry;
 			document.getElementById("can-retry").checked = newSettings?.canRetry;

@@ -38,7 +38,7 @@ class Player {
 		const game = new TetrisGame(this.socket);
 		game.setSettings(settings);
 		this.game = game;
-		this.socket.emit("music", JSON.stringify({ type: "begin", argument: settings.music }));
+		this.socket.emit("MUSIC", JSON.stringify({ type: "BEGIN", argument: settings.music }));
 		console.log("New game created for player " + this.socket.id);
 	}
 

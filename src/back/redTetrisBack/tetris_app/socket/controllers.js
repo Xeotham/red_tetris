@@ -66,7 +66,7 @@ const quitMultiplayerRoom = async (socket, roomCode) => {
 	const room = utils.getTetrisRoom(roomCode, socket);
 	if (room) {
 		dlog("Quit Room with code : " + room.getCode() + " for player : " + socket.id);
-		socket.emit("music", JSON.stringify({ type: "end" }));
+		socket.emit("MUSIC", JSON.stringify({ type: "END" }));
 		room.removePlayer(socket);
 		if (room.isEmpty())
 			exports.multiplayerRoomLst.splice(exports.multiplayerRoomLst.indexOf(room), 1);
@@ -177,7 +177,7 @@ const getMultiplayerRooms = async (socket) => {
 
 	for (const room of exports.multiplayerRoomLst) {
 		// TODO : Should see games that are playing?
-		if (room.getIsVersus() || room.isPrivate() || room.getIsInGame())
+		if (room.getIsVersus() || room.isPrivate())
 			continue ;
 		rooms.push({code: room.code, nbPlayers: room.settings?.nbPlayers});
 	}
