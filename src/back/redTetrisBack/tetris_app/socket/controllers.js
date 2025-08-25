@@ -13,7 +13,7 @@ exports.multiplayerRoomLst = []; // [MultiplayerRoom]
 
 const tetrisArcade = async (socket, settings = {}) => {
 	const tetrisGame = new TetrisGame(socket, settings);
-	exports.arcadeGames[socket.id] = new Player(socket, true);
+	exports.arcadeGames[socket.id] = new Player(socket, "Player", true);
 	exports.arcadeGames[socket.id].setGame(tetrisGame);
 	tetrisGame.gameLoop().then(() => { utils.deleteTetrisGame(socket.id) });
 	dlog("Arcade Game started for " + socket.id);
@@ -32,12 +32,12 @@ const joinMultiplayerVersus = async (socket) => {
 }
 exports.joinMultiplayerVersus = joinMultiplayerVersus;
 
-const joinMultiplayerRoom = async (socket, roomCode) => {
+const joinMultiplayerRoom = async (socket, roomCode, username) => {
 	const room = utils.getTetrisRoom(roomCode);
 	if (!room)
-		return exports.multiplayerRoomLst.push(new MultiplayerRoom.MultiplayerRoom(socket, true, roomCode));
+		return exports.multiplayerRoomLst.push(new MultiplayerRoom.MultiplayerRoom(socket, true, roomCode, username));
 	dlog("Join Room with code : " + room.getCode() + " for player : " + socket.id);
-	room.addPlayer(socket);
+	room.addPlayer(socket, username);
 }
 exports.joinMultiplayerRoom = joinMultiplayerRoom;
 

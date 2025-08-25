@@ -33,6 +33,7 @@
 }
 
 .button {
+	display:  flex;
 	background-color: #654caf;
 	color: white;
 	width: 100%;

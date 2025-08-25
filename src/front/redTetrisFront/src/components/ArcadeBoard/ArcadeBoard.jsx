@@ -87,7 +87,7 @@ const   EndDisplay = ({stats, display = false}) => {
 				<div className={"clearsInfoValue"}>{stats?.miniSpinTriple}</div>
 				<div className={"clearsInfoValue"}>{stats?.miniSpinQuad}</div>
 			</div>
-			<div className={"backHomeButton"} onClick={ () => navigate("/")} > Go Back Home </div>
+			<div className={"backHomeButtonArcade"} onClick={ () => navigate("/")} > Go Back Home </div>
 		</div>
 	);
 }

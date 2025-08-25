@@ -11,7 +11,7 @@ const { mod } = require("./Game/utils");
 
 class MultiplayerRoom {
 
-	constructor(socket, isPrivate = true, codeName = undefined) {
+	constructor(socket, isPrivate = true, codeName = undefined, username = "nameless") {
 		this.players = {}; // { socketId: Player }
 		this.opponentsOrder = [] // [Player] The player sends garbage to the next player in the array and thus receives garbage from the previous player
 		this.noLoserList = []; // [Player]
@@ -43,7 +43,7 @@ class MultiplayerRoom {
 			"resetSeedOnRetry": true,
 			"nbPlayers": 1,
 		};
-		this.addPlayer(socket);
+		this.addPlayer(socket, username);
 	}
 
 	getIsInGame() { return this.isInGame; }
@@ -61,7 +61,7 @@ class MultiplayerRoom {
 		this.sendSettingsToPlayers();
 	}
 
-	addPlayer(socket) {
+	addPlayer(socket, username) {
 		if (this.players[socket.id]) {
 			socket.emit("MULTIPLAYER_LEAVE");
 			return dlog("Player " + socket.id + " already exists in Room " + this.code);
@@ -70,11 +70,11 @@ class MultiplayerRoom {
 		socket.emit("MULTIPLAYER_JOIN", JSON.stringify({ argument: this.code }));
 		// console.log("sending MULTIPLAYER_JOIN 2");
 		if (Object.values(this.players).length <= 0) {
-			this.players[socket.id] = new Player(socket, true);
+			this.players[socket.id] = new Player(socket, username, true);
 			socket.emit("MULTIPLAYER_OWNER", JSON.stringify(true))
 		}
 		else {
-			this.players[socket.id] = new Player(socket);
+			this.players[socket.id] = new Player(socket, username);
 			if (Object.values(this.players).length === 2)
 				this.settings.canRetry = false;
 		}
@@ -167,7 +167,7 @@ class MultiplayerRoom {
 				player.getSocket().emit("MULTIPLAYER_OPPONENTS_GAMES", JSON.stringify({ argument: games }));
 			}
 		};
-		const interval = setInterval(sendOpponentsGames, 1000);
+		const interval = setInterval(sendOpponentsGames, 1000 / 10);
 
 		const endOfGame = (player) => {
 			const playerArrayEnd = Object.values(this.players);

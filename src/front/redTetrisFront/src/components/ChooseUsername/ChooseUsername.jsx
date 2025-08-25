@@ -50,7 +50,7 @@ const ChooseUsername = () => {
 
 	// TODO : Redo the visuals
 	return (
-		<>
+		<div>
 			You are in room: {roomId}. <br />
 			You can choose a username here. <br />
 
@@ -59,7 +59,7 @@ const ChooseUsername = () => {
 				console.log(inputValue);
 				localStorage.setItem("formSubmitted", "true");
 				handleUsernameChange(inputValue);
-			}} id={"chooseUsernameForm"}>
+			}} id={"chooseUsernameForm"} className={"chooseUsernameForm"}>
 				<div style={{marginBottom: `5%`}}></div>
 				<input
 					className={"usernameInput"}
@@ -74,7 +74,7 @@ const ChooseUsername = () => {
 				<div style={{marginBottom: `5%`}}></div>
 				<div className={"findRoomButton"} onClick={findRoom}>Find a Room</div>
 			</form>
-		</>
+		</div>
 	);
 };
 

@@ -19,6 +19,16 @@ export const   getTexture = (type) => {
 	}
 }
 
+export const    getMusic = (name) => {
+	switch (name) {
+		case "bgm1":    return new Audio('/src/assets/bgm/tetris/bgm1.mp3');
+		case "bgm2":    return new Audio('/src/assets/bgm/tetris/bgm2.mp3');
+		case "bgm3":    return new Audio('/src/assets/bgm/tetris/bgm3.mp3');
+		case "bgm4":    return new Audio('/src/assets/bgm/tetris/bgm4.mp3');
+		case "bgm5":    return new Audio('/src/assets/bgm/tetris/bgm5.mp3');
+		default:        return null;
+	}
+}
 
 export const getRandomUsername = (ad_seed, no_seed) => {
 	const adjectives = ["Quick", "Brave", "Clever", "Swift", "Bold"];

@@ -35,8 +35,22 @@ const   Rows = ({row, width, height, id}) => {
 	);
 }
 
-const   Matrix = ({ matrix, width, height, id }) => {
+const   UsernameDisplay = ({ username }) => {
+	if (!username)
+		return (<></>);
+
+	return (
+		<div className={"usernameContainer"}>
+			<span className="username">
+				{username}
+			</span>
+		</div>
+	);
+}
+
+const   Matrix = ({ matrix, width, height, id, username }) => {
 	const   [size, setSize] = useState({ width: width || 320, height: height || 640 });
+	const   [usernameState, setUsernameState] = useState(username || null);
 
 	if (!matrix)
 		matrix = Array.from({ length: 40 }, () => Array.from({ length: 10 }, () => ({ texture: "EMPTY" })));
@@ -67,6 +81,7 @@ const   Matrix = ({ matrix, width, height, id }) => {
 					<Rows row={matrix[39]} width={size.width} height={size.height / 20} id={id + "_19"}/>
 				</div>
 			</div>
+			<UsernameDisplay username={username} />
 		</div>
 	);
 }

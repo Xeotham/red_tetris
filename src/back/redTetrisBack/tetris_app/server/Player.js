@@ -6,9 +6,9 @@ const { TetrisGame } = require("./Game/TetrisGame");
 
 
 class Player {
-	constructor(socket, owner = false) {
+	constructor(socket, username, owner = false) {
 		this.socket = socket;
-		this.username = socket.id;
+		this.username = username;
 		this.owner = owner;
 		this.game = undefined;
 

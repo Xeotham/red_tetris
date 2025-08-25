@@ -4,7 +4,8 @@ import {useEffect, useRef, useState} from "react";
 import { sfxPlayer } from "../../sfxHandler.jsx";
 import Hold from "../Hold/Hold.jsx";
 import Bags from "../Bags/Bags.jsx";
-import {useSocket} from "../../hooks/socket/useSocket.jsx";
+import { useSocket } from "../../hooks/socket/useSocket.jsx";
+import  { getMusic } from "../../utils.jsx";
 
 const   EndDisplay = ({stats, display = false, settingsContainer, boardContainer}) => {
 	if (!stats) {
@@ -42,6 +43,12 @@ const   EndDisplay = ({stats, display = false, settingsContainer, boardContainer
 					<div className={"infoValue"}>{stats?.holds}</div>
 					<div className={"infoTitle"}>Lines:</div>
 					<div className={"infoValue"}>{stats?.linesCleared} cleared | {stats?.linesPerMinute} / min</div>
+					<div className={"infoSpacing"}/>
+					<div className={"infoSpacing"}/>
+					<div className={"infoTitle"}>Attacks Sent:</div>
+					<div className={"infoValue"}>{stats?.attacksSent} sent | {stats?.attacksSentPerMinute} / min</div>
+					<div className={"infoTitle"}>Attacks Received:</div>
+					<div className={"infoValue"}>{stats?.attacksReceived} received | {stats?.attacksReceivedPerMinute} / min</div>
 					<div className={"infoSpacing"}/>
 					<div className={"infoSpacing"}/>
 				</div>
@@ -126,15 +133,13 @@ const OpponentBoard = ({ opponent, id }) => {
 	}
 
 	return (
-		<div className="opponentParentContainer" ref={parentRef} id={id}>
-				<div className="opponentChildContainer">
-					<Matrix matrix={opponent.matrix} />
-				</div>
+		<div className="opponentContainer" ref={parentRef} id={id}>
+			<Matrix matrix={opponent.matrix} username={opponent.username} />
 		</div>
 	);
 };
 
-const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
+const RoomBoard = ({settingsContainer, boardContainer, abortController, username}) => {
 
 	const   socket = useSocket();
 	const   [game, setGame] = useState({
@@ -190,11 +195,14 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 		tspinZero: 0,
 	});
 	const   [displayStats, setDisplayStats] = useState(false);
+	const   actualMusic = useRef(null);
 	const   [leftOpponents, setLeftOpponents] = useState({
 		matrix: null,
+		username: null,
 	});
 	const   [rightOpponents, setRightOpponents] = useState({
 		matrix: null,
+		username: null,
 	});
 
 	const gameControllers = async (abortController) => {
@@ -220,7 +228,6 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 			setDisplayStats(false);
 			settingsContainer.style.display = "none";
 			boardContainer.style.display = "block";
-			console.log("Game started for player: " + socket.id);
 		});
 
 		socket.on("GAME", (data) => {
@@ -242,23 +249,43 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 
 			setStats(new_data.stats);
 			setDisplayStats(true);
-			// abortController.abort();
-			// socket.off("GAME_START");
-			// socket.off("GAME");
-			// socket.off("EFFECT");
-			// socket.off("STATS");
 		})
 
 		socket.on("MULTIPLAYER_OPPONENTS_GAMES", (data) => {
 			const   gameList = JSON.parse(data).argument;
 
-			// setGameList(gameList);
-
-			setLeftOpponents({ matrix: gameList[0]?.game.matrix });
-			setRightOpponents({ matrix: gameList[1]?.game.matrix });
+			setLeftOpponents({ matrix: gameList[0]?.game.matrix, username: gameList[0]?.username });
+			setRightOpponents({ matrix: gameList[1]?.game.matrix, username: gameList[1]?.username });
 		})
 
+		socket.on("MUSIC", (data) => {
+			const   new_data = JSON.parse(data);
+			const   type = new_data.type;
+			const   argument = new_data.argument;
+
+			if (type === "BEGIN") {
+				const music = getMusic(argument);
+
+				console.log(music);
+
+				if (music) {
+					music.loop = true;
+					music.volume = 0.30;
+					music.play();
+				}
+				actualMusic.current = music;
+			}
+			else if (type === "END") {
+				if (actualMusic.current) {
+					actualMusic.current.pause();
+					actualMusic.current.currentTime = 0;
+					actualMusic.current = null;
+				}
+			}
+		});
+
 		gameControllers(abortController);
+
 		return () => {
 			abortController.abort();
 		};
@@ -275,7 +302,7 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController}) => {
 					<Hold holdPiece={{hold: game.hold, canSwap: game.canSwap}}/>
 				</div>
 				<div className={"boardMatrix"}>
-					<Matrix matrix={game.matrix} width={320} height={640}/>
+					<Matrix matrix={game.matrix} width={320} height={640} username={username}/>
 				</div>
 				<div className={"boardBag"}>
 					<Bags bags={game.bags}/>

@@ -245,7 +245,7 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 	}
 
 	useEffect(() => {
-		socket.emit("joinMultiplayerRoom", roomId);
+		socket.emit("joinMultiplayerRoom", roomId, username);
 
 		socket.on("MULTIPLAYER_OWNER", (isRoomOwner) => {
 			const newIsOwner = JSON.parse(isRoomOwner);
@@ -379,7 +379,9 @@ const Room = () => {
 					<RoomBoard
 						settingsContainer={settingsContainer}
 						boardContainer={boardContainer}
-			            abortController={abortController}/>
+			            abortController={abortController}
+						username={username}
+					/>
 				)}
 			</div>
 		</div>
