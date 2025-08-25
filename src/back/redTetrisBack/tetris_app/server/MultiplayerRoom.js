@@ -30,7 +30,7 @@ class MultiplayerRoom {
 			"showHold": true,
 			"infiniteHold": false,
 			"infiniteMovement": false,
-			"rotationSystem": "SRS-X",
+			"rotationSystem": "SRSX",
 			"lockTime": 500,
 			"spawnARE": 0,
 			"softDropAmp": 1.5,
@@ -159,23 +159,6 @@ class MultiplayerRoom {
 				];
 				player.getSocket().emit("MULTIPLAYER_OPPONENTS_GAMES", JSON.stringify({ argument: games }));
 			}
-
-			// const players = Object.values(this.players);
-			// for (let i = 0; i < players.length; ++i) {
-			// 	let lost = 0;
-			// 	let games = [];
-			// 	for (let j = i + 1; j - lost < 6; j++) {
-			// 		j %= players.length;
-			// 		if (j === i)
-			// 			break ;
-			// 		if (players[j].getGame()?.isOver() || players[j].getGame() === undefined) {
-			// 			++lost;
-			// 			continue ;
-			// 		}
-			// 		games.push(players[j].toJSON());
-			// 	}
-			// 	players[i].getSocket().emit("MULTIPLAYER_OPPONENTS_GAMES", JSON.stringify({ argument: games }));
-			// }
 		};
 		const interval = setInterval(sendOpponentsGames, 1000);
 
@@ -198,6 +181,7 @@ class MultiplayerRoom {
 			this.isInGame = false;
 			playerArrayEnd.forEach((player) => {
 				player.getSocket().emit("GAME_FINISH");
+				player.getSocket().emit("music", JSON.stringify({ type: "end" }));
 				if (!player.getGame()?.getHasForfeit())
 					player.getSocket().emit("MULTIPLAYER_JOIN", JSON.stringify({ argument: this.code }));
 				player.setGame(undefined);
@@ -217,35 +201,6 @@ class MultiplayerRoom {
 			this.noLoserList[i].getGame()?.setOpponent(
 				this.noLoserList[(i + 1) % this.noLoserList.length].getGame());
 		}
-		// for (let i = 0; i < this.opponentsOrder.length; ++i) {
-		// 	if (this.opponentsOrder[i].getGame() === undefined || this.opponentsOrder[i].getGame()?.isOver())
-		// 		continue ;
-		// 	for (let j = 1; j < this.opponentsOrder.length; ++j) {
-		// 		if ((i + j) % this.opponentsOrder.length === i ||
-		// 			this.opponentsOrder[(i + j) % this.opponentsOrder.length].getGame() === undefined ||
-		// 			this.opponentsOrder[(i + j) % this.opponentsOrder.length].getGame()?.isOver())
-		// 			continue ;
-		// 		this.opponentsOrder[i].getGame()?.setOpponent(this.opponentsOrder[(i + j) % this.opponentsOrder.length].getGame());
-		// 	}
-		// }
-
-
-		// const playersArray = Object.values(this.players);
-		// if (this.playersRemaining <= 1 || playersArray.length <= 1)
-		// 	return ;
-		// let opponent;
-		// for (const player of playersArray) {
-		// 	let tries = 0;
-		// 	do {
-		// 		opponent = playersArray[Math.floor(Math.random() * playersArray.length)];
-		// 		++tries;
-		// 		if (tries > 100)
-		// 			break ;
-		// 	} while (opponent === undefined || opponent === player ||
-		// 			opponent.getGame() === undefined || opponent.getGame()?.isOver() ||
-		// 			opponent.getGame()?.getHasForfeit());
-		// 	player.getGame()?.setOpponent(opponent.getGame());
-		// }
 	}
 
 	sendSettingsToPlayers() {

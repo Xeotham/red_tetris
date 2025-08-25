@@ -66,6 +66,7 @@ const quitMultiplayerRoom = async (socket, roomCode) => {
 	const room = utils.getTetrisRoom(roomCode, socket);
 	if (room) {
 		dlog("Quit Room with code : " + room.getCode() + " for player : " + socket.id);
+		socket.emit("music", JSON.stringify({ type: "end" }));
 		room.removePlayer(socket);
 		if (room.isEmpty())
 			exports.multiplayerRoomLst.splice(exports.multiplayerRoomLst.indexOf(room), 1);

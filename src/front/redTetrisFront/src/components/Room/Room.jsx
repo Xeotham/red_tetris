@@ -72,7 +72,7 @@ const Square2 = ({dis, s}) => {
 				<label className="labelSettings" htmlFor="rotationSelect">Rotation : </label>
 				<select name="rotationSelect" id="rotationSelect" disabled={dis}
 						style={{width: "45%", borderRadius: "10px"}}>
-					<option value="SRS-X">SRS-X</option>
+					<option value="SRSX">SRS-X</option>
 					<option value="SRS">SRS</option>
 					<option value="original">Original</option>
 				</select>
@@ -219,7 +219,8 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 		if (backButton) {
 			backButton.addEventListener("click", () => {
 				abortController.abort();
-				navigate("/find-room")
+				socket.emit("quitMultiplayerRoom", roomId);
+				navigate("/find-room");
 			} );
 			return () => backButton.removeEventListener("click", () => navigate("/find-room") );
 		}
