@@ -50,10 +50,7 @@ const   UsernameDisplay = ({ username }) => {
 
 const   Matrix = ({ matrix, width, height, id, username }) => {
 	const   [size, setSize] = useState({ width: width || 320, height: height || 640 });
-	const   [usernameState, setUsernameState] = useState(username || null);
 
-	if (!matrix)
-		matrix = Array.from({ length: 40 }, () => Array.from({ length: 10 }, () => ({ texture: "EMPTY" })));
 
 	return (
 		<div className={"matrixContainer"}>

@@ -1,8 +1,6 @@
 import "./ArcadeBoard.css";
 import Matrix from "../Matrix/Matrix.jsx";
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
-import { address } from "../../main.jsx";
 import { sfxPlayer } from "../../sfxHandler.jsx";
 import Hold from "../Hold/Hold.jsx";
 import Bags from "../Bags/Bags.jsx";
@@ -119,10 +117,9 @@ const   GameStats = ({gameInfo}) => {
 const ArcadeBoard = () => {
 
 	const socket = useSocket();
-	// console.log(socket);
 	const [abortController, setAbortController] = useState(new AbortController());
 	const [game, setGame] = useState({
-		matrix: null,
+		matrix: Array.from({length: 41}, () => Array.from({length: 10}, () => ({texture: "EMPTY"}))),
 		bags: null,
 		hold: null,
 		canSwap: null,
@@ -175,7 +172,7 @@ const ArcadeBoard = () => {
 	});
 	const [displayStats, setDisplayStats] = useState(false);
 
-	const gameControllers = async (abortController) => {
+	const gameControllers = async (abortController, socket) => {
 		const signal = abortController.signal;
 		const keydownHandler = async (event) => {
 			if (!event.repeat)
@@ -192,42 +189,47 @@ const ArcadeBoard = () => {
 
 	useEffect(() => {
 
-		socket.emit("arcadeStart");
+		const   handleGameReplacement = (setGame) => {
+			return (data) => {
+				const new_data = JSON.parse(data);
+				setGame(new_data.game);
+			}
+		}
 
-		socket.on("GAME_START", (data) => {
-			const new_data = JSON.parse(data);
-			setGame(new_data.game);
-		});
-
-		socket.on("GAME", (data) => {
-			const new_data = JSON.parse(data);
-			setGame(new_data.game);
-			// console.log(game);
-		});
-
-		socket.on("EFFECT", (data) => {
+		const   handleSfx = (data) => {
 			const new_data = JSON.parse(data);
 			const sfx = sfxPlayer(new_data.type, new_data.value);
 
 			sfx?.play();
-		});
+		}
 
-		socket.on("STATS", (data) => {
-			const new_data = JSON.parse(data);
+		const   handleStatsUpdate = (setStats, setDisplayStats, abortController, socket) => {
+			return (data) => {
+				const new_data = JSON.parse(data);
 
-			setStats(new_data.stats);
-			setDisplayStats(true);
-			abortController.abort();
-			socket.off("GAME_START");
-			socket.off("GAME");
-			socket.off("EFFECT");
-			socket.off("STATS");
-		})
+				setStats(new_data.stats);
+				setDisplayStats(true);
+				abortController.abort();
+				socket.off("GAME_START");
+				socket.off("GAME");
+				socket.off("EFFECT");
+				socket.off("STATS");
+			}
+		}
 
-		gameControllers(abortController);
-	}, []);
+		socket.emit("arcadeStart");
 
-	// console.log(game);
+		socket.on("GAME_START", handleGameReplacement(setGame));
+
+		socket.on("GAME", handleGameReplacement(setGame));
+
+		socket.on("EFFECT", handleSfx);
+
+		socket.on("STATS", handleStatsUpdate(setStats, setDisplayStats, abortController, socket));
+
+		gameControllers(abortController, socket);
+	}, [socket, abortController, setGame, setStats, setDisplayStats]);
+
 	return (
 		<div className={"board"}>
 			<div className={"boardHold"}>

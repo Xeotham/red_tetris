@@ -23,22 +23,30 @@ const   Tetrimino = ({minoType, texture, minoSize}) => {
 		)
 	}
 
+
 	if (!texture)
 		texture = getTexture(minoType);
+
+	const   printMino = (minoSize, texture) => {
+		return (cell, cellIndex) => (
+			<img key={cellIndex} className={"mino"} style={{width: `${minoSize}px`, height: `${minoSize}px` }} src={cell ? texture : getTexture("EMPTY")} alt={cellIndex}/>
+		)
+	}
+
+	const   printTetrimino = (minoSize, texture) => {
+		return (row, rowIndex) => {
+			return (
+				<div key={rowIndex} className="tetriminoRow" style={{height: `${minoSize}px`}}>
+					{ row.map(printMino(minoSize, texture)) }
+				</div>
+			)
+		}
+	}
 
 	return (
 		<div>
 			<div className="tetrimino">
-				{
-					getTetriminoPattern(minoType).map((row, rowIndex) => (
-					<div key={rowIndex} className="tetriminoRow" style={{height: `${minoSize ? minoSize : 32}px`}}>
-						{
-							row.map((cell, cellIndex) => (
-							<img key={cellIndex} className={"mino"} style={{width: `${minoSize ? minoSize : 32}px`, height: `${minoSize ? minoSize : 32}px` }} src={cell ? texture : getTexture("EMPTY")} alt={cellIndex}/>
-						))
-						}
-					</div>
-				))}
+				{ getTetriminoPattern(minoType).map(printTetrimino(minoSize, texture)) }
 			</div>
 		</div>
 	)

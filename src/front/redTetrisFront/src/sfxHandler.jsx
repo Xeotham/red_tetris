@@ -7,7 +7,6 @@ const   btbSounds = (sound) => {
 		case 3: return new Audio("/src/assets/sfx/BejeweledSR/btb_3.ogg");
 		case "break": return new Audio("/src/assets/sfx/BejeweledSR/btb_break.ogg");
 		default:
-			console.error("Unknown sound " + sound);
 			return undefined;
 	}
 }
@@ -20,7 +19,6 @@ const   clearSounds = (sound) => {
 		case "quad": return new Audio("/src/assets/sfx/BejeweledSR/clearquad.ogg");
 		case "spin": return new Audio("/src/assets/sfx/BejeweledSR/clearspin.ogg");
 		default:
-			console.error("Unknown sound " + sound);
 			return undefined;
 	}
 }
@@ -45,7 +43,6 @@ const   comboSounds = (sound) => {
 		case 16: return new Audio("/src/assets/sfx/BejeweledSR/combo_16.ogg");
 		case "break": return new Audio("/src/assets/sfx/BejeweledSR/combobreak.ogg");
 		default:
-			console.error("Unknown sound " + sound);
 			return undefined;
 	}
 }
@@ -64,7 +61,6 @@ const   garbageSounds = (sound) => {
 		case "garbage_out_medium": return new Audio("/src/assets/sfx/BejeweledSR/garbage_out_medium.ogg");
 		case "garbage_out_small": return new Audio("/src/assets/sfx/BejeweledSR/garbage_out_small.ogg");
 		default:
-			console.error("Unknown sound " + sound);
 			return undefined;
 	}
 }
@@ -77,7 +73,6 @@ const   userEffectSounds = (sound) => {
 		case "move": return new Audio("/src/assets/sfx/BejeweledSR/move.ogg");
 		case "rotate": return new Audio("/src/assets/sfx/BejeweledSR/rotate.ogg");
 		default:
-			console.error("Unknown sound " + sound);
 			return undefined;
 	}
 }
@@ -90,7 +85,6 @@ const   levelSounds = (sound) => {
 		case "15": return new Audio("/src/assets/sfx/BejeweledSR/level15.ogg");
 		case "up": return new Audio("/src/assets/sfx/BejeweledSR/levelup.ogg");
 		default:
-			console.error("Unknown sound " + sound);
 			return undefined;
 	}
 }
@@ -100,7 +94,6 @@ const   lockSounds = (sound) => {
 		case "spinend": return new Audio("/src/assets/sfx/BejeweledSR/spinend.ogg");
 		case "lock": return new Audio("/src/assets/sfx/BejeweledSR/lock.ogg");
 		default:
-			console.error("Unknown sound " + sound);
 			return undefined;
 	}
 }
@@ -111,14 +104,11 @@ const   boardSounds = (sound) => {
 		case "sidehit": return new Audio("/src/assets/sfx/BejeweledSR/sidehit.ogg");
 		case "topout": return new Audio("/src/assets/sfx/BejeweledSR/topout.ogg");
 		default:
-			console.error("Unknown sound " + sound);
 			return undefined;
 	}
 }
 
 export const    sfxPlayer = (type, sound) => {
-	// console.log("SFX: ", type, ", ", sound)
-
 	switch(type) {
 		case "BTB":
 			return btbSounds(sound);
@@ -139,7 +129,6 @@ export const    sfxPlayer = (type, sound) => {
 		case "BOARD":
 			return boardSounds(sound);
 		default:
-			console.error("Unknown type " + type);
 			return undefined;
 	}
 }

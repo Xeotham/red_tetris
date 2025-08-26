@@ -1,14 +1,11 @@
 import  "./Home.css"
 import TetrisButtons from "../TetrisButtons/TetrisButtons.jsx";
 import { useNavigate } from "react-router-dom";
-import { io } from "socket.io-client";
-import { address } from "../../main.jsx";
 
 const   Home = () => {
 	const   navigate = useNavigate();
 
 	const   arcadeOnClick = () => {
-		// console.log("arcadeOnClick");
 		navigate("/arcade-board");
 	}
 
@@ -24,7 +21,6 @@ const   Home = () => {
 	}
 
 	const   joinGameOnClick = () => {
-		console.log("joinGameOnClick");
 		navigate("/find-room");
 	}
 

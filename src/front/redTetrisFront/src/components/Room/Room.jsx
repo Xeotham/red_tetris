@@ -2,8 +2,6 @@ import { useParams } from "react-router-dom";
 import TetrisButtons from "../TetrisButtons/TetrisButtons.jsx";
 import "./Room.css";
 import {useCallback, useEffect, useState} from "react";
-import { io } from "socket.io-client";
-import { address } from "../../main.jsx";
 import { useNavigate } from "react-router-dom";
 import {clamp} from "ramda";
 import {useSocket} from "../../hooks/socket/useSocket.jsx";
@@ -120,7 +118,6 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 	const navigate = useNavigate();
 
 	const [s, setS] = useState({nbPlayers: 0, isPrivate: true}); // Placeholder for the number of players, replace with actual state or props as needed.
-	const [invalidName, setInvalidName] = useState(true);
 	const [isOwner, setIsOwner] = useState(false);
 	const [form, setForm] = useState(null);
 	const socket = useSocket();
@@ -132,8 +129,6 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 			"2": parseFloat((document.getElementById("soft-drop-amp")).value),
 			"3": parseInt((document.getElementById("level")).value, 10),
 		};
-
-		console.log("musicSelectValue:", (document.getElementById("musicSelect"))?.value);
 
 		const newS = {
 			"isPrivate": (document.getElementById("is-private"))?.checked,
@@ -162,12 +157,10 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 		document.getElementById("spawn-ARE").value = newS["spawnARE"].toString();
 		document.getElementById("soft-drop-amp").value = newS["softDropAmp"].toString();
 		document.getElementById("level").value = newS["level"].toString();
-		// console.log("sending settings: ", newS);
 		socket?.emit("multiplayerRoomCommand", "settings", {roomCode: roomId, settings: newS});
 
-	});
+	}, [setS, socket, roomId, s]);
 
-	// useEffect to handle the form submission and save settings
 	useEffect(() => {
 		const formElement = document.getElementById("roomSettingsForm");
 		setForm(formElement);
@@ -177,7 +170,7 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 				formElement.removeEventListener("change", saveMultiplayerRoomSettings);
 			};
 		}
-	}, [saveMultiplayerRoomSettings]);
+	}, [setForm, saveMultiplayerRoomSettings]);
 
 	useEffect(() => {
 		const backButton = document.getElementById("BackButton");
@@ -189,20 +182,19 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 			} );
 			return () => backButton.removeEventListener("click", () => navigate("/find-room") );
 		}
-	});
+	}, [abortController, socket, navigate, roomId]);
 
 	useEffect(() => {
 		const clipboardCopy = document.getElementById("clipboardCopy");
 		if (clipboardCopy) { // FIXME : missing ip
 			clipboardCopy.addEventListener("click", () =>
-				navigator.clipboard.writeText("http://" + "localhost" + ":" + import.meta.env.VITE_FRONT_PORT + "/" + roomId) );
+				navigator.clipboard.writeText(`http://${import.meta.env.VITE_API_ADDRESS}/${roomId}`));
 			return () => clipboardCopy.removeEventListener("click", () =>
-				navigator.clipboard.writeText("http://" + "localhost" + ":" + import.meta.env.VITE_FRONT_PORT + "/" + roomId) );
+				navigator.clipboard.writeText(`http://${import.meta.env.VITE_API_ADDRESS}/${roomId}`) );
 		}
-	});
+	}, [roomId]);
 
-	// TODO : implement the start game logic
-	const startGame = (isOwner) => {
+	const startGame = (isOwner, socket, roomId) => {
 		if (!isOwner)
 			return ;
 
@@ -210,45 +202,53 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 	}
 
 	useEffect(() => {
+		const   handleOwn = (setIsOwner) => {
+			return (isRoomOwner) => {
+				const newIsOwner = JSON.parse(isRoomOwner);
+				setIsOwner(newIsOwner);
+			}
+		}
+
+		const   handleMultiplayerSettings = (form, saveMultiplayerRoomSettings, setS) => {
+			return (settings) => {
+				form?.removeEventListener("change", saveMultiplayerRoomSettings);
+				const newSettings = JSON.parse(settings);
+				setS(newSettings);
+				if (!newSettings)
+					return ;
+				document.getElementById("is-private").checked = newSettings?.isPrivate;
+				document.getElementById("is-versus").checked = newSettings?.isVersus;
+				document.getElementById("show-shadow").checked = newSettings?.showShadowPiece;
+				document.getElementById("show-bags").checked = newSettings?.showBags;
+				document.getElementById("hold-allowed").checked = newSettings?.holdAllowed;
+				document.getElementById("show-hold").checked = newSettings?.showHold;
+				document.getElementById("infinite-hold").checked = newSettings?.infiniteHold;
+				document.getElementById("infinite-movement").checked = newSettings?.infiniteMovement;
+				document.getElementById("lock-time").value = newSettings?.lockTime;
+				document.getElementById("rotationSelect").value = newSettings?.rotationSystem || "SRSX";
+				document.getElementById("spawn-ARE").value = newSettings?.spawnARE || "0";
+				document.getElementById("soft-drop-amp").value = newSettings?.softDropAmp
+					? newSettings?.softDropAmp.toString() : "1.5";
+				document.getElementById("level").value = newSettings?.level || "4";
+				document.getElementById("is-leveling").checked = newSettings?.isLevelling;
+				document.getElementById("musicSelect").value = newSettings?.music || "bgm1";
+				document.getElementById("seed").value = newSettings?.seed || "error";
+				document.getElementById("reset-seed-on-retry").checked = newSettings?.resetSeedOnRetry;
+				document.getElementById("can-retry").checked = newSettings?.canRetry;
+				form?.addEventListener("change", saveMultiplayerRoomSettings);
+			}
+		}
+
 		socket.emit("joinMultiplayerRoom", roomId, username);
 
-		socket.on("MULTIPLAYER_OWNER", (isRoomOwner) => {
-			const newIsOwner = JSON.parse(isRoomOwner);
-			setIsOwner(newIsOwner);
-		});
+		socket.on("MULTIPLAYER_OWNER", handleOwn(setIsOwner));
 
-		socket.on("MULTIPLAYER_SETTINGS", (settings) => {
-			form?.removeEventListener("change", saveMultiplayerRoomSettings);
-			const newSettings = JSON.parse(settings);
-			setS(newSettings);
-			if (!newSettings)
-				return ;
-			document.getElementById("is-private").checked = newSettings?.isPrivate;
-			document.getElementById("is-versus").checked = newSettings?.isVersus;
-			document.getElementById("show-shadow").checked = newSettings?.showShadowPiece;
-			document.getElementById("show-bags").checked = newSettings?.showBags;
-			document.getElementById("hold-allowed").checked = newSettings?.holdAllowed;
-			document.getElementById("show-hold").checked = newSettings?.showHold;
-			document.getElementById("infinite-hold").checked = newSettings?.infiniteHold;
-			document.getElementById("infinite-movement").checked = newSettings?.infiniteMovement;
-			document.getElementById("lock-time").value = newSettings?.lockTime;
-			document.getElementById("rotationSelect").value = newSettings?.rotationSystem || "SRSX";
-			document.getElementById("spawn-ARE").value = newSettings?.spawnARE || "0";
-			document.getElementById("soft-drop-amp").value = newSettings?.softDropAmp
-				? newSettings?.softDropAmp.toString() : "1.5";
-			document.getElementById("level").value = newSettings?.level || "4";
-			document.getElementById("is-leveling").checked = newSettings?.isLevelling;
-			document.getElementById("musicSelect").value = newSettings?.music || "bgm1";
-			document.getElementById("seed").value = newSettings?.seed || "error";
-			document.getElementById("reset-seed-on-retry").checked = newSettings?.resetSeedOnRetry;
-			document.getElementById("can-retry").checked = newSettings?.canRetry;
-			form?.addEventListener("change", saveMultiplayerRoomSettings);
-		});
+		socket.on("MULTIPLAYER_SETTINGS", handleMultiplayerSettings(form, saveMultiplayerRoomSettings, setS));
 
 		return () => {
 			// socket.disconnect();
 		};
-	}, [roomId]);
+	}, [socket, roomId, username, setIsOwner, form, setS, saveMultiplayerRoomSettings]);
 
 	if ((/^[A-Z]+$/.test(roomId)) === false || roomId.length !== 4) {
 		return (
@@ -257,7 +257,7 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 				Please use a valid room code. <br />
 				Valid room codes are 4 uppercase letters (A-Z). <br />
 				<div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "10%", marginTop: "100%" }}>
-					<TetrisButtons onClick={() => window.location.href = "/"}>Go to Home</TetrisButtons>
+					<TetrisButtons onClick={() => navigate("/")}>Go to Home</TetrisButtons>
 				</div>
 			</>
 		);
@@ -274,7 +274,7 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 
 			<div id="startBox" style={{width: "100%", height: "6%"}}>
 				<div style={{display: "flex", alignItems: "left", width: "100%", height: "100%"}}>
-					<button className="playButton" id="playButton" onClick={() => startGame(isOwner)}>Start</button>
+					<button className="playButton" id="playButton" onClick={() => startGame(isOwner, socket, roomId)}>Start</button>
 					{/* TODO : change, this is not aligned correctly when resizing*/}
 					<div id="clipboardCopy" className="copyCodeBox">
 						<div style={{fontSize: "1.2em", marginTop: "2.25%"}}>{roomId}</div>
@@ -324,7 +324,7 @@ const Room = () => {
 	useEffect(() => {
 		setSettingContainer(document.getElementById("settingsContainer"));
 		setBoardContainer(document.getElementById("boardContainer"));
-	})
+	}, [setSettingContainer, setBoardContainer]);
 
 	return (
 		<div>

@@ -128,10 +128,8 @@ const   GameStats = ({gameInfo}) => {
 const OpponentBoard = ({ opponent, id }) => {
 	const parentRef = useRef();
 
-	if (!opponent || !opponent.matrix) {
-		return (<></>)
-
-	}
+	if (!opponent || !opponent.matrix)
+		return (<></>);
 
 	return (
 		<div className="opponentContainer" ref={parentRef} id={id}>
@@ -144,7 +142,7 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController, username
 
 	const   socket = useSocket();
 	const   [game, setGame] = useState({
-		matrix: null,
+		matrix: Array.from({length: 41}, () => Array.from({length: 10}, () => ({texture: "EMPTY"}))),
 		bags: null,
 		hold: null,
 		canSwap: null,
@@ -198,15 +196,15 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController, username
 	const   [displayStats, setDisplayStats] = useState(false);
 	const   actualMusic = useRef(null);
 	const   [leftOpponents, setLeftOpponents] = useState({
-		matrix: null,
+		matrix: Array.from({length: 41}, () => Array.from({length: 10}, () => ({texture: "EMPTY"}))),
 		username: null,
 	});
 	const   [rightOpponents, setRightOpponents] = useState({
-		matrix: null,
+		matrix: Array.from({length: 41}, () => Array.from({length: 10}, () => ({texture: "EMPTY"}))),
 		username: null,
 	});
 
-	const gameControllers = async (abortController) => {
+	const gameControllers = async (abortController, socket) => {
 		const signal = abortController.signal;
 		const keydownHandler = async (event) => {
 			if (!event.repeat) {
@@ -223,97 +221,126 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController, username
 	}
 
 	useEffect(() => {
-		socket.on("GAME_START", (data) => {
-			const   new_data = JSON.parse(data);
-			setGame(new_data.game);
-			setDisplayStats(false);
-			settingsContainer.style.display = "none";
-			boardContainer.style.display = "block";
-		});
 
-		socket.on("MULTIPLAYER_SPEC_JOIN", () => {
-			settingsContainer.style.display = "none";
-			boardContainer.style.display = "block";
-			setDisplayStats(false);
-		});
+		const   handleGameStart = (setGame, setDisplayStats, settingsContainer, boardContainer) => {
+			return (data) => {
+				const   new_data = JSON.parse(data);
 
-		socket.on("MULTIPLAYER_SPEC_LEAVE", () => {
-			settingsContainer.style.display = "block";
-			boardContainer.style.display = "none";
-			setDisplayStats(false);
-		});
+				setGame(new_data.game);
+				setDisplayStats(false);
+				settingsContainer.style.display = "none";
+				boardContainer.style.display = "block";
+			}
+		}
 
-		socket.on("GAME", (data) => {
-			const new_data = JSON.parse(data);
-			setGame(new_data.game);
-			// console.log(game);
-		});
+		const   handleSpecJoin = (settingsContainer, boardContainer, setDisplayStats) => {
+			return () => {
+				settingsContainer.style.display = "none";
+				boardContainer.style.display = "block";
+				setDisplayStats(false);
+			}
+		}
 
-		socket.on("EFFECT", (data) => {
+		const   handleSpecLeave = (settingsContainer, boardContainer, setDisplayStats) => {
+			return () => {
+				settingsContainer.style.display = "block";
+				boardContainer.style.display = "none";
+				setDisplayStats(false);
+			}
+		}
+
+		const   handleGameUpdate = (setGame) => {
+			return (data) => {
+				const new_data = JSON.parse(data);
+
+				setGame(new_data.game);
+			}
+		}
+
+		const   handleEffect = (data) => {
 			const new_data = JSON.parse(data);
 			const sfx = sfxPlayer(new_data.type, new_data.value);
 
-
 			sfx?.play();
-		});
+		}
 
-		socket.on("STATS", (data) => {
-			const new_data = JSON.parse(data);
-			document.getElementById("hideShowButton").style = {display: "block"};
-			setStats(new_data.stats);
-			setDisplayStats(true);
-		})
+		const   handleStats = (setStats, setDisplayStats) => {
+			return (data) => {
+				const new_data = JSON.parse(data);
 
-		socket.on("MULTIPLAYER_OPPONENTS_GAMES", (data) => {
-			const   gameList = JSON.parse(data).argument;
-
-			setLeftOpponents({ matrix: gameList[0]?.game.matrix, username: gameList[0]?.username });
-			setRightOpponents({ matrix: gameList[1]?.game.matrix, username: gameList[1]?.username });
-		})
-
-		socket.on("MUSIC", (data) => {
-			const   new_data = JSON.parse(data);
-			const   type = new_data.type;
-			const   argument = new_data.argument;
-
-			if (type === "BEGIN") {
-				const music = getMusic(argument);
-
-				console.log(music);
-
-				if (music) {
-					music.loop = true;
-					music.volume = 0.30;
-					music.play();
-				}
-				actualMusic.current = music;
+				document.getElementById("hideShowButton").style = {display: "block"};
+				setStats(new_data.stats);
+				setDisplayStats(true);
 			}
-			else if (type === "END") {
-				if (actualMusic.current) {
-					actualMusic.current.pause();
-					actualMusic.current.currentTime = 0;
-					actualMusic.current = null;
+		}
+
+		const   handleOpponent = (setLeftOpponents, setRightOpponents) => {
+			return (data) => {
+				const   gameList = JSON.parse(data).argument;
+
+				setLeftOpponents({ matrix: gameList[0]?.game.matrix, username: gameList[0]?.username });
+				setRightOpponents({ matrix: gameList[1]?.game.matrix, username: gameList[1]?.username });
+			}
+		}
+
+		const   handleMusic = (actualMusic) => {
+			return (data) => {
+				const   new_data = JSON.parse(data);
+				const   type = new_data.type;
+				const   argument = new_data.argument;
+
+				if (type === "BEGIN") {
+					const music = getMusic(argument);
+
+					if (music) {
+						music.loop = true;
+						music.volume = 0.30;
+						music.play();
+					}
+					actualMusic.current = music;
+				}
+				else if (type === "END") {
+					if (actualMusic.current) {
+						actualMusic.current.pause();
+						actualMusic.current.currentTime = 0;
+						actualMusic.current = null;
+					}
 				}
 			}
-		});
+		}
 
-		gameControllers(abortController);
+		socket.on("GAME_START", handleGameStart(setGame, setDisplayStats, settingsContainer, boardContainer));
+
+		socket.on("MULTIPLAYER_SPEC_JOIN", handleSpecJoin(setDisplayStats, settingsContainer, boardContainer));
+
+		socket.on("MULTIPLAYER_SPEC_LEAVE", handleSpecLeave(setDisplayStats, settingsContainer, boardContainer));
+
+		socket.on("GAME", handleGameUpdate(setGame));
+
+		socket.on("EFFECT", handleEffect);
+
+		socket.on("STATS", handleStats(setStats, setDisplayStats));
+
+		socket.on("MULTIPLAYER_OPPONENTS_GAMES", handleOpponent(setLeftOpponents, setRightOpponents));
+
+		socket.on("MUSIC", handleMusic(actualMusic));
+
+		gameControllers(abortController, socket);
 
 		return () => {
 			abortController.abort();
 		};
-	}, []);
+	}, [socket, setGame, setDisplayStats, settingsContainer, boardContainer, setStats, setLeftOpponents, setRightOpponents, abortController, actualMusic]);
 
-	const hideShowStats = () => {
+	const hideShowStats = (setDisplayStats, displayStats) => {
 		const hideShowButton = document.getElementById("hideShowButton");
 		setDisplayStats(!displayStats);
 		hideShowButton.textContent = (displayStats ? "Show stats" : "Hide stats");
 	}
 
-	// console.log(game);
 	return (
 		<div className={"roomBoard"}>
-			<div className={"hideShow"} id="hideShowButton" style={{display: "none"}} onClick={hideShowStats}>Hide stats</div>
+			<div className={"hideShow"} id="hideShowButton" style={{display: "none"}} onClick={() => hideShowStats(setDisplayStats, displayStats)}>Hide stats</div>
 			<div className={"opponentBoard"}>
 				<OpponentBoard opponent={leftOpponents} id={"leftOpponents"}/>
 			</div>
@@ -322,7 +349,7 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController, username
 					<Hold holdPiece={{hold: game.hold, canSwap: game.canSwap}}/>
 				</div>
 				<div className={"boardMatrix"}>
-					<Matrix matrix={game.matrix} width={320} height={640} username={game.username}/>
+					<Matrix matrix={game.matrix} width={320} height={640} username={username}/>
 				</div>
 				<div className={"boardBag"}>
 					<Bags bags={game.bags}/>

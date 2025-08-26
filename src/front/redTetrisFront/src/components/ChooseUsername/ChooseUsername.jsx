@@ -1,7 +1,7 @@
 import "./ChooseUsername.css";
 import {useNavigate, useParams} from "react-router-dom";
 import TetrisButtons from "../TetrisButtons/TetrisButtons.jsx";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getRandomUsername } from "../../utils.jsx";
 
 
@@ -26,19 +26,14 @@ const ChooseUsername = () => {
 	const   [inputValue, setInputValue] = useState(getRandomUsername(Math.random(), Math.random()));
 	const   navigate = useNavigate();
 
-	const handleUsernameChange = (inputUsername) => {
-		// Allow alphanumeric and underscores, max 20 characters
+	const handleUsernameChange = (inputUsername, navigate) => {
 		const   username = !(/^[A-Za-z0-9_]{1,20}$/.test(inputUsername)) ? getRandomUsername(Math.random(), Math.random()) : inputUsername;
 		navigate(`/${roomId}/${username}`);
 	};
 
-	const findRoom = () => {
+	const findRoom = (navigate) => {
 		navigate("/find-room");
 	}
-
-	useEffect(() => {
-
-	}, []);
 
 	if ((/^[A-Z]+$/.test(roomId)) === false || roomId.length !== 4) {
 		return (
@@ -56,23 +51,19 @@ const ChooseUsername = () => {
 
 			<form onSubmit={(e) => {
 				e.preventDefault();
-				console.log(inputValue);
-				localStorage.setItem("formSubmitted", "true");
-				handleUsernameChange(inputValue);
+				handleUsernameChange(inputValue, navigate);
 			}} id={"chooseUsernameForm"} className={"chooseUsernameForm"}>
 				<div style={{marginBottom: `5%`}}></div>
 				<input
 					className={"usernameInput"}
 					type="text"
 					placeholder={getRandomUsername(Math.random(), Math.random())}
-					style={{ marginTop: "10px", padding: "8px", fontSize: "16px" }}
+					style={{ marginTop: "10px", padding: "8px", fontSize: "16px", marginBottom: "5%" }}
 					onChange={e => setInputValue(e.target.value)}
 					value={inputValue}
 				/>
-				<div style={{marginBottom: `5%`}}></div>
-				<input className={"submitButton"} type="submit" value="Submit"/>
-				<div style={{marginBottom: `5%`}}></div>
-				<div className={"findRoomButton"} onClick={findRoom}>Find a Room</div>
+				<input className={"submitButton"} type="submit" value="Submit" style={{marginBottom: `5%`}}/>
+				<div className={"findRoomButton"} onClick={() => findRoom(navigate)}>Find a Room</div>
 			</form>
 		</div>
 	);
