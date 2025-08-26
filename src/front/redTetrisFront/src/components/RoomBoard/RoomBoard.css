@@ -1,5 +1,35 @@
 /* Board Related (Matrix, Hold, Bags) Styles */
 
+.hideShow {
+	position: absolute;
+	top: 5%;
+	right: 5%;
+	width: 9%;
+	height: 9%;
+	background: #7125df;
+	border-radius: 5px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+	z-index: 10;
+	transition: 0.5s;
+	font-size: 1.5vmin;
+	user-select: none;
+}
+
+.hideShow:hover {
+	background: #4411a3;
+	width: 11%;
+	height: 11%;
+	top: 4%;
+	right: 4%;
+	box-shadow: 2px 2px 0 #000000, 2px -2px 10px #000000, -2px 2px 10px #000;
+	border-radius: 10px;
+	font-size: 1.75vmin;
+	transition: 0.5s;
+}
+
 .roomBoard {
 	width: 100%;
 	height: 100%;

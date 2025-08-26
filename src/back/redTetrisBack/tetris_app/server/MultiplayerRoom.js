@@ -234,13 +234,18 @@ class MultiplayerRoom {
 	}
 
 	#setSpecGame(player) {
+		if (!this.isInGame || this.noLoserList.length <= 0)
+			return ;
 		player.spec = true;
 		const pos = this.opponentsOrder.indexOf(player);
 		for (let i = 1; i < this.opponentsOrder.length - 1; ++i) {
 			const newPlayer = this.opponentsOrder[mod(i + pos, this.opponentsOrder.length)];
 			if (!newPlayer.getGame() || newPlayer.getGame().isOver())
 				continue ;
-			player.startInterval(newPlayer);
+			player.startInterval(newPlayer).then(() => {
+				// dlog("Respec (player " + player.getUsername() + ")");
+				this.#setSpecGame(player)
+			});
 			break ;
 		}
 	}

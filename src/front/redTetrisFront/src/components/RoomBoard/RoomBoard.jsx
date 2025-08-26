@@ -5,7 +5,7 @@ import { sfxPlayer } from "../../sfxHandler.jsx";
 import Hold from "../Hold/Hold.jsx";
 import Bags from "../Bags/Bags.jsx";
 import { useSocket } from "../../hooks/socket/useSocket.jsx";
-import  { getMusic } from "../../utils.jsx";
+import { getMusic } from "../../utils.jsx";
 
 const   EndDisplay = ({stats, display = false, settingsContainer, boardContainer}) => {
 	if (!stats) {
@@ -258,7 +258,7 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController, username
 
 		socket.on("STATS", (data) => {
 			const new_data = JSON.parse(data);
-
+			document.getElementById("hideShowButton").style = {display: "block"};
 			setStats(new_data.stats);
 			setDisplayStats(true);
 		})
@@ -302,10 +302,15 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController, username
 			abortController.abort();
 		};
 	}, []);
+	const hideShowStats = () => {
+		const hideShowButton = document.getElementById("hideShowButton");
+		setDisplayStats(!displayStats);
+		hideShowButton.textContent = (displayStats ? "Show stats" : "Hide stats");
+	}
 
-	// console.log(game);
 	return (
 		<div className={"roomBoard"}>
+			<div className={"hideShow"} id="hideShowButton" style={{display: "none"}} onClick={hideShowStats}>Hide stats</div>
 			<div className={"opponentBoard"}>
 				<OpponentBoard opponent={leftOpponents} id={"leftOpponents"}/>
 			</div>
@@ -321,7 +326,12 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController, username
 				</div>
 				<GameStats gameInfo={game} />
 				<ScoreDisplay score={game.score} />
-				<EndDisplay stats={stats} display={displayStats} settingsContainer={settingsContainer} boardContainer={boardContainer} />
+				<EndDisplay
+					stats={stats}
+					display={displayStats}
+					settingsContainer={settingsContainer}
+					boardContainer={boardContainer}
+				/>
 			</div>
 			<div className={"opponentBoard"}>
 				<OpponentBoard opponent={rightOpponents} id={"rightOpponents"}/>

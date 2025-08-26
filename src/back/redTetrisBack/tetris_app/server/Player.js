@@ -48,17 +48,24 @@ class Player {
 		// dog("New game created for player " + this.socket.id);
 	}
 
-	startInterval(toWatch) {
-		clearInterval(this.watchInterval);
-		this.watchInterval = setInterval(() => {
+	async startInterval(toWatch) {
+		return new Promise((resolve) => {
 			if (!toWatch.getGame()) {
-				clearInterval(this.watchInterval);
-				this.watchInterval = -1;
+				resolve();
 				return ;
 			}
-			this.getSocket().emit("GAME", JSON.stringify({game: toWatch.getGame()?.toJSON()}));
-		}, 1000 / 55); // 60 times per second
-
+			if (this.watchInterval !== -1)
+				clearInterval(this.watchInterval);
+			this.watchInterval = setInterval(() => {
+				if (!toWatch.getGame() || toWatch.getGame()?.isOver()) {
+					clearInterval(this.watchInterval);
+					this.watchInterval = -1;
+					resolve();
+					return ;
+				}
+				this.getSocket().emit("GAME", JSON.stringify({game: toWatch.getGame()?.toJSON()}));
+			}, 1000 / 55); // 60 times per second
+		});
 	}
 
 	toJSON() {
