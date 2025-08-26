@@ -89,12 +89,12 @@ const Square2 = ({dis, s}) => {
 			<label className="labelSettings" htmlFor="musicSelect">Music : </label>
 			<select name="musicSelect" className={"inputSettingsSelect"} id="musicSelect" disabled={dis}
 					style={{width: "70%", borderRadius: "10px"}}>
+				<option value="none">No Music</option>
 				<option value="bgm1">Tetoris</option>
 				<option value="bgm2">Disturbing the peace</option>
 				<option value="bgm3">Jump up, Super Star!</option>
 				<option value="bgm4">Submerciful</option>
 				<option value="bgm5">chirpsichord</option>
-				<option value="none">No Music</option>
 			</select>
 
 				<label id="seedLabel" className="labelSettings" htmlFor="seed">Seed : </label>
@@ -139,7 +139,7 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 			"showHold": (document.getElementById("show-hold"))?.checked,
 			"infiniteHold": (document.getElementById("infinite-hold"))?.checked,
 			"infiniteMovement": (document.getElementById("infinite-movement"))?.checked,
-			"rotationSystem": (document.getElementById("rotationSelect"))?.value,
+			"rotationType": (document.getElementById("rotationSelect"))?.value,
 			"lockTime": isNaN(v["0"]) ? 500 : clamp(-1, abs(v["0"]), v["0"]), // Lock time must be >= -1
 			"spawnARE": isNaN(v["1"]) ? 0 : clamp(0, abs(v["1"]), v["1"]), // Spawn ARE must be >= 0
 			"softDropAmp": isNaN(v["2"]) ? 1.5 : clamp(0.1, abs(v["2"]), v["2"]), // Soft drop amp must be > 0
@@ -186,7 +186,7 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 
 	useEffect(() => {
 		const clipboardCopy = document.getElementById("clipboardCopy");
-		if (clipboardCopy) { // FIXME : missing ip
+		if (clipboardCopy) {
 			clipboardCopy.addEventListener("click", () =>
 				navigator.clipboard.writeText(`http://${import.meta.env.VITE_API_ADDRESS}/${roomId}`));
 			return () => clipboardCopy.removeEventListener("click", () =>
@@ -225,7 +225,7 @@ const   SettingsScreen = ({roomId, username, settingsContainer, boardContainer, 
 				document.getElementById("infinite-hold").checked = newSettings?.infiniteHold;
 				document.getElementById("infinite-movement").checked = newSettings?.infiniteMovement;
 				document.getElementById("lock-time").value = newSettings?.lockTime;
-				document.getElementById("rotationSelect").value = newSettings?.rotationSystem || "SRSX";
+				document.getElementById("rotationSelect").value = newSettings?.rotationType || "SRSX";
 				document.getElementById("spawn-ARE").value = newSettings?.spawnARE || "0";
 				document.getElementById("soft-drop-amp").value = newSettings?.softDropAmp
 					? newSettings?.softDropAmp.toString() : "1.5";

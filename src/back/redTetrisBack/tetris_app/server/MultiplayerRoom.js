@@ -7,7 +7,7 @@ const { Player } = require("./Player");
 const { dlog } = require("./../../server/server");
 const controllers = require("../socket/controllers");
 const { mod } = require("./Game/utils");
-const {clearInterval} = require("node:timers");
+const { clearInterval } = require("node:timers");
 
 
 class MultiplayerRoom {
@@ -32,14 +32,14 @@ class MultiplayerRoom {
 			"showHold": true,
 			"infiniteHold": false,
 			"infiniteMovement": false,
-			"rotationSystem": "SRSX",
+			"rotationType": "SRSX",
 			"lockTime": 500,
 			"spawnARE": 0,
 			"softDropAmp": 1.5,
 			"level": 4,
 			"isLevelling": false,
 			"canRetry": true,
-			"music": "bgm1",
+			"music": "none",
 			"seed": Date.now().toString(),
 			"resetSeedOnRetry": true,
 			"nbPlayers": 1,
@@ -139,8 +139,8 @@ class MultiplayerRoom {
 		this.playersRemaining = playersArray.length;
 		this.isInGame = true;
 		this.settings.isInRoom = true;
+		this.settings.placement = this.playersRemaining;
 
-		// this.opponentsOrder = playersArray.filter(player => !player.getGame()?.isOver() && player.getGame() !== undefined);
 		// Deep copy of the array (not the players)
 		this.opponentsOrder = playersArray.concat([]).sort(() => Math.random() - 0.5);
 
@@ -165,7 +165,7 @@ class MultiplayerRoom {
 
 		const endOfGame = (player) => {
 			const playerArrayEnd = Object.values(this.players);
-			dlog("End of game for player " + player.getUsername() + " is at place " + this.playersRemaining + " in Room " + this.code);
+			// dlog("End of game for player " + player.getUsername() + " is at place " + this.playersRemaining + " in Room " + this.code);
 			this.#setSpecGame(player);
 			player.getGame().place = this.playersRemaining;
 			player.getSocket().emit("MULTIPLAYER_FINISH", JSON.stringify({ argument: this.playersRemaining }));
@@ -174,7 +174,7 @@ class MultiplayerRoom {
 			controllers.keyUp(player.keys.softDrop, player.getSocket());
 			--this.playersRemaining;
 			if (player.getGame()?.getHasForfeit())
-				this.removePlayer(player.getUsername());
+				this.removePlayer(player.getSocket());
 			if (this.playersRemaining === 1)
 				playerArrayEnd.find((player) => !player.getGame()?.isOver())?.getGame()?.setOver(true);
 			this.#assignOpponents();
@@ -203,12 +203,14 @@ class MultiplayerRoom {
 		});
 	}
 
+	// Assign opponents is caled when a player loses or joins as a spectator
 	#assignOpponents() {
 		this.noLoserList = this.opponentsOrder.filter(player => player.getGame() && !player.getGame()?.isOver());
-		if (this.noLoserList.length <= 1)
-			return ;
+		// if (this.noLoserList.length <= 1)
+		// 	return ;
 		for (let i = 0; i < this.opponentsOrder.length; ++i) {
 			let player = this.opponentsOrder[i];
+			player.getGame()?.setPlacement(this.playersRemaining);
 			let newPlayer = undefined;
 			if (!player.getGame() || player.getGame()?.isOver()) {
 				for (let j = 1; j < this.opponentsOrder.length; ++j) {

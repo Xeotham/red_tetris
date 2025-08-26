@@ -34,7 +34,7 @@ describe('MultiplayerRoom', () => {
 	});
 
 	it('Should return the list of players', () => {
-		const room = new MultiplayerRoom(clientSocket, true, "TEST");
+		const room = new MultiplayerRoom(clientSocket, true, "TEST", clientSocket.id);
 		expect(room.getPlayers()).to.be.an('object');
 		expect(room.getPlayers()).to.have.property(clientSocket.id);
 		expect(room.getPlayers()[clientSocket.id].getUsername()).to.equal(clientSocket.id);
