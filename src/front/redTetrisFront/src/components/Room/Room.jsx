@@ -16,51 +16,35 @@ const abs = (value) => {
 const Square1 = ({dis, s}) => {
 	return (
 		<div id="roomSettingsSquare1" className="settingBox">
-			<div className="inSettingBox">
-				<label id="isPrivate" className="labelSettings" htmlFor="is-private">Is private : </label>
-				<input type="checkbox" id="is-private" name="is-private" defaultChecked={s.isPrivate} disabled={dis}/>
-			</div>
+			<label id="isPrivate" className="labelSettings" htmlFor="is-private">Is private : </label>
+			<input type="checkbox" className={"inputSettingsCheckbox"} id="is-private" name="is-private" defaultChecked={s.isPrivate} disabled={dis}/>
 
-			<div className="inSettingBox">
-				<label id="isVersus" className="labelSettings" htmlFor="is-versus">Is versus : </label>
-				<input type="checkbox" id="is-versus" name="is-versus" defaultChecked={s.isVersus} disabled={dis}/>
-			</div>
+			<label id="isVersus" className="labelSettings" htmlFor="is-versus">Is versus : </label>
+			<input type="checkbox" className={"inputSettingsCheckbox"} id="is-versus" name="is-versus" defaultChecked={s.isVersus} disabled={dis}/>
 
-			<div className="inSettingBox">
-				<label id="showShadow" className="labelSettings" htmlFor="show-shadow">Show shadow : </label>
-				<input type="checkbox" id="show-shadow" name="show-shadow" defaultChecked={s.showShadowPiece}
-					   disabled={dis}/>
-			</div>
+			<label id="showShadow" className="labelSettings" htmlFor="show-shadow">Show shadow : </label>
+			<input type="checkbox" className={"inputSettingsCheckbox"} id="show-shadow" name="show-shadow" defaultChecked={s.showShadowPiece}
+				   disabled={dis}/>
 
-			<div className="inSettingBox">
-				<label id="showBags" className="labelSettings" htmlFor="show-bags">Show bags : </label>
-				<input type="checkbox" id="show-bags" name="show-bags" defaultChecked={s.showBags} disabled={dis}/>
-			</div>
+			<label id="showBags" className="labelSettings" htmlFor="show-bags">Show bags : </label>
+			<input type="checkbox" className={"inputSettingsCheckbox"} id="show-bags" name="show-bags" defaultChecked={s.showBags} disabled={dis}/>
 
-			<div className="inSettingBox">
-				<label id="holdAllowed" className="labelSettings" htmlFor="hold-allowed">Hold allowed : </label>
-				<input type="checkbox" id="hold-allowed" name="hold-allowed" defaultChecked={s.holdAllowed}
-					   disabled={dis}/>
-			</div>
+			<label id="holdAllowed" className="labelSettings" htmlFor="hold-allowed">Hold allowed : </label>
+			<input type="checkbox" className={"inputSettingsCheckbox"} id="hold-allowed" name="hold-allowed" defaultChecked={s.holdAllowed}
+				   disabled={dis}/>
 
-			<div className="inSettingBox">
-				<label id="showHold" className="labelSettings" htmlFor="show-hold">Show hold : </label>
-				<input type="checkbox" id="show-hold" name="show-hold" defaultChecked={s.showHold} disabled={dis}/>
-			</div>
+			<label id="showHold" className="labelSettings" htmlFor="show-hold">Show hold : </label>
+			<input type="checkbox" className={"inputSettingsCheckbox"} id="show-hold" name="show-hold" defaultChecked={s.showHold} disabled={dis}/>
 
-			<div className="inSettingBox">
-				<label id="infiniteHold" className="labelSettings" htmlFor="infinite-hold">Infinite hold
-					: </label>
-				<input type="checkbox" id="infinite-hold" name="infinite-hold" defaultChecked={s.infiniteHold}
-					   disabled={dis}/>
-			</div>
+			<label id="infiniteHold" className="labelSettings" htmlFor="infinite-hold">Infinite hold
+				: </label>
+			<input type="checkbox" className={"inputSettingsCheckbox"} id="infinite-hold" name="infinite-hold" defaultChecked={s.infiniteHold}
+				   disabled={dis}/>
 
-			<div className="inSettingBox">
-				<label id="infiniteMovement" className="labelSettings" htmlFor="infinite-movement">Infinite movement
-					: </label>
-				<input type="checkbox" id="infinite-movement" name="infinite-movement"
-					   defaultChecked={s.infiniteMovement} disabled={dis}/>
-			</div>
+			<label id="infiniteMovement" className="labelSettings" htmlFor="infinite-movement">Infinite movement
+				: </label>
+			<input type="checkbox" className={"inputSettingsCheckbox"} id="infinite-movement" name="infinite-movement"
+				   defaultChecked={s.infiniteMovement} disabled={dis}/>
 		</div>
 	);
 }
@@ -68,47 +52,34 @@ const Square1 = ({dis, s}) => {
 const Square2 = ({dis, s}) => {
 	return (
 		<div id="roomSettingsSquare2" className="settingBox">
-			<div className="inSettingBox">
-				<label className="labelSettings" htmlFor="rotationSelect">Rotation : </label>
-				<select name="rotationSelect" id="rotationSelect" disabled={dis}
-						style={{width: "45%", borderRadius: "10px"}}>
-					<option value="SRSX">SRS-X</option>
-					<option value="SRS">SRS</option>
-					<option value="original">Original</option>
-				</select>
-			</div>
+			<label className="labelSettings" htmlFor="rotationSelect">Rotation : </label>
+			<select name="rotationSelect" className={"inputSettingsSelect"} id="rotationSelect" disabled={dis}
+					style={{width: "45%", borderRadius: "10px"}}>
+				<option value="SRSX">SRS-X</option>
+				<option value="SRS">SRS</option>
+				<option value="original">Original</option>
+			</select>
+			<label id="lockTime" className="labelSettings" htmlFor="lock-time">Lock time : </label>
+			<input type="number" className={"inputSettingsNumber"} id="lock-time" name="lock-time" style={{width: "25%", borderRadius: "10px"}}
+				   disabled={dis} min={-1}/>
 
-			<div className="inSettingBox">
-				<label id="lockTime" className="labelSettings" htmlFor="lock-time">Lock time : </label>
-				<input type="number" id="lock-time" name="lock-time" style={{width: "25%", borderRadius: "10px"}}
-					   disabled={dis} min={-1}/>
-			</div>
+			<label id="spawnARE" className="labelSettings" htmlFor="spawn-ARE">Spawn ARE : </label>
+			<input type="number" className={"inputSettingsNumber"} id="spawn-ARE" name="spawn-ARE" style={{width: "25%", borderRadius: "10px"}}
+				   disabled={dis} defaultValue={s.spawnARE || "0"}/>
 
-			<div className="inSettingBox">
-				<label id="spawnARE" className="labelSettings" htmlFor="spawn-ARE">Spawn ARE : </label>
-				<input type="number" id="spawn-ARE" name="spawn-ARE" style={{width: "25%", borderRadius: "10px"}}
-					   disabled={dis} defaultValue={s.spawnARE || "0"}/>
-			</div>
+			<label id="softDropAmp" className="labelSettings" htmlFor="soft-drop-amp">SoftDrop amp.
+				: </label>
+			<input type="number" className={"inputSettingsNumber"} id="soft-drop-amp" name="soft-drop-amp"
+				   style={{width: "25%", borderRadius: "10px"}}
+				   disabled={dis} defaultValue={s.softDropAmp || "1.5"}/>
 
-			<div className="inSettingBox">
-				<label id="softDropAmp" className="labelSettings" htmlFor="soft-drop-amp">SoftDrop amplifier
-					: </label>
-				<input type="number" id="soft-drop-amp" name="soft-drop-amp"
-					   style={{width: "25%", borderRadius: "10px"}}
-					   disabled={dis} defaultValue={s.softDropAmp || "1.5"}/>
-			</div>
+			<label id="levelLabel" className="labelSettings" htmlFor="level">Level : </label>
+			<input type="number" className={"inputSettingsNumber"} id="level" name="level" style={{width: "25%", borderRadius: "10px"}}
+				   disabled={dis} defaultValue={s.level || "4"}/>
 
-			<div className="inSettingBox">
-				<label id="levelLabel" className="labelSettings" htmlFor="level">Level : </label>
-				<input type="number" id="level" name="level" style={{width: "25%", borderRadius: "10px"}}
-					   disabled={dis} defaultValue={s.level || "4"}/>
-			</div>
-
-			<div className="inSettingBox">
-				<label id="isLevelling" className="labelSettings" htmlFor="is-leveling">Is leveling : </label>
-				<input type="checkbox" id="is-leveling" name="is-leveling"
-					   defaultChecked={s.isLevelling} disabled={dis}/>
-			</div>
+			<label id="isLevelling" className="labelSettings" htmlFor="is-leveling">Is leveling : </label>
+			<input type="checkbox" className={"inputSettingsCheckbox"} id="is-leveling" name="is-leveling"
+				   defaultChecked={s.isLevelling} disabled={dis}/>
 
 		</div>
 	);
@@ -117,36 +88,30 @@ const Square2 = ({dis, s}) => {
 	const Square3 = ({dis, s}) => {
 	return (
 		<div id="roomSettingsSquare3" className="settingBox">
-			<div className="inSettingBox">
-				<label className="labelSettings" htmlFor="musicSelect">Music : </label>
-				<select name="musicSelect" id="musicSelect" disabled={dis}
-						style={{width: "70%", borderRadius: "10px"}}>
-					<option value="none">No Music</option>
-					<option value="bgm1">Tetoris</option>
-					<option value="bgm2">Disturbing the peace</option>
-					<option value="bgm3">Jump up, Super Star!</option>
-					<option value="bgm4">Submerciful</option>
-					<option value="bgm5">chirpsichord</option>
-				</select>
-			</div>
+			<label className="labelSettings" htmlFor="musicSelect">Music : </label>
+			<select name="musicSelect" className={"inputSettingsSelect"} id="musicSelect" disabled={dis}
+					style={{width: "70%", borderRadius: "10px"}}>
+				<option value="none">No Music</option>
+				<option value="bgm1">Tetoris</option>
+				<option value="bgm2">Disturbing the peace</option>
+				<option value="bgm3">Jump up, Super Star!</option>
+				<option value="bgm4">Submerciful</option>
+				<option value="bgm5">chirpsichord</option>
+			</select>
 
-			<div className="inSettingBox">
 				<label id="seedLabel" className="labelSettings" htmlFor="seed">Seed : </label>
-				<input type="text" id="seed" name="seed" style={{width: "50%", borderRadius: "10px"}}
+				<input type="text" className={"inputSettingsText"} id="seed" name="seed" style={{width: "50%", borderRadius: "10px", minWidth: "100%", textAlign: "center"}}
 					   disabled={dis} defaultValue={s.seed || Date.now()}/>
-			</div>
-			<div className="inSettingBox">
+
 				<label id="resetSeedOnRetry" className="labelSettings" htmlFor="reset-seed-on-retry">
 					Reset seed on retry : </label>
-				<input type="checkbox" id="reset-seed-on-retry" name="reset-seed-on-retry"
+				<input type="checkbox" className={"inputSettingsCheckbox"} id="reset-seed-on-retry" name="reset-seed-on-retry"
 					   defaultChecked={s.resetSeedOnRetry} disabled={dis}/>
-			</div>
-			<div className="inSettingBox">
+
 				<label id="canRetry" className="labelSettings" htmlFor="can-retry">Can retry : </label>
-				<input type="checkbox" id="can-retry" name="can-retry"
+				<input type="checkbox" className={"inputSettingsCheckbox"} id="can-retry" name="can-retry"
 					   defaultChecked={s.canRetry}
 					   disabled={dis}/>
-			</div>
 		</div>
 	);
 }
