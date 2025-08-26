@@ -13,9 +13,9 @@
 	align-items: center;
 	cursor: pointer;
 	z-index: 10;
-	transition: 0.5s;
 	font-size: 1.5vmin;
 	user-select: none;
+	transition: 0.5s;
 }
 
 .hideShow:hover {
@@ -93,6 +93,11 @@
 .statsDisplay {
 	padding: 30px 100px 175px 100px;
 	position: absolute;
+	width: 60vw;
+	height: 95vh;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 	z-index: 100;
 	align-items: center;
 	display: flex;
@@ -269,23 +274,26 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	position: fixed; /* Position relative to the viewport */
-	bottom: 100px; /* Distance from the bottom of the viewport */
-	left: 50%; /* Center horizontally in the viewport */
-	transform: translateX(-50%); /* Adjust for the button's width */
-	background-color: #4411a3;
+	background-color: #654caf;
+	margin-top: 20px;
 	color: white;
 	border: none;
-	width: 40%;
+	width: 90%;
+	margin-left: 5%;
 	height: 80px;
 	padding: 10px 20px;
 	border-radius: 5px;
 	cursor: pointer;
 	font-size: 30px;
+	position: relative;
+	transition: 0.25s;
 }
 
 .backHomeButton:hover {
 	box-shadow: 2px 2px 0 #000000, 2px -2px 10px #000000, -2px 2px 10px #000;
-	width: 45%;
-	background-color: #4411a3;
+	width: 100%;
+	margin-left: 0;
+	border-radius: 40px;
+	background-color: #7762b0;
+	transition: 0.25s;
 }

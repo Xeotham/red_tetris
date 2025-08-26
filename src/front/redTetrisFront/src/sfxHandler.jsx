@@ -110,6 +110,8 @@ const   boardSounds = (sound) => {
 		case "floor": return new Audio("/src/assets/sfx/BejeweledSR/floor.ogg");
 		case "sidehit": return new Audio("/src/assets/sfx/BejeweledSR/sidehit.ogg");
 		case "topout": return new Audio("/src/assets/sfx/BejeweledSR/topout.ogg");
+		case "victory": return new Audio("/src/assets/sfx/BejeweledSR/victory.mp3");
+		case "gameover": return new Audio("/src/assets/sfx/BejeweledSR/gameover.mp3");
 		default:
 			console.error("Unknown sound " + sound);
 			return undefined;

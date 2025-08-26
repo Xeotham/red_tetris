@@ -23,7 +23,7 @@ describe('Player', () => {
 	});
 
 	it('should create a Player with a socket', () => {
-		const player = new Player(clientSocket);
+		const player = new Player(clientSocket, clientSocket.id);
 		expect(player.getSocket().id).to.equal(clientSocket.id);
 		expect(player.getUsername()).to.equal(clientSocket.id);
 		expect(player.isOwner()).to.be.false;
@@ -31,24 +31,24 @@ describe('Player', () => {
 	});
 
 	it('Should get the socket', () => {
-		const player = new Player(clientSocket);
+		const player = new Player(clientSocket, clientSocket.id);
 		expect(player.getSocket()).to.equal(clientSocket);
 	});
 
 	it('Should get the username (socket id)', () => {
-		const player = new Player(clientSocket);
+		const player = new Player(clientSocket, clientSocket.id);
 		expect(player.getUsername()).to.equal(clientSocket.id);
 	});
 
 	it('Should set and get the owner status', () => {
-		const player = new Player(clientSocket);
+		const player = new Player(clientSocket, clientSocket.id);
 		expect(player.isOwner()).to.be.false;
 		player.setOwner(true);
 		expect(player.isOwner()).to.be.true;
 	});
 
 	it('Should set and get the game', () => {
-		const player = new Player(clientSocket);
+		const player = new Player(clientSocket, clientSocket.id);
 		expect(player.getGame()).to.be.undefined;
 		const game = new TetrisGame(clientSocket);
 		player.setGame(game);
@@ -56,7 +56,7 @@ describe('Player', () => {
 	});
 
 	it('Should setup a game with settings', () => {
-		const player = new Player(clientSocket);
+		const player = new Player(clientSocket, clientSocket.id);
 		const settings = {
 			showBags: false,
 			holdAllowed: false,

@@ -26,7 +26,7 @@ describe('TetrisUtils', () => {
 	});
 
 	it('Should return the user inside arcadeGames or multiplayerRoomLst', () => {
-		const player = new Player(clientSocket, true);
+		const player = new Player(clientSocket, clientSocket.id, true);
 		controllers.arcadeGames[clientSocket.id] = player;
 		expect(controllers.arcadeGames[clientSocket.id]).to.equal(player);
 		expect(controllers.arcadeGames[clientSocket.id]).to.equal(getTetrisUser(clientSocket.id));
@@ -42,7 +42,7 @@ describe('TetrisUtils', () => {
 	});
 
 	it('Should return the game inside arcadeGames or multiplayerRoomLst with a given Id', () => {
-		const player = new Player(clientSocket, true);
+		const player = new Player(clientSocket, clientSocket.id, true);
 		const game = new TetrisGame(clientSocket);
 		player.setGame(game);
 		controllers.arcadeGames[clientSocket.id] = player;
@@ -62,7 +62,7 @@ describe('TetrisUtils', () => {
 	});
 
 	it('Should delete the game for a given Id', async () => {
-		const player = new Player(clientSocket, true);
+		const player = new Player(clientSocket, clientSocket.id, true);
 		const game = new TetrisGame(clientSocket);
 		player.setGame(game);
 		controllers.arcadeGames[clientSocket.id] = player;

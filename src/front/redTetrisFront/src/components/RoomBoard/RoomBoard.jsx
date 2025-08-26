@@ -16,6 +16,7 @@ const   EndDisplay = ({stats, display = false, settingsContainer, boardContainer
 		<div className={"statsDisplay"} style={{display: display ? "block" : "none"}}>
 			<div className={"endTitle"}>GAME OVER</div>
 			<div className={"score"}>Score: {stats.score}</div>
+			<div className={"score"}>Placement: {stats.placement}</div>
 
 			<div className={"detailsTable"}>
 				<div className={"infoTable"}>
@@ -229,6 +230,7 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController, username
 			setDisplayStats(false);
 			settingsContainer.style.display = "none";
 			boardContainer.style.display = "block";
+			document.getElementById("hideShowButton").style.display = "none";
 		});
 
 		socket.on("MULTIPLAYER_SPEC_JOIN", () => {
@@ -246,7 +248,6 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController, username
 		socket.on("GAME", (data) => {
 			const new_data = JSON.parse(data);
 			setGame(new_data.game);
-			// console.log(game);
 		});
 
 		socket.on("EFFECT", (data) => {
@@ -259,7 +260,7 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController, username
 
 		socket.on("STATS", (data) => {
 			const new_data = JSON.parse(data);
-			document.getElementById("hideShowButton").style = {display: "block"};
+			document.getElementById("hideShowButton").style.display = "flex";
 			setStats(new_data.stats);
 			setDisplayStats(true);
 		})

@@ -62,6 +62,7 @@ class 	TetrisGame {
 		// statistics
 
 		this.beginningTime = Date.now();
+		this.placement = 1;
 		this.totalTime = this.beginningTime;
 		this.gameTime = 0;
 		this.maxCombo = 0;
@@ -98,7 +99,6 @@ class 	TetrisGame {
 			"Mini Spin Triple": 0,
 			"Mini Spin Quad": 0,
 		};
-		this.place = undefined;
 
 		// settings
 
@@ -192,7 +192,7 @@ class 	TetrisGame {
 			maxB2B: this.maxB2B,
 			perfectClears: this.perfectClears,
 			allLinesClear: JSON.parse(JSON.stringify(this.allLinesClear)),
-			place: this.place,
+			placement: this.placement,
 			resetSeedOnRetry: this.resetSeedOnRetry,
 			seed: this.seed,
 			rng: this.rng,
@@ -218,6 +218,7 @@ class 	TetrisGame {
 
 	setOver(over) { this.over = over; }
 	setOpponent(opponent) { this.opponent = opponent; }
+	setPlacement(placement) { this.placement = placement; }
 	setSettings(settings) {
 		if (!settings || this.fallInterval !== -1)
 			return;
@@ -708,7 +709,10 @@ class 	TetrisGame {
 		this.fallInterval = -1;
 		clearInterval(this.sendInterval);
 		this.sendInterval = -1;
-		this.player.emit("EFFECT", JSON.stringify({ type: "BOARD", value: "gameover" }));
+		if (this.isInRoom && this.placement === 1)
+			this.player.emit("EFFECT", JSON.stringify({ type: "BOARD", value: "victory" }));
+		else
+			this.player.emit("EFFECT", JSON.stringify({ type: "BOARD", value: "gameover" }));
 		this.player.emit("GAME", JSON.stringify({ game: this.toJSON() }));
 		this.player.emit("STATS", JSON.stringify({ stats: this.#getStats() }));
 		this.player.emit("GAME_FINISH");
@@ -738,6 +742,7 @@ class 	TetrisGame {
 
 	#getStats() {
 		return {
+			placement: this.placement,
 			level: this.level,
 			isInRoom: this.isInRoom,
 			gameTime: this.gameTime,
@@ -773,7 +778,6 @@ class 	TetrisGame {
 			miniSpinDouble: this.allLinesClear["Mini Spin Double"],
 			miniSpinTriple: this.allLinesClear["Mini Spin Triple"],
 			miniSpinQuad: this.allLinesClear["Mini Spin Quad"],
-			place: this.place,
 		};
 	}
 
