@@ -7,7 +7,7 @@ import Bags from "../Bags/Bags.jsx";
 import { useSocket } from "../../hooks/socket/useSocket.jsx";
 import  { getMusic } from "../../utils.jsx";
 
-const   EndDisplay = ({stats, display = false, settingsContainer, boardContainer}) => {
+const   EndDisplay = ({stats, display = false, settingsContainer, boardContainer, setOpponentsMatrix, opponentsMatrix }) => {
 	if (!stats) {
 		return <div className={"statsDisplay"}></div>;
 	}
@@ -93,7 +93,8 @@ const   EndDisplay = ({stats, display = false, settingsContainer, boardContainer
 				boardContainer.style.display = "none";
 				settingsContainer.style.display = "block";
 				document.getElementsByClassName("statsDisplay")[0].style.display = "none";
-
+				setOpponentsMatrix[0]({matrix: null, username: opponentsMatrix[0].username || null});
+				setOpponentsMatrix[1]({matrix: null, username: opponentsMatrix[1].username || null});
 			}} > Go Back </div>
 		</div>
 	);
@@ -321,7 +322,7 @@ const RoomBoard = ({settingsContainer, boardContainer, abortController, username
 				</div>
 				<GameStats gameInfo={game} />
 				<ScoreDisplay score={game.score} />
-				<EndDisplay stats={stats} display={displayStats} settingsContainer={settingsContainer} boardContainer={boardContainer} />
+				<EndDisplay stats={stats} display={displayStats} settingsContainer={settingsContainer} boardContainer={boardContainer} setOpponentsMatrix={[setLeftOpponents, setRightOpponents]} opponentsMatrix={[leftOpponents, rightOpponents]} />
 			</div>
 			<div className={"opponentBoard"}>
 				<OpponentBoard opponent={rightOpponents} id={"rightOpponents"}/>
